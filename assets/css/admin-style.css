@@ -1,0 +1,69 @@
+.cookierus-admin-wrap {
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    margin-top: 20px;
+}
+
+.cookierus-admin-wrap h1, .cookierus-admin-wrap h2, .cookierus-admin-wrap h3 {
+    color: #0760D2;
+    font-weight: 700;
+}
+
+.cookierus-nav-tabs {
+    border-bottom: 2px solid #f0f0f1;
+    margin-bottom: 30px;
+    display: flex;
+    gap: 10px;
+}
+
+.cookierus-nav-tab {
+    padding: 12px 24px;
+    text-decoration: none;
+    color: #646970;
+    font-weight: 600;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.cookierus-nav-tab:hover {
+    color: #0760D2;
+}
+
+.cookierus-nav-tab.active {
+    color: #0760D2;
+    border-bottom-color: #0760D2;
+}
+
+.cookierus-admin-wrap .button-primary {
+    background: #0760D2 !important;
+    border-color: #0760D2 !important;
+    color: #fff !important;
+    padding: 8px 24px !important;
+    height: auto !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    border-radius: 6px !important;
+    box-shadow: 0 4px 10px rgba(7, 96, 210, 0.2) !important;
+    transition: all 0.3s ease !important;
+}
+
+.cookierus-admin-wrap .button-primary:hover {
+    background: #064eb1 !important;
+    box-shadow: 0 6px 15px rgba(7, 96, 210, 0.3) !important;
+    transform: translateY(-1px);
+}
+
+.cookierus-admin-wrap .form-table th {
+    font-weight: 600;
+    color: #1d2327;
+}
+
+.cookierus-card {
+    background: #f8faff;
+    border: 1px solid #e1e9f5;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
