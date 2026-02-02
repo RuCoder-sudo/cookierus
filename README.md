@@ -3,6 +3,9 @@
 [Русская версия](#-cookierus--менеджер-согласия-с-cookie-для-wordpress) | [English version](#-cookierus--cookie-consent-manager-for-wordpress)
 
 ---
+<p align="center">
+  <img src="assets/css/bannerus.png" alt="CookieRus — WordPress Cookie Consent Plugin">
+</p>
 
 ## 🇷🇺 CookieRus — менеджер согласия с cookie для WordPress
 
