@@ -47,7 +47,14 @@ class CookieRus {
         add_action('wp_ajax_cookierus_log_consent', [$this, 'ajax_log_consent']);
         add_action('wp_ajax_nopriv_cookierus_log_consent', [$this, 'ajax_log_consent']);
         add_action('admin_init', [$this, 'handle_csv_export']);
+        add_action('before_woocommerce_init', [$this, 'declare_woo_compatibility']);
         register_activation_hook(__FILE__, [$this, 'activate']);
+    }
+
+    public function declare_woo_compatibility() {
+        if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
+            \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_order_tables', __FILE__, true);
+        }
     }
 
     public function handle_csv_export() {
