@@ -8,6 +8,7 @@ $anim_class = 'cookierus-animate-' . ($banner['animation'] ?? 'fade');
     <?php echo $banner['custom_css'] ?? ''; ?>
     #cookierus-banner .cookierus-title { font-size: <?php echo esc_attr($banner['title_size'] ?? 18); ?>px !important; }
     #cookierus-banner .cookierus-text { font-size: <?php echo esc_attr($banner['text_size'] ?? 14); ?>px !important; }
+    #cookierus-banner.pos-bottom-left, #cookierus-banner.pos-bottom-right { max-width: <?php echo esc_attr($banner['max_width'] ?? 455); ?>px !important; }
     
     .cookierus-btn-accept { 
         background-color: <?php echo esc_attr($banner['btn_bg'] ?? '#0760D2'); ?> !important; 
@@ -99,7 +100,7 @@ $anim_class = 'cookierus-animate-' . ($banner['animation'] ?? 'fade');
         <div class="cookierus-category">
             <div class="cookierus-category-header">
                 <span>Реклама</span>
-                <input type="checkbox" id="cat-advertising">
+                <input type="checkbox" id="cat-advertising" checked>
             </div>
             <p style="font-size: 12px; margin-top: 5px; color: #666;">Рекламные файлы cookie используются для предоставления персонализированной рекламы на основе посещаемых ими страниц и анализа эффективности рекламной кампании. <?php echo esc_html($sections['advertising_desc'] ?? ''); ?></p>
         </div>
