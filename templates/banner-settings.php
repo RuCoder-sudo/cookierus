@@ -324,14 +324,15 @@ $sections = $settings['sections'] ?? [];
 
             <div class="cookierus-form-group">
                 <label>Положение и форма</label>
-                <div style="display:flex; gap:15px; align-items:center;">
-                    <select name="cookierus_settings[banner][position]" style="flex:1;">
+                <div style="display:flex; gap:15px; align-items:center; flex-wrap:wrap;">
+                    <select name="cookierus_settings[banner][position]" style="flex:1; min-width:150px;">
                         <option value="bottom" <?php selected('bottom', $banner['position'] ?? ''); ?>>Снизу</option>
                         <option value="top" <?php selected('top', $banner['position'] ?? ''); ?>>Сверху</option>
                         <option value="bottom-left" <?php selected('bottom-left', $banner['position'] ?? ''); ?>>Снизу слева</option>
                         <option value="bottom-right" <?php selected('bottom-right', $banner['position'] ?? ''); ?>>Снизу справа</option>
                     </select>
                     <span>Скругление: <input type="number" name="cookierus_settings[banner][radius]" value="<?php echo esc_attr($banner['radius'] ?? 8); ?>" style="width:60px;"> px</span>
+                    <span>Макс. ширина: <input type="number" name="cookierus_settings[banner][max_width]" value="<?php echo esc_attr($banner['max_width'] ?? 455); ?>" style="width:70px;"> px</span>
                 </div>
             </div>
 
