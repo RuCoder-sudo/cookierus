@@ -221,5 +221,12 @@ It provides a customizable cookie banner, detailed consent categories, user acti
 
 ---
 
+👨‍💻 Автор: Сергей Солошенко (RuCoder)
+🛠 WordPress / Full Stack
+📬 support@рукодер.рф
+📲 Telegram: @RussCoder
+
+Если нужна кастомизация под проект или установка под ключ — пишите в личные сообщения.
+
 ### 📌 License
 GPL v2 or later
