@@ -4,6 +4,13 @@ $table_name = $wpdb->prefix . 'cookierus_logs';
 $logs = $wpdb->get_results("SELECT * FROM $table_name ORDER BY created_at DESC LIMIT 100");
 ?>
 <h3>Менеджер логов согласия</h3>
+
+<?php if (isset($_GET['cleared']) && $_GET['cleared'] == '1'): ?>
+    <div class="notice notice-success is-dismissible">
+        <p>Все логи успешно очищены!</p>
+    </div>
+<?php endif; ?>
+
 <p>Здесь отображаются последние 100 записей о действиях пользователей с файлами cookie.</p>
 
 <div style="background: #fff; border: 1px solid #ccd0d4; padding: 15px; border-radius: 4px; margin-bottom: 20px;">
@@ -13,6 +20,15 @@ $logs = $wpdb->get_results("SELECT * FROM $table_name ORDER BY created_at DESC L
     <p style="margin: 5px 0 0 0; font-size: 12px; color: #666;">
         Все данные о согласии пользователей записываются напрямую в базу данных вашего сайта для обеспечения юридической значимости и безопасности.
     </p>
+</div>
+
+<div style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
+    <a href="<?php echo admin_url('admin.php?page=cookierus&action=cookierus_export_csv'); ?>" class="button button-primary">Выгрузить логи (CSV)</a>
+    
+    <?php $clear_url = wp_nonce_url(admin_url('admin.php?page=cookierus&action=cookierus_clear_logs'), 'cookierus_clear_logs_nonce'); ?>
+    <a href="<?php echo esc_url($clear_url); ?>" class="button button-secondary" style="color: #b32d2e; border-color: #b32d2e;" onclick="return confirm('Вы уверены, что хотите безвозвратно удалить все логи? Это действие нельзя отменить.');">Очистить все логи</a>
+    
+    <span class="description" style="margin-left: 10px;">Скачать полную историю согласий в формате CSV или полностью очистить базу логов.</span>
 </div>
 
 <table class="wp-list-table widefat fixed striped">
@@ -47,8 +63,3 @@ $logs = $wpdb->get_results("SELECT * FROM $table_name ORDER BY created_at DESC L
         <?php endif; ?>
     </tbody>
 </table>
-
-<div style="margin-top: 20px;">
-    <a href="<?php echo admin_url('admin.php?page=cookierus&action=cookierus_export_csv'); ?>" class="button button-primary">Выгрузить логи (CSV)</a>
-    <span class="description" style="margin-left: 10px;">Скачать полную историю согласий в формате CSV (совместимо с Excel).</span>
-</div>
