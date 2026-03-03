@@ -3,7 +3,7 @@
  * Plugin Name: CookieRus
  * Plugin URI: https://github.com/RuCoder-sudo/
  * Description: Простой способ убедиться, что ваш сайт соответствует Закону России о файлах cookie.
- * Version: 3.1
+ * Version: 3.3
  * Author: Сергей Солошенко (RuCoder)
  * Author URI: https://рукодер.рф
  * License: GPL v2 or later
@@ -47,6 +47,7 @@ class CookieRus {
         add_action('wp_ajax_cookierus_log_consent', [$this, 'ajax_log_consent']);
         add_action('wp_ajax_nopriv_cookierus_log_consent', [$this, 'ajax_log_consent']);
         add_action('admin_init', [$this, 'handle_csv_export']);
+        add_action('admin_init', [$this, 'handle_clear_logs']);
         add_action('before_woocommerce_init', [$this, 'declare_woo_compatibility']);
         register_activation_hook(__FILE__, [$this, 'activate']);
     }
@@ -80,6 +81,26 @@ class CookieRus {
                 }
             }
             fclose($output);
+            exit;
+        }
+    }
+
+    public function handle_clear_logs() {
+        if (isset($_GET['page']) && $_GET['page'] === 'cookierus' && isset($_GET['action']) && $_GET['action'] === 'cookierus_clear_logs') {
+            if (!current_user_can('manage_options')) {
+                wp_die('Unauthorized');
+            }
+            
+            // Check nonce for security
+            if (!isset($_GET['_wpnonce']) || !wp_verify_nonce($_GET['_wpnonce'], 'cookierus_clear_logs_nonce')) {
+                wp_die('Security check failed');
+            }
+
+            global $wpdb;
+            $table_name = $wpdb->prefix . 'cookierus_logs';
+            $wpdb->query("TRUNCATE TABLE $table_name");
+
+            wp_redirect(admin_url('admin.php?page=cookierus&tab=logs&cleared=1'));
             exit;
         }
     }
@@ -168,9 +189,9 @@ class CookieRus {
             'banner' => [
                 'enabled' => true,
                 'title' => 'Мы уважаем вашу конфиденциальность',
-                'text' => 'Мы используем файлы cookie, чтобы обеспечить вам наилучший опыт на нашем сайте.',
-                'link_text' => 'Политика в отношении файлов cookie',
-                'link_url' => '',
+                'text' => 'Мы используем файлы cookie, чтобы улучшить ваш опыт просмотра, показывать персонализированную рекламу или контент и анализировать наш трафик. Нажимая «Принять все», вы соглашаетесь на использование наших файлов cookie',
+                'link_text' => 'Политика cookie',
+                'link_url' => 'https://armsu.ru/cookie-usage-policy/',
                 'btn_accept' => 'Принять все',
                 'btn_decline' => 'Отклонить',
                 'btn_settings' => 'Настроить',
@@ -180,6 +201,9 @@ class CookieRus {
                 'btn_text' => '#ffffff',
                 'position' => 'bottom',
                 'radius' => 8,
+                'text_align' => 'left',
+                'btn_position' => 'flex-start',
+                'is_blocking' => false,
             ],
             'policy' => [
                 'email' => get_option('admin_email'),
@@ -208,6 +232,10 @@ class CookieRus {
     public function render_banner() {
         $settings = get_option('cookierus_settings');
         if (empty($settings['banner']['enabled'])) return;
+        
+        // Check consent cookie before rendering to prevent flashing
+        if (isset($_COOKIE['cookierus_consent'])) return;
+        
         include plugin_dir_path(__FILE__) . 'templates/banner-template.php';
     }
 }
