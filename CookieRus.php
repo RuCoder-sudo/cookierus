@@ -3,7 +3,7 @@
  * Plugin Name: CookieRus
  * Plugin URI: https://github.com/RuCoder-sudo/
  * Description: Простой способ убедиться, что ваш сайт соответствует Закону России о файлах cookie.
- * Version: 3.3
+ * Version: 3.1
  * Author: Сергей Солошенко (RuCoder)
  * Author URI: https://рукодер.рф
  * License: GPL v2 or later
@@ -91,10 +91,7 @@ class CookieRus {
                 wp_die('Unauthorized');
             }
             
-            // Check nonce for security
-            if (!isset($_GET['_wpnonce']) || !wp_verify_nonce($_GET['_wpnonce'], 'cookierus_clear_logs_nonce')) {
-                wp_die('Security check failed');
-            }
+            check_admin_referer('cookierus_clear_logs_action', 'cookierus_nonce');
 
             global $wpdb;
             $table_name = $wpdb->prefix . 'cookierus_logs';
@@ -189,9 +186,9 @@ class CookieRus {
             'banner' => [
                 'enabled' => true,
                 'title' => 'Мы уважаем вашу конфиденциальность',
-                'text' => 'Мы используем файлы cookie, чтобы улучшить ваш опыт просмотра, показывать персонализированную рекламу или контент и анализировать наш трафик. Нажимая «Принять все», вы соглашаетесь на использование наших файлов cookie',
-                'link_text' => 'Политика cookie',
-                'link_url' => 'https://armsu.ru/cookie-usage-policy/',
+                'text' => 'Мы используем файлы cookie, чтобы обеспечить вам наилучший опыт на нашем сайте.',
+                'link_text' => 'Политика в отношении файлов cookie',
+                'link_url' => '',
                 'btn_accept' => 'Принять все',
                 'btn_decline' => 'Отклонить',
                 'btn_settings' => 'Настроить',
@@ -201,9 +198,6 @@ class CookieRus {
                 'btn_text' => '#ffffff',
                 'position' => 'bottom',
                 'radius' => 8,
-                'text_align' => 'left',
-                'btn_position' => 'flex-start',
-                'is_blocking' => false,
             ],
             'policy' => [
                 'email' => get_option('admin_email'),
@@ -233,7 +227,7 @@ class CookieRus {
         $settings = get_option('cookierus_settings');
         if (empty($settings['banner']['enabled'])) return;
         
-        // Check consent cookie before rendering to prevent flashing
+        // PHP check for cookie to prevent flicker
         if (isset($_COOKIE['cookierus_consent'])) return;
         
         include plugin_dir_path(__FILE__) . 'templates/banner-template.php';
