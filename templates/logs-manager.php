@@ -7,7 +7,7 @@ $logs = $wpdb->get_results("SELECT * FROM $table_name ORDER BY created_at DESC L
 
 <?php if (isset($_GET['cleared']) && $_GET['cleared'] == '1'): ?>
     <div class="notice notice-success is-dismissible">
-        <p>Все логи успешно очищены!</p>
+        <p>Логи успешно очищены.</p>
     </div>
 <?php endif; ?>
 
@@ -22,13 +22,19 @@ $logs = $wpdb->get_results("SELECT * FROM $table_name ORDER BY created_at DESC L
     </p>
 </div>
 
-<div style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
+<div style="margin-bottom: 20px;">
     <a href="<?php echo admin_url('admin.php?page=cookierus&action=cookierus_export_csv'); ?>" class="button button-primary">Выгрузить логи (CSV)</a>
     
-    <?php $clear_url = wp_nonce_url(admin_url('admin.php?page=cookierus&action=cookierus_clear_logs'), 'cookierus_clear_logs_nonce'); ?>
-    <a href="<?php echo esc_url($clear_url); ?>" class="button button-secondary" style="color: #b32d2e; border-color: #b32d2e;" onclick="return confirm('Вы уверены, что хотите безвозвратно удалить все логи? Это действие нельзя отменить.');">Очистить все логи</a>
+    <?php 
+    $clear_url = wp_nonce_url(
+        admin_url('admin.php?page=cookierus&action=cookierus_clear_logs'), 
+        'cookierus_clear_logs_action', 
+        'cookierus_nonce'
+    ); 
+    ?>
+    <a href="<?php echo $clear_url; ?>" class="button button-secondary" style="color: #d63638; border-color: #d63638;" onclick="return confirm('Вы уверены, что хотите очистить все логи?');">Очистить все логи</a>
     
-    <span class="description" style="margin-left: 10px;">Скачать полную историю согласий в формате CSV или полностью очистить базу логов.</span>
+    <span class="description" style="margin-left: 10px;">Скачать полную историю согласий в формате CSV или полностью очистить таблицу.</span>
 </div>
 
 <table class="wp-list-table widefat fixed striped">
@@ -63,3 +69,7 @@ $logs = $wpdb->get_results("SELECT * FROM $table_name ORDER BY created_at DESC L
         <?php endif; ?>
     </tbody>
 </table>
+
+<div style="margin-top: 20px;">
+    <p class="description">Последние 100 записей из базы данных.</p>
+</div>
