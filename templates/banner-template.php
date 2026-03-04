@@ -25,13 +25,14 @@ $anim_class = 'cookierus-animate-' . ($banner['animation'] ?? 'fade');
         color: <?php echo esc_attr($banner['btn_settings_text'] ?? '#333333'); ?> !important; 
         <?php echo !empty($banner['btn_settings_border']) ? 'border: 2px solid '.esc_attr($banner['btn_settings_border_color']).' !important;' : 'border: 1px solid rgba(0,0,0,0.1) !important;'; ?>
     }
+    #cookierus-banner { display: none !important; }
+    body.cookierus-show-banner #cookierus-banner { display: flex !important; }
 </style>
 
 <div id="cookierus-banner" class="cookierus-banner pos-<?php echo esc_attr($banner['position'] ?? 'bottom'); ?> <?php echo $anim_class; ?>" style="
     background-color: <?php echo esc_attr($banner['bg_color'] ?? '#ffffff'); ?>;
     color: <?php echo esc_attr($banner['text_color'] ?? '#333333'); ?>;
     border-radius: <?php echo esc_attr($banner['radius'] ?? 8); ?>px;
-    display: flex !important;
 ">
     <div class="cookierus-content-wrapper">
         <?php if (!empty($banner['title'])): ?>
@@ -126,15 +127,24 @@ $anim_class = 'cookierus-animate-' . ($banner['animation'] ?? 'fade');
 
         if (!banner) return;
 
-        if (localStorage.getItem('cookierus_consent')) {
+        if (localStorage.getItem('cookierus_consent') || document.cookie.indexOf('cookierus_consent=') !== -1) {
             banner.style.setProperty('display', 'none', 'important');
+            banner.remove();
             return;
         }
+
+        // Show banner if no consent
+        document.body.classList.add('cookierus-show-banner');
 
         function logConsent(status, categories = 'all') {
             const uid = localStorage.getItem('cookierus_uid') || 'uid_' + Math.random().toString(36).substr(2, 9);
             localStorage.setItem('cookierus_uid', uid);
             localStorage.setItem('cookierus_consent', status);
+            
+            // Set cookie for PHP check
+            const date = new Date();
+            date.setTime(date.getTime() + (365*24*60*60*1000));
+            document.cookie = "cookierus_consent=" + status + "; expires=" + date.toUTCString() + "; path=/; SameSite=Lax";
 
             const formData = new FormData();
             formData.append('action', 'cookierus_log_consent');
