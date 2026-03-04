@@ -267,14 +267,6 @@ $sections = $settings['sections'] ?? [];
                     <input type="text" name="cookierus_settings[banner][link_url]" value="<?php echo esc_attr($banner['link_url'] ?? ''); ?>" placeholder="URL (/policy/)" style="flex:1;">
                 </div>
             </div>
-
-            <div class="cookierus-form-group">
-                <label>Положение текста (Выравнивание)</label>
-                <select name="cookierus_settings[banner][text_align]" class="regular-text" style="width:100%;">
-                    <option value="left" <?php selected('left', $banner['text_align'] ?? 'left'); ?>>По левому краю</option>
-                    <option value="center" <?php selected('center', $banner['text_align'] ?? ''); ?>>По центру</option>
-                </select>
-            </div>
         </div>
 
         <!-- Группа 2: Дизайн кнопок -->
@@ -316,23 +308,6 @@ $sections = $settings['sections'] ?? [];
                     <div class="cookierus-color-item">Цвет бордюра: <input type="color" name="cookierus_settings[banner][btn_settings_border_color]" value="<?php echo esc_attr($banner['btn_settings_border_color'] ?? '#c3c4c7'); ?>"></div>
                 </div>
             </div>
-
-            <div class="cookierus-form-group">
-                <label>Положение кнопок</label>
-                <select name="cookierus_settings[banner][btn_position]" class="regular-text" style="width:100%;">
-                    <option value="flex-start" <?php selected('flex-start', $banner['btn_position'] ?? 'flex-start'); ?>>Слева</option>
-                    <option value="center" <?php selected('center', $banner['btn_position'] ?? ''); ?>>По центру</option>
-                    <option value="flex-end" <?php selected('flex-end', $banner['btn_position'] ?? ''); ?>>Справа</option>
-                    <option value="space-between" <?php selected('space-between', $banner['btn_position'] ?? ''); ?>>Равномерно (Между)</option>
-                </select>
-            </div>
-            <div class="cookierus-form-group">
-                <label>Блокировать интерфейс (Overlay)</label>
-                <div style="display:flex; align-items:center; gap:10px; background:#fff8e5; padding:10px; border-radius:8px; border:1px solid #ffcc00;">
-                    <input type="checkbox" name="cookierus_settings[banner][is_blocking]" value="1" <?php checked(1, $banner['is_blocking'] ?? 0); ?>>
-                    <span style="font-size:12px; line-height:1.2;">Показывать баннер поверх контента и блокировать взаимодействие до принятия решения</span>
-                </div>
-            </div>
         </div>
 
         <!-- Группа 3: Общий дизайн -->
@@ -355,8 +330,6 @@ $sections = $settings['sections'] ?? [];
                         <option value="top" <?php selected('top', $banner['position'] ?? ''); ?>>Сверху</option>
                         <option value="bottom-left" <?php selected('bottom-left', $banner['position'] ?? ''); ?>>Снизу слева</option>
                         <option value="bottom-right" <?php selected('bottom-right', $banner['position'] ?? ''); ?>>Снизу справа</option>
-                        <option value="top-left" <?php selected('top-left', $banner['position'] ?? ''); ?>>Сверху слева</option>
-                        <option value="top-right" <?php selected('top-right', $banner['position'] ?? ''); ?>>Сверху справа</option>
                     </select>
                     <span>Скругление: <input type="number" name="cookierus_settings[banner][radius]" value="<?php echo esc_attr($banner['radius'] ?? 8); ?>" style="width:60px;"> px</span>
                     <span>Макс. ширина: <input type="number" name="cookierus_settings[banner][max_width]" value="<?php echo esc_attr($banner['max_width'] ?? 455); ?>" style="width:70px;"> px</span>
@@ -443,7 +416,6 @@ jQuery(document).ready(function($) {
         var bgColor = $('input[name="cookierus_settings[banner][bg_color]"]').val() || '#ffffff';
         var textColor = $('input[name="cookierus_settings[banner][text_color]"]').val() || '#333333';
         var radius = $('input[name="cookierus_settings[banner][radius]"]').val() || 8;
-        var textAlign = $('select[name="cookierus_settings[banner][text_align]"]').val() || 'left';
         
         var btnAccept = $('input[name="cookierus_settings[banner][btn_accept]"]').val() || 'Принять все';
         var btnAcceptBg = $('input[name="cookierus_settings[banner][btn_bg]"]').val() || '#0760D2';
@@ -462,26 +434,20 @@ jQuery(document).ready(function($) {
         var btnSettingsText = $('input[name="cookierus_settings[banner][btn_settings_text]"]').val() || '#333333';
         var btnSettingsBorder = $('input[name="cookierus_settings[banner][btn_settings_border]"]').is(':checked');
         var btnSettingsBorderColor = $('input[name="cookierus_settings[banner][btn_settings_border_color]"]').val() || '#c3c4c7';
-        var btnPosition = $('select[name="cookierus_settings[banner][btn_position]"]').val() || 'flex-start';
         
         $previewBanner.css({
             'background-color': bgColor,
             'color': textColor,
-            'border-radius': radius + 'px',
-            'text-align': textAlign
+            'border-radius': radius + 'px'
         });
-
-        $previewBanner.find('.preview-buttons').css({
-            'justify-content': btnPosition
-        });
-
-        $previewBanner.find('.preview-title').text(title).css({'font-size': titleSize + 'px', 'text-align': textAlign});
+        
+        $previewBanner.find('.preview-title').text(title).css('font-size', titleSize + 'px');
         
         var textHtml = text;
         if (linkUrl && linkText) {
             textHtml += ' <a href="' + linkUrl + '" class="preview-link" style="color:' + textColor + ';">' + linkText + '</a>';
         }
-        $previewBanner.find('.preview-text').html(textHtml).css({'font-size': textSize + 'px', 'text-align': textAlign});
+        $previewBanner.find('.preview-text').html(textHtml).css('font-size', textSize + 'px');
         
         $previewBanner.find('.preview-btn-accept').text(btnAccept).css({
             'background-color': btnAcceptBg,
