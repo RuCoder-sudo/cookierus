@@ -95,7 +95,7 @@ class CookieRus {
 
             global $wpdb;
             $table_name = $wpdb->prefix . 'cookierus_logs';
-            $wpdb->query("TRUNCATE TABLE $");
+            $wpdb->query("TRUNCATE TABLE $table_name");
 
             wp_redirect(admin_url('admin.php?page=cookierus&tab=logs&cleared=1'));
             exit;
