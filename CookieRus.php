@@ -3,7 +3,7 @@
  * Plugin Name: CookieRus
  * Plugin URI: https://github.com/RuCoder-sudo/
  * Description: Простой способ убедиться, что ваш сайт соответствует Закону России о файлах cookie.
- * Version: 3.1
+ * Version: 3.2
  * Author: Сергей Солошенко (RuCoder)
  * Author URI: https://рукодер.рф
  * License: GPL v2 or later
@@ -95,7 +95,7 @@ class CookieRus {
 
             global $wpdb;
             $table_name = $wpdb->prefix . 'cookierus_logs';
-            $wpdb->query("TRUNCATE TABLE $table_name");
+            $wpdb->query("TRUNCATE TABLE $");
 
             wp_redirect(admin_url('admin.php?page=cookierus&tab=logs&cleared=1'));
             exit;
