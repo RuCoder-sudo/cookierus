@@ -3,7 +3,7 @@
  * Plugin Name: CookieRus
  * Plugin URI: https://github.com/RuCoder-sudo/
  * Description: Простой способ убедиться, что ваш сайт соответствует Закону России о файлах cookie.
- * Version: 3.2
+ * Version: 3.1
  * Author: Сергей Солошенко (RuCoder)
  * Author URI: https://рукодер.рф
  * License: GPL v2 or later
@@ -44,12 +44,40 @@ class CookieRus {
         add_action('admin_init', [$this, 'register_settings']);
         add_action('wp_enqueue_scripts', [$this, 'enqueue_assets']);
         add_action('wp_footer', [$this, 'render_banner']);
+        add_action('template_redirect', [$this, 'start_output_buffer']);
         add_action('wp_ajax_cookierus_log_consent', [$this, 'ajax_log_consent']);
         add_action('wp_ajax_nopriv_cookierus_log_consent', [$this, 'ajax_log_consent']);
         add_action('admin_init', [$this, 'handle_csv_export']);
         add_action('admin_init', [$this, 'handle_clear_logs']);
         add_action('before_woocommerce_init', [$this, 'declare_woo_compatibility']);
         register_activation_hook(__FILE__, [$this, 'activate']);
+    }
+
+    public function start_output_buffer() {
+        if (is_admin()) return;
+        ob_start([$this, 'inject_banner_before_body_close']);
+    }
+
+    public function inject_banner_before_body_close($html) {
+        $settings = get_option('cookierus_settings');
+        if (empty($settings['banner']['enabled'])) return $html;
+        if (isset($_COOKIE['cookierus_consent'])) return $html;
+
+        // Check if wp_footer already ran (banner already injected via wp_footer hook)
+        if (strpos($html, 'id="cookierus-banner"') !== false) return $html;
+
+        ob_start();
+        include plugin_dir_path(__FILE__) . 'templates/banner-template.php';
+        $banner_html = ob_get_clean();
+
+        $pos = strrpos($html, '</body>');
+        if ($pos !== false) {
+            $html = substr($html, 0, $pos) . $banner_html . substr($html, $pos);
+        } else {
+            $html .= $banner_html;
+        }
+
+        return $html;
     }
 
     public function declare_woo_compatibility() {
