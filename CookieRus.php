@@ -55,29 +55,33 @@ class CookieRus {
 
     public function start_output_buffer() {
         if (is_admin()) return;
+
+        $settings = get_option('cookierus_settings');
+        if (empty($settings['banner']['enabled'])) return;
+        if (isset($_COOKIE['cookierus_consent'])) return;
+
+        // Capture banner HTML now (safe to use ob_start here, outside the callback)
+        ob_start();
+        include plugin_dir_path(__FILE__) . 'templates/banner-template.php';
+        $this->banner_html_cache = ob_get_clean();
+
         ob_start([$this, 'inject_banner_before_body_close']);
     }
 
+    private $banner_html_cache = '';
+
     public function inject_banner_before_body_close($html) {
-        $settings = get_option('cookierus_settings');
-        if (empty($settings['banner']['enabled'])) return $html;
-        if (isset($_COOKIE['cookierus_consent'])) return $html;
+        if (empty($this->banner_html_cache)) return $html;
 
-        // Check if wp_footer already ran (banner already injected via wp_footer hook)
+        // Avoid duplicate if wp_footer already injected it
         if (strpos($html, 'id="cookierus-banner"') !== false) return $html;
-
-        ob_start();
-        include plugin_dir_path(__FILE__) . 'templates/banner-template.php';
-        $banner_html = ob_get_clean();
 
         $pos = strrpos($html, '</body>');
         if ($pos !== false) {
-            $html = substr($html, 0, $pos) . $banner_html . substr($html, $pos);
-        } else {
-            $html .= $banner_html;
+            return substr($html, 0, $pos) . $this->banner_html_cache . substr($html, $pos);
         }
 
-        return $html;
+        return $html . $this->banner_html_cache;
     }
 
     public function declare_woo_compatibility() {
