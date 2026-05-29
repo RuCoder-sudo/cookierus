@@ -1,0 +1,566 @@
+/**
+ * CookieRus banner styles — v1.0.6
+ */
+
+/* ─── Base banner ─────────────────────────────────── */
+.cookierus-banner {
+    position: fixed;
+    z-index: 999999;
+    padding: 20px 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    opacity: 1;
+    box-sizing: border-box;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+}
+
+/* ─── Typography ──────────────────────────────────── */
+.cookierus-title {
+    font-size: 17px;
+    font-weight: 700;
+    margin: 0 0 6px 0;
+    line-height: 1.2;
+}
+
+.cookierus-text {
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0;
+    opacity: 0.9;
+}
+
+.cookierus-policy-link {
+    display: inline;
+    text-decoration: underline;
+    font-weight: 600;
+    margin-left: 4px;
+    opacity: 0.9;
+}
+.cookierus-policy-link:hover { opacity: 1; text-decoration: none; }
+
+/* ─── Content wrapper ─────────────────────────────── */
+.cookierus-content-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+.cookierus-icon-wrap { flex-shrink: 0; display: flex; align-items: center; }
+.cookierus-icon { display: block; object-fit: contain; }
+.cookierus-text-wrap { flex: 1; }
+
+/* ─── Minimize button — minimal, text first, then icon ── */
+.cookierus-minimize-btn {
+    position: absolute;
+    top: 7px;
+    right: 10px;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    cursor: pointer;
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 3px;
+    padding: 2px 4px;
+    border-radius: 2px;
+    font-size: 9px !important;
+    font-weight: 400;
+    color: #000 !important;
+    opacity: 0.38;
+    transition: opacity 0.2s;
+    z-index: 1;
+    white-space: nowrap;
+    line-height: 1;
+    outline: none;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+}
+.cookierus-minimize-btn:hover { opacity: 0.7; background: none !important; }
+.cookierus-minimize-btn svg { flex-shrink: 0; fill: #000; }
+
+/* ─── Minimized floating button ───────────────────── */
+.cookierus-minimized-btn {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    z-index: 999998;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.22);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+    border: none;
+    outline: none;
+    animation: cookierusPulse 3s ease-in-out infinite;
+}
+.cookierus-minimized-btn:hover {
+    transform: scale(1.14);
+    box-shadow: 0 8px 28px rgba(0,0,0,0.28);
+    animation: none;
+}
+.cookierus-minimized-btn img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    transition: transform 0.22s;
+}
+.cookierus-minimized-btn:hover img { transform: rotate(18deg); }
+
+/* ─── Animations ──────────────────────────────────── */
+.cookierus-animate-fade    { animation: cookierusFadeIn   0.4s ease both; }
+.cookierus-animate-slide   { animation: cookierusSlideIn  0.42s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.cookierus-animate-bounce  { animation: cookierusBounceIn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.cookierus-animate-zoom    { animation: cookierusZoomIn   0.38s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.cookierus-animate-flip    { animation: cookierusFlipIn   0.48s ease both; }
+
+@keyframes cookierusFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+@keyframes cookierusSlideIn {
+    from { transform: translateY(110%); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+@keyframes cookierusBounceIn {
+    0%   { transform: scale(0.5) translateY(40px); opacity: 0; }
+    60%  { transform: scale(1.04); opacity: 1; }
+    80%  { transform: scale(0.98); }
+    100% { transform: scale(1); }
+}
+@keyframes cookierusZoomIn {
+    from { transform: scale(0.6); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+}
+@keyframes cookierusFlipIn {
+    from { transform: perspective(600px) rotateX(-40deg) translateY(20px); opacity: 0; }
+    to   { transform: perspective(600px) rotateX(0deg) translateY(0);      opacity: 1; }
+}
+@keyframes cookierusPulse {
+    0%,100% { box-shadow: 0 4px 18px rgba(0,0,0,0.22); }
+    50%     { box-shadow: 0 4px 28px rgba(7,96,210,0.45); }
+}
+
+/* Slide in from top for pos-top */
+.cookierus-banner.pos-top.cookierus-animate-slide {
+    animation-name: cookierusSlideInTop;
+}
+@keyframes cookierusSlideInTop {
+    from { transform: translateY(-110%); opacity: 0; }
+    to   { transform: translateY(0);     opacity: 1; }
+}
+
+/* ─── Buttons ─────────────────────────────────────── */
+.cookierus-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+.cookierus-btn:active {
+    transform: translateY(0) scale(0.97) !important;
+    box-shadow: none !important;
+}
+
+/* Ripple */
+.cr-ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.38);
+    transform: scale(0);
+    animation: crRipple 0.55s linear;
+    pointer-events: none;
+}
+@keyframes crRipple {
+    to { transform: scale(4); opacity: 0; }
+}
+
+/* ─── Positions ───────────────────────────────────── */
+.cookierus-banner.pos-bottom {
+    bottom: 0; left: 0; right: 0;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 0 !important;
+}
+.cookierus-banner.pos-top {
+    top: 0; left: 0; right: 0;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 0 !important;
+}
+.cookierus-banner.pos-bottom-left {
+    bottom: 24px; left: 24px; right: auto;
+    width: calc(100% - 48px);
+    max-width: 420px;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 16px 18px 18px;
+    gap: 10px;
+}
+.cookierus-banner.pos-bottom-right {
+    bottom: 24px; right: 24px; left: auto;
+    width: calc(100% - 48px);
+    max-width: 420px;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 16px 18px 18px;
+    gap: 10px;
+}
+.cookierus-banner.pos-top-left {
+    top: 24px; left: 24px; right: auto;
+    width: calc(100% - 48px);
+    max-width: 420px;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 16px 18px 18px;
+    gap: 10px;
+}
+.cookierus-banner.pos-top-right {
+    top: 24px; right: 24px; left: auto;
+    width: calc(100% - 48px);
+    max-width: 420px;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 16px 18px 18px;
+    gap: 10px;
+}
+
+/* ─── Button row ──────────────────────────────────── */
+.cookierus-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: stretch;
+    width: 100%;
+}
+/* Bar banners: row, right-aligned */
+.pos-bottom .cookierus-buttons,
+.pos-top    .cookierus-buttons {
+    width: auto;
+    flex-shrink: 0;
+    margin-left: 16px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+.pos-bottom .cookierus-buttons .cookierus-btn,
+.pos-top    .cookierus-buttons .cookierus-btn {
+    padding: 9px 14px;
+    font-size: 13px;
+}
+/* Corner banners: always full-width column stack */
+.pos-bottom-left .cookierus-buttons,
+.pos-bottom-right .cookierus-buttons,
+.pos-top-left .cookierus-buttons,
+.pos-top-right .cookierus-buttons {
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+}
+.pos-bottom-left .cookierus-buttons .cookierus-btn,
+.pos-bottom-right .cookierus-buttons .cookierus-btn,
+.pos-top-left .cookierus-buttons .cookierus-btn,
+.pos-top-right .cookierus-buttons .cookierus-btn {
+    width: 100%;
+    padding: 9px 16px;
+    font-size: 13px;
+    text-align: center;
+    justify-content: center;
+}
+
+/* ─── Responsive ──────────────────────────────────── */
+@media (max-width: 768px) {
+    .cookierus-banner.pos-bottom,
+    .cookierus-banner.pos-top {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 18px 20px;
+    }
+    .pos-bottom .cookierus-buttons,
+    .pos-top    .cookierus-buttons {
+        margin-left: 0;
+        margin-top: 10px;
+        width: 100%;
+        justify-content: stretch;
+    }
+    .pos-bottom .cookierus-buttons .cookierus-btn,
+    .pos-top    .cookierus-buttons .cookierus-btn { flex: 1; }
+    .cookierus-banner.pos-bottom-left,
+    .cookierus-banner.pos-bottom-right,
+    .cookierus-banner.pos-top-left,
+    .cookierus-banner.pos-top-right {
+        left: 10px !important; right: 10px !important;
+        width: calc(100% - 20px) !important;
+        max-width: none !important;
+        bottom: 10px;
+    }
+    .cookierus-banner.pos-top-left,
+    .cookierus-banner.pos-top-right { top: 10px; bottom: auto; }
+}
+@media (max-width: 480px) {
+    .cookierus-banner { padding: 16px; gap: 12px; }
+    .cookierus-title  { font-size: 15px; }
+    .cookierus-text   { font-size: 13px; }
+    .cookierus-buttons { flex-direction: column; width: 100%; }
+    .cookierus-btn { width: 100%; padding: 12px; }
+    .cookierus-minimized-btn { bottom: 14px; left: 14px; }
+}
+
+/* ═══════════════════════════════════════════════════
+   MODAL — два-вкладочный
+═══════════════════════════════════════════════════ */
+.cookierus-modal {
+    position: fixed;
+    z-index: 1000000;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    box-sizing: border-box;
+}
+.cookierus-modal[style*="flex"],
+.cookierus-modal.cr-modal-open { display: flex; }
+
+/* Backdrop */
+.cookierus-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.52);
+    backdrop-filter: blur(4px);
+    animation: cookierusFadeIn 0.22s ease both;
+}
+
+/* Content box */
+.cookierus-modal-content {
+    position: relative;
+    background: #fff;
+    border-radius: 18px;
+    max-width: 520px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.28), 0 0 0 1px rgba(0,0,0,0.05);
+    animation: cookierusBounceIn 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    display: flex;
+    flex-direction: column;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Header */
+.cookierus-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 24px 0;
+    flex-shrink: 0;
+}
+.cookierus-modal-header h3 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+    color: #111;
+    line-height: 1.2;
+}
+/* ── Close button: small black X, no bg, no border ── */
+.cookierus-modal-close-x {
+    all: unset;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    color: #1a1a1a !important;
+    opacity: 0.5;
+    transition: opacity 0.15s;
+    flex-shrink: 0;
+    box-sizing: border-box;
+}
+.cookierus-modal-close-x:hover { opacity: 1; }
+.cookierus-modal-close-x svg { display: block; }
+
+/* ── Tabs: full reset so themes can't break them ─── */
+.cr-modal-tabs {
+    display: flex;
+    gap: 0;
+    padding: 12px 24px 0;
+    border-bottom: 1px solid #e5e7eb;
+    flex-shrink: 0;
+    margin: 0;
+    list-style: none;
+}
+.cr-modal-tab {
+    /* nuclear reset */
+    all: unset;
+    box-sizing: border-box;
+    /* our styles */
+    display: inline-block;
+    padding: 8px 18px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #6b7280 !important;
+    cursor: pointer;
+    border: none !important;
+    border-bottom: 2.5px solid transparent !important;
+    border-radius: 0 !important;
+    margin-bottom: -1px;
+    background: none !important;
+    white-space: nowrap;
+    line-height: 1.4 !important;
+    transition: color 0.18s, border-color 0.18s;
+    text-decoration: none !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    box-shadow: none !important;
+    outline: none !important;
+    -webkit-appearance: none;
+    appearance: none;
+}
+.cr-modal-tab:hover { color: #0760D2 !important; background: none !important; }
+.cr-modal-tab--active {
+    color: #0760D2 !important;
+    border-bottom-color: #0760D2 !important;
+    background: none !important;
+    font-weight: 700 !important;
+}
+
+/* Panels */
+.cr-modal-panel {
+    padding: 16px 24px;
+    flex: 1;
+    overflow-y: auto;
+}
+.cr-modal-panel--hidden { display: none; }
+
+.cr-modal-desc {
+    font-size: 12.5px;
+    color: #666;
+    line-height: 1.55;
+    margin: 0 0 14px 0;
+}
+
+/* Category rows */
+.cookierus-category {
+    margin-bottom: 8px;
+    padding: 12px 14px;
+    border: 1px solid #eef0f3;
+    border-radius: 10px;
+    transition: border-color 0.2s;
+}
+.cookierus-category:hover { border-color: #c8d8f0; }
+.cr-cat-required { background: #f8fbff; }
+
+.cookierus-category-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+.cr-cat-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.cr-cat-name {
+    font-weight: 700;
+    font-size: 13.5px;
+    color: #1a1a1a;
+}
+.cr-cat-meta {
+    font-size: 11px;
+    color: #888;
+}
+.cr-cat-always-on {
+    display: inline-block;
+    background: #dcfce7;
+    color: #166534;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 20px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.cr-cat-desc {
+    margin: 7px 0 0 0;
+    font-size: 12px;
+    color: #666;
+    line-height: 1.5;
+}
+
+/* Toggle switch for categories */
+.cr-toggle {
+    position: relative;
+    display: inline-block;
+    width: 42px;
+    height: 23px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+.cr-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+.cr-toggle-track {
+    position: absolute;
+    inset: 0;
+    background: #d1d5db;
+    border-radius: 23px;
+    transition: background 0.25s;
+}
+.cr-toggle input:checked ~ .cr-toggle-track { background: #0760D2; }
+.cr-toggle-thumb {
+    position: absolute;
+    left: 3px;
+    top: 3px;
+    width: 17px;
+    height: 17px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+.cr-toggle input:checked ~ .cr-toggle-track .cr-toggle-thumb { transform: translateX(19px); }
+
+/* Footer */
+.cookierus-modal-footer {
+    display: flex;
+    gap: 10px;
+    padding: 14px 24px 20px;
+    border-top: 1px solid #f0f0f1;
+    flex-shrink: 0;
+}
+.cookierus-modal-footer .cookierus-btn { flex: 1; }
+
+/* ─── Scrollbar in modal ──────────────────────────── */
+.cookierus-modal-content::-webkit-scrollbar,
+.cr-modal-panel::-webkit-scrollbar { width: 5px; }
+.cookierus-modal-content::-webkit-scrollbar-track,
+.cr-modal-panel::-webkit-scrollbar-track { background: transparent; }
+.cookierus-modal-content::-webkit-scrollbar-thumb,
+.cr-modal-panel::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 5px; }
