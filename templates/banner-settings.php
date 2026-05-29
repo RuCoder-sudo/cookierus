@@ -629,11 +629,11 @@ $sections = $settings['sections'] ?? [];
             <div class="cookierus-form-group">
                 <label>Анимация появления</label>
                 <select name="cookierus_settings[banner][animation]" class="regular-text" style="width:100%;">
-                    <option value="slide"  <?php selected('slide',  $banner['animation'] ?? ''); ?>>🔼 Слайд (снизу вверх)</option>
-                    <option value="fade"   <?php selected('fade',   $banner['animation'] ?? ''); ?>>✨ Затухание (Fade In)</option>
-                    <option value="bounce" <?php selected('bounce', $banner['animation'] ?? ''); ?>>🏀 Прыжок (эластично)</option>
-                    <option value="zoom"   <?php selected('zoom',   $banner['animation'] ?? ''); ?>>🔍 Масштаб (Zoom In)</option>
-                    <option value="flip"   <?php selected('flip',   $banner['animation'] ?? ''); ?>>🔄 Переворот (Flip)</option>
+                    <option value="slide"  <?php selected('slide',  $banner['animation'] ?? ''); ?>>Слайд (снизу вверх)</option>
+                    <option value="fade"   <?php selected('fade',   $banner['animation'] ?? ''); ?>>Затухание (Fade In)</option>
+                    <option value="bounce" <?php selected('bounce', $banner['animation'] ?? ''); ?>>Прыжок (эластично)</option>
+                    <option value="zoom"   <?php selected('zoom',   $banner['animation'] ?? ''); ?>>Масштаб (Zoom In)</option>
+                    <option value="flip"   <?php selected('flip',   $banner['animation'] ?? ''); ?>>Переворот (Flip)</option>
                 </select>
             </div>
 
@@ -685,6 +685,15 @@ $sections = $settings['sections'] ?? [];
         <!-- Группа 7: Поведение баннера -->
         <div class="cookierus-settings-card">
             <h4><span class="dashicons dashicons-schedule"></span> Поведение баннера</h4>
+
+            <div class="cookierus-form-group">
+                <label>Расположение кнопок</label>
+                <select name="cookierus_settings[banner][btn_layout]" class="regular-text" style="width:100%;">
+                    <option value="column" <?php selected('column', $banner['btn_layout'] ?? 'column'); ?>>⬇️ В столбик (по умолчанию)</option>
+                    <option value="row"    <?php selected('row',    $banner['btn_layout'] ?? '');       ?>>➡️ В ряд (горизонтально, баннер шире)</option>
+                </select>
+                <p class="description" style="margin-top:5px;">«В ряд» — кнопки встают горизонтально, баннер автоматически расширяется (до 600 px). Работает для угловых позиций (снизу слева/справа). На очень узких экранах автоматически переходит обратно в столбик.</p>
+            </div>
 
             <div class="cookierus-form-group">
                 <label>Повторный показ баннера</label>
@@ -807,12 +816,17 @@ $sections = $settings['sections'] ?? [];
 
             <?php
             $goals_list_admin = [
-                'storage'         => ['Хранение и доступ к данным на устройстве',  'Основная цель — запись и чтение cookie. Необходима для работы большинства функций сайта.'],
-                'analytics'       => ['Аналитика аудитории',                         'Сбор статистики посещаемости и поведения для улучшения сайта.'],
-                'personalized'    => ['Персонализированная реклама',                  'Показ рекламы на основе профиля интересов пользователя.'],
-                'ad_measure'      => ['Оценка эффективности рекламы',                 'Измерение охвата рекламных кампаний.'],
-                'content_measure' => ['Оценка эффективности контента',                'Анализ полезности представленного на сайте контента.'],
-                'development'     => ['Разработка и совершенствование сервисов',      'Использование данных для улучшения функционала.'],
+                'storage'              => ['Хранение и доступ к данным на устройстве',  'Основная цель — запись и чтение cookie. Необходима для работы большинства функций сайта (ст. 6 ч. 1 п. 5 152-ФЗ).'],
+                'analytics'            => ['Аналитика и статистика',                      'Сбор обезличенной статистики посещаемости и поведения пользователей для улучшения сайта.'],
+                'personalized_content' => ['Персонализация контента',                     'Подбор материалов сайта (статей, рекомендаций) с учётом предпочтений пользователя.'],
+                'personalized'         => ['Персонализированная реклама',                  'Показ рекламы на основе профиля интересов пользователя.'],
+                'retargeting'          => ['Ретаргетинг',                                  'Повторный показ рекламы посетителям сайта на сторонних площадках.'],
+                'ad_measure'           => ['Оценка эффективности рекламы',                 'Измерение охвата и результативности рекламных кампаний.'],
+                'content_measure'      => ['Оценка эффективности контента',                'Анализ полезности представленного на сайте контента для пользователей.'],
+                'profiling'            => ['Создание профиля пользователя',                'Формирование поведенческого профиля на основе истории посещений.'],
+                'geolocation'          => ['Геолокация',                                   'Использование приблизительного местоположения для регионального контента или рекламы.'],
+                'third_party'          => ['Передача данных третьим лицам',                'Предоставление данных партнёрам и поставщикам услуг (ст. 6 ч. 3, ст. 18 152-ФЗ).'],
+                'development'          => ['Разработка и совершенствование сервисов',      'Использование данных для улучшения функционала и создания новых возможностей.'],
             ];
             foreach ($goals_list_admin as $key => [$title, $hint]):
             ?>
