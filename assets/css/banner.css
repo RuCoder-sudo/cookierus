@@ -84,36 +84,48 @@
 
 /* ─── Minimized floating button ───────────────────── */
 .cookierus-minimized-btn {
-    position: fixed;
-    bottom: 24px;
-    left: 24px;
-    z-index: 999998;
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    background: #fff;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.22);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
-    border: none;
-    outline: none;
+    position: fixed !important;
+    bottom: 24px !important;
+    left: 24px !important;
+    z-index: 999998 !important;
+    width: 52px !important;
+    height: 52px !important;
+    border-radius: 50% !important;
+    background: #fff !important;
+    background-color: #fff !important;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.22) !important;
+    cursor: pointer !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s !important;
+    border: none !important;
+    outline: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    text-decoration: none !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
     animation: cookierusPulse 3s ease-in-out infinite;
 }
-.cookierus-minimized-btn:hover {
-    transform: scale(1.14);
-    box-shadow: 0 8px 28px rgba(0,0,0,0.28);
-    animation: none;
+.cookierus-minimized-btn:hover,
+.cookierus-minimized-btn:focus,
+.cookierus-minimized-btn:active {
+    transform: scale(1.14) !important;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.28) !important;
+    border: none !important;
+    outline: none !important;
+    background: #fff !important;
+    animation: none !important;
 }
 .cookierus-minimized-btn img {
-    width: 28px;
-    height: 28px;
-    object-fit: contain;
-    transition: transform 0.22s;
+    width: 28px !important;
+    height: 28px !important;
+    object-fit: contain !important;
+    transition: transform 0.22s !important;
+    border: none !important;
+    box-shadow: none !important;
 }
-.cookierus-minimized-btn:hover img { transform: rotate(18deg); }
+.cookierus-minimized-btn:hover img { transform: rotate(18deg) !important; }
 
 /* ─── Animations ──────────────────────────────────── */
 .cookierus-animate-fade    { animation: cookierusFadeIn   0.4s ease both; }
@@ -270,7 +282,7 @@
     padding: 9px 14px;
     font-size: 13px;
 }
-/* Corner banners: always full-width column stack */
+/* Corner banners: default — vertical column */
 .pos-bottom-left .cookierus-buttons,
 .pos-bottom-right .cookierus-buttons,
 .pos-top-left .cookierus-buttons,
@@ -288,6 +300,41 @@
     font-size: 13px;
     text-align: center;
     justify-content: center;
+}
+
+/* ── Горизонтальный макет кнопок (настройка «В ряд») ── */
+/* Для угловых баннеров: кнопки в ряд, баннер шире */
+.pos-bottom-left.cr-btns-row,
+.pos-bottom-right.cr-btns-row,
+.pos-top-left.cr-btns-row,
+.pos-top-right.cr-btns-row {
+    max-width: 600px !important;
+}
+.cr-btns-row .cookierus-buttons {
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    width: 100% !important;
+    gap: 8px !important;
+}
+.cr-btns-row .cookierus-buttons .cookierus-btn {
+    flex: 1 1 0 !important;
+    width: auto !important;
+    min-width: 0 !important;
+    padding: 9px 10px !important;
+    font-size: 13px !important;
+    text-align: center !important;
+    justify-content: center !important;
+}
+/* На очень узких экранах всё равно переходим в колонку */
+@media (max-width: 400px) {
+    .cr-btns-row .cookierus-buttons {
+        flex-direction: column !important;
+        flex-wrap: wrap !important;
+    }
+    .cr-btns-row .cookierus-buttons .cookierus-btn {
+        width: 100% !important;
+        flex: none !important;
+    }
 }
 
 /* ─── Responsive ──────────────────────────────────── */
@@ -387,20 +434,40 @@
 /* ── Close button: small black X, no bg, no border ── */
 .cookierus-modal-close-x {
     all: unset;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 22px;
-    height: 22px;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 22px !important;
+    height: 22px !important;
+    min-width: 0 !important;
     color: #1a1a1a !important;
     opacity: 0.5;
     transition: opacity 0.15s;
-    flex-shrink: 0;
-    box-sizing: border-box;
+    flex-shrink: 0 !important;
+    box-sizing: border-box !important;
+    background: none !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    outline: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    text-shadow: none !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
 }
-.cookierus-modal-close-x:hover { opacity: 1; }
-.cookierus-modal-close-x svg { display: block; }
+.cookierus-modal-close-x:hover,
+.cookierus-modal-close-x:focus,
+.cookierus-modal-close-x:active {
+    opacity: 1 !important;
+    background: none !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+.cookierus-modal-close-x svg { display: block !important; }
 
 /* ── Tabs: full reset so themes can't break them ─── */
 .cr-modal-tabs {
