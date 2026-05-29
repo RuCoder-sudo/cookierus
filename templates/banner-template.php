@@ -28,6 +28,7 @@ $shadow_map = [
 $banner_shadow = $shadow_map[$banner['banner_shadow'] ?? 'medium'] ?? '0 10px 30px rgba(0,0,0,0.2)';
 
 $btn_hover     = $banner['btn_hover']     ?? 'lift';
+$btn_layout    = $banner['btn_layout']    ?? 'column';
 $repeat_show   = $banner['repeat_show']   ?? 'never';
 $allow_minimize = !empty($banner['allow_minimize']);
 $decline_url   = $banner['btn_decline_url'] ?? '';
@@ -36,12 +37,17 @@ $plugin_url = defined('COOKIERUS_PLUGIN_URL') ? COOKIERUS_PLUGIN_URL : plugin_di
 
 // Goals configured to show
 $show_goals = [
-    'storage'          => !empty($goals_cfg['storage']),
-    'personalized'     => !empty($goals_cfg['personalized']),
-    'ad_measure'       => !empty($goals_cfg['ad_measure']),
-    'content_measure'  => !empty($goals_cfg['content_measure']),
-    'analytics'        => !empty($goals_cfg['analytics']),
-    'development'      => !empty($goals_cfg['development']),
+    'storage'              => !empty($goals_cfg['storage']),
+    'analytics'            => !empty($goals_cfg['analytics']),
+    'personalized_content' => !empty($goals_cfg['personalized_content']),
+    'personalized'         => !empty($goals_cfg['personalized']),
+    'retargeting'          => !empty($goals_cfg['retargeting']),
+    'ad_measure'           => !empty($goals_cfg['ad_measure']),
+    'content_measure'      => !empty($goals_cfg['content_measure']),
+    'profiling'            => !empty($goals_cfg['profiling']),
+    'geolocation'          => !empty($goals_cfg['geolocation']),
+    'third_party'          => !empty($goals_cfg['third_party']),
+    'development'          => !empty($goals_cfg['development']),
 ];
 ?>
 <style>
@@ -83,7 +89,7 @@ $show_goals = [
      БАННЕР
 ═══════════════════════════════════════════════════════ -->
 <div id="cookierus-banner"
-     class="cookierus-banner pos-<?php echo esc_attr($banner['position'] ?? 'bottom'); ?> <?php echo $anim_class; ?>"
+     class="cookierus-banner pos-<?php echo esc_attr($banner['position'] ?? 'bottom'); ?> <?php echo $anim_class; ?><?php echo ($btn_layout === 'row') ? ' cr-btns-row' : ''; ?>"
      style="background-color:<?php echo esc_attr($banner['bg_color'] ?? '#ffffff'); ?>;color:<?php echo esc_attr($banner['text_color'] ?? '#333333'); ?>;border-radius:<?php echo esc_attr($banner['radius'] ?? 8); ?>px;"
      role="dialog" aria-modal="true" aria-label="Настройки cookie">
 
@@ -193,7 +199,7 @@ $show_goals = [
             <div class="cookierus-category cr-cat-required">
                 <div class="cookierus-category-header">
                     <div class="cr-cat-info">
-                        <span class="cr-cat-name">🔒 Необходимые</span>
+                        <span class="cr-cat-name">Необходимые</span>
                         <span class="cr-cat-meta">Сессия · Всегда активны</span>
                     </div>
                     <span class="cr-cat-always-on">Включены</span>
@@ -205,7 +211,7 @@ $show_goals = [
             <div class="cookierus-category">
                 <div class="cookierus-category-header">
                     <div class="cr-cat-info">
-                        <span class="cr-cat-name">⚙️ Функциональные</span>
+                        <span class="cr-cat-name">Функциональные</span>
                         <span class="cr-cat-meta">До 12 мес.</span>
                     </div>
                     <label class="cr-toggle">
@@ -221,7 +227,7 @@ $show_goals = [
             <div class="cookierus-category">
                 <div class="cookierus-category-header">
                     <div class="cr-cat-info">
-                        <span class="cr-cat-name">📊 Аналитические</span>
+                        <span class="cr-cat-name">Аналитические</span>
                         <span class="cr-cat-meta">До 24 мес.</span>
                     </div>
                     <label class="cr-toggle">
@@ -237,7 +243,7 @@ $show_goals = [
             <div class="cookierus-category">
                 <div class="cookierus-category-header">
                     <div class="cr-cat-info">
-                        <span class="cr-cat-name">⚡ Производительность</span>
+                        <span class="cr-cat-name">Производительность</span>
                         <span class="cr-cat-meta">До 12 мес.</span>
                     </div>
                     <label class="cr-toggle">
@@ -253,7 +259,7 @@ $show_goals = [
             <div class="cookierus-category">
                 <div class="cookierus-category-header">
                     <div class="cr-cat-info">
-                        <span class="cr-cat-name">📢 Маркетинговые</span>
+                        <span class="cr-cat-name">Маркетинговые</span>
                         <span class="cr-cat-meta">До 90 дней</span>
                     </div>
                     <label class="cr-toggle">
@@ -275,44 +281,59 @@ $show_goals = [
             <?php
             $goals_list = [
                 'storage' => [
-                    'icon'  => '💾',
                     'title' => 'Хранение и доступ к данным',
-                    'desc'  => 'Хранение информации на устройстве или доступ к ней для обеспечения базовой функциональности сайта.',
+                    'desc'  => 'Хранение информации на устройстве или доступ к ней для обеспечения базовой функциональности сайта (ст. 6 ч. 1 п. 5 152-ФЗ).',
                 ],
                 'analytics' => [
-                    'icon'  => '📈',
-                    'title' => 'Аналитика аудитории',
+                    'title' => 'Аналитика и статистика',
                     'desc'  => 'Сбор данных о том, как посетители используют сайт, в целях формирования агрегированной статистики и улучшения сервиса.',
                 ],
+                'personalized_content' => [
+                    'title' => 'Персонализация контента',
+                    'desc'  => 'Подбор материалов сайта (статей, рекомендаций, разделов) с учётом ваших предпочтений и истории посещений.',
+                ],
                 'personalized' => [
-                    'icon'  => '🎯',
                     'title' => 'Персонализированная реклама',
                     'desc'  => 'Подбор рекламных материалов, соответствующих вашим интересам, на основе профиля посещений.',
                 ],
+                'retargeting' => [
+                    'title' => 'Ретаргетинг',
+                    'desc'  => 'Повторный показ рекламы пользователям, ранее посещавшим сайт, на сторонних площадках.',
+                ],
                 'ad_measure' => [
-                    'icon'  => '📏',
                     'title' => 'Оценка эффективности рекламы',
                     'desc'  => 'Измерение охвата и результативности рекламных кампаний без привязки к конкретному профилю.',
                 ],
                 'content_measure' => [
-                    'icon'  => '📋',
                     'title' => 'Оценка эффективности контента',
                     'desc'  => 'Анализ того, насколько интересен и полезен для вас представленный на сайте контент.',
                 ],
+                'profiling' => [
+                    'title' => 'Создание профиля пользователя',
+                    'desc'  => 'Формирование профиля ваших интересов и поведения на основе данных о посещениях для последующей персонализации.',
+                ],
+                'geolocation' => [
+                    'title' => 'Геолокация',
+                    'desc'  => 'Использование данных о приблизительном местоположении для показа регионального контента или рекламы.',
+                ],
+                'third_party' => [
+                    'title' => 'Передача данных третьим лицам',
+                    'desc'  => 'Предоставление данных партнёрам и поставщикам услуг в целях, указанных выше (ст. 6 ч. 3, ст. 18 152-ФЗ).',
+                ],
                 'development' => [
-                    'icon'  => '🔧',
                     'title' => 'Разработка и совершенствование',
                     'desc'  => 'Использование данных для улучшения существующих и создания новых функций и сервисов.',
                 ],
             ];
+            $goals_off_by_default = ['personalized', 'retargeting', 'ad_measure', 'profiling', 'geolocation', 'third_party'];
             foreach ($goals_list as $key => $g):
                 if (empty($show_goals[$key])) continue;
-                $checked = !in_array($key, ['personalized','ad_measure']) ? 'checked' : '';
+                $checked = !in_array($key, $goals_off_by_default) ? 'checked' : '';
             ?>
             <div class="cookierus-category">
                 <div class="cookierus-category-header">
                     <div class="cr-cat-info">
-                        <span class="cr-cat-name"><?php echo esc_html($g['title']); ?></span>
+                        <span class="cr-cat-name"><?php echo esc_html($g['title'] ?? ''); ?></span>
                     </div>
                     <label class="cr-toggle">
                         <input type="checkbox" id="goal-<?php echo esc_attr($key); ?>" name="cr-goal-<?php echo esc_attr($key); ?>" <?php echo $checked; ?>>
