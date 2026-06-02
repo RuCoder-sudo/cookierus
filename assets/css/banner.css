@@ -1,5 +1,5 @@
 /**
- * CookieRus banner styles — v1.0.6
+ * CookieRus banner styles — v1.0.7
  */
 
 /* ─── Base banner ─────────────────────────────────── */
@@ -52,35 +52,84 @@
 .cookierus-icon { display: block; object-fit: contain; }
 .cookierus-text-wrap { flex: 1; }
 
-/* ─── Minimize button — minimal, text first, then icon ── */
-.cookierus-minimize-btn {
-    position: absolute;
-    top: 7px;
-    right: 10px;
-    background: none !important;
+/* ─── Minimize button ─────────────────────────────── */
+/* Маленький текст «Свернуть» + иконка. Максимальная защита от переопределений темы. */
+#cookierus-banner .cookierus-minimize-btn,
+.cookierus-banner .cookierus-minimize-btn {
+    position: absolute !important;
+    top: 7px !important;
+    right: 10px !important;
+    /* Полный сброс внешнего вида */
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
     border: none !important;
+    border-radius: 2px !important;
     box-shadow: none !important;
-    cursor: pointer;
-    display: inline-flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 3px;
-    padding: 2px 4px;
-    border-radius: 2px;
+    outline: none !important;
+    text-shadow: none !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    /* Размер и стиль */
+    cursor: pointer !important;
+    display: inline-flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 3px !important;
+    padding: 2px 4px !important;
+    margin: 0 !important;
     font-size: 9px !important;
-    font-weight: 400;
+    font-weight: 400 !important;
+    line-height: 1 !important;
     color: #000 !important;
     opacity: 0.38;
     transition: opacity 0.2s;
     z-index: 1;
-    white-space: nowrap;
-    line-height: 1;
-    outline: none;
+    white-space: nowrap !important;
     text-transform: none !important;
     letter-spacing: normal !important;
+    text-decoration: none !important;
+    vertical-align: baseline !important;
+    /* Фиксированные размеры чтоб тема не растягивала */
+    width: auto !important;
+    height: auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-width: none !important;
+    max-height: none !important;
 }
-.cookierus-minimize-btn:hover { opacity: 0.7; background: none !important; }
-.cookierus-minimize-btn svg { flex-shrink: 0; fill: #000; }
+#cookierus-banner .cookierus-minimize-btn:hover,
+#cookierus-banner .cookierus-minimize-btn:focus,
+#cookierus-banner .cookierus-minimize-btn:active,
+.cookierus-banner .cookierus-minimize-btn:hover,
+.cookierus-banner .cookierus-minimize-btn:focus,
+.cookierus-banner .cookierus-minimize-btn:active {
+    opacity: 0.7 !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    transform: none !important;
+    color: #000 !important;
+}
+#cookierus-banner .cookierus-minimize-btn span {
+    font-size: 9px !important;
+    font-weight: 400 !important;
+    line-height: 1 !important;
+    color: inherit !important;
+    text-transform: none !important;
+    display: inline !important;
+}
+#cookierus-banner .cookierus-minimize-btn svg {
+    flex-shrink: 0 !important;
+    fill: #000 !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
+    width: 8px !important;
+    height: 2px !important;
+}
 
 /* ─── Minimized floating button ───────────────────── */
 .cookierus-minimized-btn {
@@ -260,7 +309,7 @@
     gap: 10px;
 }
 
-/* ─── Button row ──────────────────────────────────── */
+/* ─── Button container base ───────────────────────── */
 .cookierus-buttons {
     display: flex;
     gap: 8px;
@@ -268,7 +317,7 @@
     align-items: stretch;
     width: 100%;
 }
-/* Bar banners: row, right-aligned */
+/* Bar banners (full-width): row, right-aligned */
 .pos-bottom .cookierus-buttons,
 .pos-top    .cookierus-buttons {
     width: auto;
@@ -302,38 +351,54 @@
     justify-content: center;
 }
 
-/* ── Горизонтальный макет кнопок (настройка «В ряд») ── */
-/* Для угловых баннеров: кнопки в ряд, баннер шире */
+/* ══════════════════════════════════════════════════════════
+   ГОРИЗОНТАЛЬНЫЙ МАКЕТ «В РЯД»
+   Используем #cookierus-banner (ID) для максимальной специфичности —
+   гарантированно выигрывает у любых стилей темы с классовыми и
+   составными селекторами.
+══════════════════════════════════════════════════════════ */
+
+/* Расширяем баннер под ряд кнопок */
 .pos-bottom-left.cr-btns-row,
 .pos-bottom-right.cr-btns-row,
 .pos-top-left.cr-btns-row,
 .pos-top-right.cr-btns-row {
-    max-width: 600px !important;
+    max-width: 640px !important;
 }
-.cr-btns-row .cookierus-buttons {
+
+/* Контейнер кнопок — строка, без переноса */
+#cookierus-banner.cr-btns-row .cookierus-buttons {
     flex-direction: row !important;
     flex-wrap: nowrap !important;
     width: 100% !important;
     gap: 8px !important;
+    align-items: stretch !important;
 }
-.cr-btns-row .cookierus-buttons .cookierus-btn {
+
+/* Каждая кнопка — равная доля строки */
+#cookierus-banner.cr-btns-row .cookierus-buttons .cookierus-btn {
     flex: 1 1 0 !important;
     width: auto !important;
     min-width: 0 !important;
-    padding: 9px 10px !important;
-    font-size: 13px !important;
+    padding: 9px 8px !important;
+    font-size: 12px !important;
     text-align: center !important;
     justify-content: center !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
 }
-/* На очень узких экранах всё равно переходим в колонку */
-@media (max-width: 400px) {
-    .cr-btns-row .cookierus-buttons {
+
+/* Очень узкие экраны (телефоны < 380px) — разрешаем колонку */
+@media (max-width: 380px) {
+    #cookierus-banner.cr-btns-row .cookierus-buttons {
         flex-direction: column !important;
         flex-wrap: wrap !important;
     }
-    .cr-btns-row .cookierus-buttons .cookierus-btn {
+    #cookierus-banner.cr-btns-row .cookierus-buttons .cookierus-btn {
         width: 100% !important;
         flex: none !important;
+        white-space: normal !important;
     }
 }
 
@@ -370,7 +435,8 @@
     .cookierus-banner { padding: 16px; gap: 12px; }
     .cookierus-title  { font-size: 15px; }
     .cookierus-text   { font-size: 13px; }
-    .cookierus-buttons { flex-direction: column; width: 100%; }
+    /* Только колонна-режим. cr-btns-row переопределяется ниже через ID */
+    .cookierus-buttons:not(.cr-btns-row-buttons) { flex-direction: column; width: 100%; }
     .cookierus-btn { width: 100%; padding: 12px; }
     .cookierus-minimized-btn { bottom: 14px; left: 14px; }
 }
