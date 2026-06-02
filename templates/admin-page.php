@@ -2,7 +2,7 @@
 <div class="wrap cookierus-admin-wrap">
     <div class="cookierus-admin-title-row">
         <h1>CookieRus — Настройка согласия с файлами cookie</h1>
-        <span class="cookierus-version">v<?php echo defined('COOKIERUS_VERSION') ? esc_html(COOKIERUS_VERSION) : '1.0.6'; ?></span>
+        <span class="cookierus-version">v<?php echo defined('COOKIERUS_VERSION') ? esc_html(COOKIERUS_VERSION) : '1.0.7'; ?></span>
     </div>
 
     <nav class="cookierus-nav-tabs">
@@ -11,6 +11,7 @@
         <a href="?page=cookierus&tab=logs"      class="cookierus-nav-tab <?php echo $active_tab == 'logs'      ? 'active' : ''; ?>">Менеджер логов</a>
         <a href="?page=cookierus&tab=policy"    class="cookierus-nav-tab <?php echo $active_tab == 'policy'    ? 'active' : ''; ?>">Генератор политики</a>
         <a href="?page=cookierus&tab=info"      class="cookierus-nav-tab <?php echo $active_tab == 'info'      ? 'active' : ''; ?>">Информация</a>
+        <a href="?page=cookierus&tab=updates"   class="cookierus-nav-tab <?php echo $active_tab == 'updates'   ? 'active' : ''; ?>">🔄 Обновления</a>
         <a href="?page=cookierus&tab=important" class="cookierus-nav-tab cookierus-nav-tab--urgent <?php echo $active_tab == 'important' ? 'active' : ''; ?>">
             ⚠️ ВАЖНО
         </a>
@@ -33,6 +34,9 @@
                 break;
             case 'info':
                 include plugin_dir_path(__FILE__) . 'info-page.php';
+                break;
+            case 'updates':
+                include plugin_dir_path(__FILE__) . 'updates-page.php';
                 break;
             case 'important':
                 include plugin_dir_path(__FILE__) . 'important-page.php';
