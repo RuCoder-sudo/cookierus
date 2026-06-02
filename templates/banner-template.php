@@ -63,6 +63,7 @@ $show_goals = [
         font-family: <?php echo esc_attr($banner['font_family'] ?? 'inherit'); ?> !important;
         box-shadow: <?php echo $banner_shadow; ?> !important;
         display: none !important;
+        padding: <?php echo intval($banner['pad_top'] ?? 20); ?>px <?php echo intval($banner['pad_right'] ?? 24); ?>px <?php echo intval($banner['pad_bottom'] ?? 20); ?>px <?php echo intval($banner['pad_left'] ?? 24); ?>px !important;
     }
     body.cookierus-show-banner #cookierus-banner { display: flex !important; }
     .cookierus-btn {
