@@ -638,6 +638,49 @@ $sections = $settings['sections'] ?? [];
             </div>
 
             <div class="cookierus-form-group">
+                <label>Внутренние отступы баннера (padding)</label>
+                <p style="margin:0 0 10px;font-size:12px;color:#6b7280;">Размер пространства между краем баннера и его содержимым. По умолчанию — 20 px (верх/низ) и 24 px (лево/право).</p>
+                <table style="width:100%;border-collapse:collapse;">
+                    <tr>
+                        <td style="width:80px;font-size:12px;color:#555;padding:5px 0;">Верх</td>
+                        <td>
+                            <div class="cookierus-range-row">
+                                <input type="range" min="0" max="60" name="cookierus_settings[banner][pad_top]" id="range-pad-top" value="<?php echo intval($banner['pad_top'] ?? 20); ?>" oninput="document.getElementById('val-pad-top').textContent = this.value + 'px'">
+                                <span class="range-value" id="val-pad-top"><?php echo intval($banner['pad_top'] ?? 20); ?>px</span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-size:12px;color:#555;padding:5px 0;">Право</td>
+                        <td>
+                            <div class="cookierus-range-row">
+                                <input type="range" min="0" max="60" name="cookierus_settings[banner][pad_right]" id="range-pad-right" value="<?php echo intval($banner['pad_right'] ?? 24); ?>" oninput="document.getElementById('val-pad-right').textContent = this.value + 'px'">
+                                <span class="range-value" id="val-pad-right"><?php echo intval($banner['pad_right'] ?? 24); ?>px</span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-size:12px;color:#555;padding:5px 0;">Низ</td>
+                        <td>
+                            <div class="cookierus-range-row">
+                                <input type="range" min="0" max="60" name="cookierus_settings[banner][pad_bottom]" id="range-pad-bottom" value="<?php echo intval($banner['pad_bottom'] ?? 20); ?>" oninput="document.getElementById('val-pad-bottom').textContent = this.value + 'px'">
+                                <span class="range-value" id="val-pad-bottom"><?php echo intval($banner['pad_bottom'] ?? 20); ?>px</span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-size:12px;color:#555;padding:5px 0;">Лево</td>
+                        <td>
+                            <div class="cookierus-range-row">
+                                <input type="range" min="0" max="60" name="cookierus_settings[banner][pad_left]" id="range-pad-left" value="<?php echo intval($banner['pad_left'] ?? 24); ?>" oninput="document.getElementById('val-pad-left').textContent = this.value + 'px'">
+                                <span class="range-value" id="val-pad-left"><?php echo intval($banner['pad_left'] ?? 24); ?>px</span>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="cookierus-form-group">
                 <label>Пользовательский CSS</label>
                 <textarea name="cookierus_settings[banner][custom_css]" rows="5" class="large-text" style="font-family:monospace; font-size:12px;"><?php echo esc_textarea($banner['custom_css'] ?? ''); ?></textarea>
             </div>
