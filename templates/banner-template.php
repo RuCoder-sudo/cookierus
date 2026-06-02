@@ -1,6 +1,6 @@
 <?php
 /**
- * CookieRus Banner Template — v1.0.6
+ * CookieRus Banner Template — v1.0.7
  * Рендерится на фронтенде: баннер + модал настроек (2 вкладки) + блокировка трекеров
  */
 if (!defined('ABSPATH')) exit;
@@ -58,7 +58,7 @@ $show_goals = [
     #cookierus-banner.pos-bottom-left,
     #cookierus-banner.pos-bottom-right,
     #cookierus-banner.pos-top-left,
-    #cookierus-banner.pos-top-right { max-width: 460px !important; }
+    #cookierus-banner.pos-top-right { max-width: <?php echo ($btn_layout === 'row') ? '640px' : '460px'; ?> !important; }
     #cookierus-banner {
         font-family: <?php echo esc_attr($banner['font_family'] ?? 'inherit'); ?> !important;
         box-shadow: <?php echo $banner_shadow; ?> !important;
@@ -355,7 +355,7 @@ $show_goals = [
 </div><!-- #cookierus-modal -->
 
 <script>
-/* CookieRus v1.0.6 — frontend script */
+/* CookieRus v1.0.7 — frontend script */
 (function() {
     'use strict';
 
