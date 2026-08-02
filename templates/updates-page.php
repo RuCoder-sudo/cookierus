@@ -1,6 +1,6 @@
 <?php
 /**
- * CookieRus Updates Page — v1.0.7
+ * CookieRus Updates Page — v1.0.8
  */
 if (!defined('ABSPATH')) exit; ?>
 
@@ -124,17 +124,28 @@ if (!defined('ABSPATH')) exit; ?>
     <div class="cr-updates-section">
         <h3><span class="dashicons dashicons-backup"></span> История версий CookieRus</h3>
 
+        <!-- v1.0.8 -->
+        <div class="cr-version-block">
+            <div>
+                <span class="cr-version-tag cr-latest">✅ v1.0.8 <span class="cr-version-date">— 2 августа 2026</span></span>
+            </div>
+            <ul class="cr-change-list">
+                <li class="cr-fix"><strong>Исправлено:</strong> технические ответы WordPress больше не получают HTML-код баннера CookieRus.</li>
+                <li class="cr-new"><strong>Добавлено:</strong> пропуск `robots.txt`, sitemap, RSS/Atom, REST API и XML-RPC до запуска буферизации вывода.</li>
+                <li class="cr-fix"><strong>Исправлено:</strong> если ответ не содержит закрывающий тег <code>&lt;/body&gt;</code>, он возвращается без изменений и HTML не дописывается в конец.</li>
+            </ul>
+        </div>
+
         <!-- v1.0.7 -->
         <div class="cr-version-block">
             <div>
-                <span class="cr-version-tag cr-latest">✅ v1.0.7 <span class="cr-version-date">— 2 июня 2026</span></span>
+                <span class="cr-version-tag">v1.0.7 <span class="cr-version-date">— 2 июня 2026</span></span>
             </div>
             <ul class="cr-change-list">
-                <li class="cr-fix"><strong>Исправлено:</strong> кнопки в режиме «В ряд» теперь всегда отображаются в одну строку — устранён конфликт специфичности CSS (ID vs класс в inline-стиле).</li>
+                <li class="cr-fix"><strong>Исправлено:</strong> кнопки в режиме «В ряд» теперь всегда отображаются в одну строку.</li>
                 <li class="cr-fix"><strong>Исправлено:</strong> баннер автоматически расширяется до 640 px при горизонтальном расположении кнопок.</li>
-                <li class="cr-fix"><strong>Исправлено:</strong> кнопка «Свернуть» — полный сброс стилей темы, всегда отображается как маленький текст + иконка, а не как полноразмерная кнопка.</li>
+                <li class="cr-fix"><strong>Исправлено:</strong> кнопка «Свернуть» всегда отображается как маленький текст + иконка.</li>
                 <li class="cr-fix"><strong>Исправлено:</strong> медиа-запрос 480 px больше не ломает горизонтальный режим кнопок на узких экранах.</li>
-                <li class="cr-new"><strong>Добавлено:</strong> настройка внутренних отступов баннера (padding) из панели «Настройки баннера».</li>
             </ul>
         </div>
 
