@@ -3,7 +3,7 @@
  * Plugin Name: CookieRus
  * Plugin URI: https://github.com/RuCoder-sudo/cookierus
  * Description: Простой способ убедиться, что ваш сайт соответствует Закону России о файлах cookie.
- * Version: 1.0.7
+ * Version: 1.0.8
  * Author: Сергей Солошенко (RuCoder)
  * Author URI: https://рукодер.рф
  * License: GPL v2 or later
@@ -29,7 +29,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('COOKIERUS_VERSION', '1.0.7');
+define('COOKIERUS_VERSION', '1.0.8');
 define('COOKIERUS_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('COOKIERUS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
@@ -68,6 +68,7 @@ class CookieRus {
 
     public function start_output_buffer() {
         if (is_admin()) return;
+        if ($this->is_technical_request()) return;
 
         $settings = get_option('cookierus_settings');
         if (empty($settings['banner']['enabled'])) return;
@@ -86,6 +87,26 @@ class CookieRus {
 
     private $banner_html_cache = '';
 
+    /**
+     * Technical WordPress responses must never be modified with HTML.
+     *
+     * @return bool
+     */
+    private function is_technical_request() {
+        if (function_exists('is_robots') && is_robots()) return true;
+        if (function_exists('is_feed') && is_feed()) return true;
+        if (defined('REST_REQUEST') && REST_REQUEST) return true;
+        if (defined('XMLRPC_REQUEST') && XMLRPC_REQUEST) return true;
+
+        $request_uri = isset($_SERVER['REQUEST_URI']) ? wp_unslash($_SERVER['REQUEST_URI']) : '';
+        $request_path = (string) wp_parse_url($request_uri, PHP_URL_PATH);
+
+        return (bool) preg_match(
+            '#/(?:robots\.txt$|wp-json(?:/|$)|xmlrpc\.php$|(?:[a-z0-9_-]+[-_])?sitemap(?:[-_][a-z0-9_-]+|[0-9]+)?\.xml$)#i',
+            $request_path
+        );
+    }
+
     public function inject_banner_before_body_close($html) {
         if (empty($this->banner_html_cache)) return $html;
 
@@ -97,7 +118,8 @@ class CookieRus {
             return substr($html, 0, $pos) . $this->banner_html_cache . substr($html, $pos);
         }
 
-        return $html . $this->banner_html_cache;
+        // Do not append HTML to responses without a closing body tag.
+        return $html;
     }
 
     public function declare_woo_compatibility() {
