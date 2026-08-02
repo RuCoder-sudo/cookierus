@@ -95,6 +95,13 @@
 
 ---
 
+### Исправления в версии 1.0.8
+- Технические ответы WordPress больше не изменяются HTML-кодом баннера CookieRus.
+- До запуска буферизации пропускаются `robots.txt`, sitemap, RSS/Atom, REST API и XML-RPC.
+- Если HTML-ответ не содержит закрывающий тег `</body>`, он возвращается без изменений.
+
+---
+
 ### Статус проекта
 - Все функции протестированы
 - Логирование работает корректно
@@ -203,6 +210,13 @@ It provides a customizable cookie banner, detailed consent categories, user acti
 - Database readiness
 - AJAX logging
 - User consent statistics
+
+---
+
+### Fixes in version 1.0.8
+- WordPress technical responses are no longer modified with CookieRus banner HTML.
+- `robots.txt`, sitemaps, RSS/Atom, REST API, and XML-RPC are skipped before output buffering starts.
+- HTML responses without a closing `</body>` tag are returned unchanged.
 
 ---
 
