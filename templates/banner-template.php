@@ -1,7 +1,7 @@
 <?php
 /**
- * CookieRus Banner Template — v1.0.8
- * Рендерится на фронтенде: баннер + модал настроек (2 вкладки) + блокировка трекеров
+ * CookieRus Banner Template — v1.1.0
+ * Рендерится на фронтенде: баннер + модал настроек (3 вкладки) + блокировка трекеров
  */
 if (!defined('ABSPATH')) exit;
 
@@ -159,7 +159,7 @@ $show_goals = [
 <?php endif; ?>
 
 <!-- ═══════════════════════════════════════════════════════
-     МОДАЛЬНОЕ ОКНО "Настроить" — 2 ВКЛАДКИ
+     МОДАЛЬНОЕ ОКНО "Настроить"
 ═══════════════════════════════════════════════════════ -->
 <div id="cookierus-modal" class="cookierus-modal" role="dialog" aria-modal="true" aria-label="Настройки согласия" style="display:none;">
     <div class="cookierus-modal-backdrop" id="cookierus-modal-backdrop"></div>
@@ -186,6 +186,12 @@ $show_goals = [
                     aria-selected="false" aria-controls="cr-panel-goals"
                     data-tab="goals">
                 Цели обработки
+            </button>
+            <button class="cr-modal-tab"
+                    id="cr-tab-btn-mentions" role="tab"
+                    aria-selected="false" aria-controls="cr-panel-mentions"
+                    data-tab="mentions">
+                Упоминания
             </button>
         </div>
 
@@ -236,7 +242,7 @@ $show_goals = [
                         <span class="cr-toggle-track"><span class="cr-toggle-thumb"></span></span>
                     </label>
                 </div>
-                <p class="cr-cat-desc">Позволяют анализировать посещаемость и поведение пользователей (Google Analytics, Яндекс.Метрика и аналоги). Помогают улучшать сайт. Данные обезличены и агрегированы. <?php echo esc_html($sections['analytics_desc'] ?? ''); ?></p>
+                <p class="cr-cat-desc">Позволяют анализировать посещаемость и поведение пользователей (например, Яндекс.Метрика и другие подключенные сервисы). Помогают улучшать сайт. Данные обезличены и агрегированы. <?php echo esc_html($sections['analytics_desc'] ?? ''); ?></p>
             </div>
             <?php endif; ?>
 
@@ -346,6 +352,27 @@ $show_goals = [
             <?php endforeach; ?>
         </div>
 
+        <!-- ── ПАНЕЛЬ: УПОМНАНИЯ ───────────────────────── -->
+        <div class="cr-modal-panel cr-modal-panel--hidden" id="cr-panel-mentions" role="tabpanel">
+            <p class="cr-modal-desc">
+                Важные сведения о регистрации и входе на сайте.
+            </p>
+            <div class="cookierus-category cr-cat-required">
+                <div class="cookierus-category-header">
+                    <div class="cr-cat-info">
+                        <span class="cr-cat-name">Ограничение почтовых доменов</span>
+                        <span class="cr-cat-meta">Сайт, WooCommerce и /wp-admin/</span>
+                    </div>
+                </div>
+                <p class="cr-cat-desc">
+                    Регистрация и вход на сайте, включая WooCommerce и раздел /wp-admin/, запрещены с email-адресов иностранных почтовых сервисов. Разрешены только российские почтовые домены: mail.ru, yandex.ru, rambler.ru, bk.ru, а также другие домены в зонах .ru, .su и .рф.
+                </p>
+                <p class="cr-cat-desc">
+                    Это фактическое ограничение, включённое владельцем сайта. Федеральный закон от 31.07.2023 № 406-ФЗ регулирует способы авторизации на отдельных российских ресурсах, но не устанавливает универсальный запрет всех иностранных email-доменов. Само наличие этой настройки не подтверждает полное соответствие требованиям законодательства.
+                </p>
+            </div>
+        </div>
+
         <!-- Кнопки внизу модала -->
         <div class="cookierus-modal-footer">
             <button type="button" class="cookierus-btn cookierus-btn-accept" id="cookierus-accept-all-modal" style="flex:1;">Принять все</button>
@@ -356,16 +383,15 @@ $show_goals = [
 </div><!-- #cookierus-modal -->
 
 <script>
-/* CookieRus v1.0.8 — frontend script */
+/* CookieRus v1.1.0 — frontend script */
 (function() {
     'use strict';
 
     var REPEAT_SHOW    = <?php echo json_encode($repeat_show); ?>;
     var ALLOW_MINIMIZE = <?php echo $allow_minimize ? 'true' : 'false'; ?>;
     var DECLINE_URL    = <?php echo json_encode($decline_url); ?>;
+    var LOG_NONCE      = <?php echo json_encode(wp_create_nonce('cookierus_log_consent')); ?>;
     var TRACKERS       = <?php echo json_encode([
-        'ga4_id'  => $trackers['ga4_id']  ?? '',
-        'gtm_id'  => $trackers['gtm_id']  ?? '',
         'ym_id'   => $trackers['ym_id']   ?? '',
         'meta_id' => $trackers['meta_id'] ?? '',
         'vk_id'   => $trackers['vk_id']   ?? '',
@@ -392,32 +418,6 @@ $show_goals = [
         var all  = cats.indexOf('all') !== -1 || cats.indexOf('accepted') !== -1;
         var analytics  = all || cats.indexOf('analytics')   !== -1;
         var marketing  = all || cats.indexOf('advertising') !== -1;
-
-        /* Google Analytics 4 */
-        if (TRACKERS.ga4_id && analytics) {
-            var s = document.createElement('script');
-            s.async = true;
-            s.src = 'https://www.googletagmanager.com/gtag/js?id=' + TRACKERS.ga4_id;
-            document.head.appendChild(s);
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){ window.dataLayer.push(arguments); }
-            window.gtag = gtag;
-            gtag('js', new Date());
-            gtag('config', TRACKERS.ga4_id);
-        }
-
-        /* Google Tag Manager */
-        if (TRACKERS.gtm_id && analytics) {
-            (function(w,d,s,l,i){
-                w[l]=w[l]||[];
-                w[l].push({'gtm.start':new Date().getTime(), event:'gtm.js'});
-                var f=d.getElementsByTagName(s)[0],
-                    j=d.createElement(s), dl=l!='dataLayer'?'&l='+l:'';
-                j.async=true;
-                j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
-                f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer',TRACKERS.gtm_id);
-        }
 
         /* Яндекс Метрика */
         if (TRACKERS.ym_id && analytics) {
@@ -516,6 +516,7 @@ $show_goals = [
             fd.append('status',     status);
             fd.append('categories', categories);
             fd.append('uid',        uid);
+            fd.append('nonce',      LOG_NONCE);
             var ajax = (typeof CookieRusData !== 'undefined') ? CookieRusData.ajax_url : '/wp-admin/admin-ajax.php';
             fetch(ajax, {method:'POST', body:fd}).catch(function(){});
 
