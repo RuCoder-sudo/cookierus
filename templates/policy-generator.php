@@ -19,7 +19,6 @@ $doc_refund = $policy['doc_refund'] ?? '';
 
 // Дополнительные аналитики и сервисы
 $analytics_calibri = $policy['analytics_calibri'] ?? '';
-$analytics_google = $policy['analytics_google'] ?? '';
 $analytics_custom = $policy['analytics_custom'] ?? '';
 
 $policy_html = "
@@ -94,10 +93,6 @@ $policy_html = "
 " . (!empty($analytics_calibri) ? "
 <p><b>Инструмент:</b> Callibri (коллтрекинг и аналитика).</p>
 <p><b>Цель:</b> отслеживание источников звонков и обращений.</p>
-" : "") . "
-" . (!empty($analytics_google) ? "
-<p><b>Инструмент:</b> Google Analytics.</p>
-<p><b>Цель:</b> сбор статистических данных о посещении сайта.</p>
 " : "") . "
 " . (!empty($analytics_custom) ? "
 <p><b>Дополнительные инструменты:</b> $analytics_custom</p>
@@ -253,10 +248,6 @@ $policy_html = "
                     <tr>
                         <th scope="row"> Callibri (ссылка/ID)</th>
                         <td><input type="text" name="cookierus_settings[policy][analytics_calibri]" value="<?php echo esc_attr($analytics_calibri); ?>" class="regular-text" placeholder="Вставьте данные Calibri"></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Google Analytics (ID)</th>
-                        <td><input type="text" name="cookierus_settings[policy][analytics_google]" value="<?php echo esc_attr($analytics_google); ?>" class="regular-text" placeholder="UA-XXXXX-Y или G-XXXXX"></td>
                     </tr>
                     <tr>
                         <th scope="row">Другие сервисы</th>
