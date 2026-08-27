@@ -1,6 +1,6 @@
 <?php
 /**
- * CookieRus Info Page — v1.0.6
+ * CookieRus Info Page — v1.1.0
  */
 if (!defined('ABSPATH')) exit; ?>
 
@@ -176,7 +176,7 @@ if (!defined('ABSPATH')) exit; ?>
             <li>Соответствие политики конфиденциальности и cookie-политики актуальным требованиям 152-ФЗ;</li>
             <li>Ведение журнала согласий и хранение его не менее 12 месяцев;</li>
             <li>Блокировку сторонних трекеров до получения согласия (обеспечивается настройками плагина);</li>
-            <li>Уведомление Роскомнадзора о трансграничной передаче данных (GA, Meta, Hotjar и др.);</li>
+            <li>Уведомление Роскомнадзора о трансграничной передаче данных (Meta, Hotjar и другие иностранные сервисы);</li>
             <li>Размещение политики конфиденциальности на отдельной странице с постоянным URL;</li>
             <li>Размещение ссылки на политику в футере и под каждой формой сбора данных;</li>
             <li>Ведение локализации персональных данных на территории РФ.</li>
@@ -225,7 +225,7 @@ if (!defined('ABSPATH')) exit; ?>
             </div>
             <div class="cr-compliance-item cr-ok">
                 <h5>✅ 8. Блокировка трекинга до согласия</h5>
-                <p>Плагин блокирует GA4, GTM, Яндекс.Метрику, Meta Pixel, VK Pixel до нажатия «Принять». Укажите ID трекеров в настройках → «Блокировка трекеров».</p>
+                <p>Плагин блокирует Яндекс.Метрику, Meta Pixel и VK Pixel до нажатия «Принять». Укажите ID трекеров в настройках → «Блокировка трекеров».</p>
             </div>
             <div class="cr-warn" style="padding:14px 16px;border-radius:10px;border:1px solid #fcd34d;background:#fffbeb;">
                 <h5 style="margin:0 0 6px 0;font-size:12.5px;font-weight:700;color:#92400e;">⚠️ 9. Сроки хранения cookie</h5>
@@ -260,7 +260,7 @@ if (!defined('ABSPATH')) exit; ?>
             <div class="cookierus-principle"><p>📋 Любые данные, позволяющие идентифицировать физическое лицо (в т.ч. cookie), являются персональными</p></div>
             <div class="cookierus-principle"><p>✋ Обработка ПД без согласия субъекта возможна только в случаях, прямо предусмотренных законом (ст. 6 ч. 1 п. 5 — «законный интерес» для необходимых cookie)</p></div>
             <div class="cookierus-principle"><p>🔒 Оператор обязан хранить ПД граждан РФ на серверах, расположенных на территории РФ (ч. 5 ст. 18)</p></div>
-            <div class="cookierus-principle"><p>🌐 Трансграничная передача ПД (GA, Meta, Hotjar) требует уведомления РКН и ожидания 10 раб. дней</p></div>
+            <div class="cookierus-principle"><p>🌐 Трансграничная передача ПД (Meta, Hotjar и другие иностранные сервисы) требует отдельной оценки и уведомления РКН</p></div>
             <div class="cookierus-principle"><p>📜 На каждой странице сбора ПД должна быть ссылка на Политику конфиденциальности (ч. 2 ст. 18.1)</p></div>
             <div class="cookierus-principle"><p>⚖️ За нарушение предусмотрена административная ответственность: до 6 млн ₽ за первичное нарушение</p></div>
         </div>
@@ -324,7 +324,7 @@ if (!defined('ABSPATH')) exit; ?>
                     <td><span class="fine-amount">от 200 000 ₽</span></td>
                 </tr>
                 <tr>
-                    <td><strong>Трансграничная передача без уведомления РКН</strong><br><small style="color:#666;">GA / Meta Pixel / Hotjar без разрешения</small></td>
+                    <td><strong>Трансграничная передача без уведомления РКН</strong><br><small style="color:#666;">Meta Pixel / Hotjar и другие иностранные сервисы</small></td>
                     <td><span class="fine-amount">до 100 000 ₽</span></td>
                     <td><span class="fine-amount">до 1 000 000 ₽</span></td>
                 </tr>
@@ -345,7 +345,7 @@ if (!defined('ABSPATH')) exit; ?>
             </div>
             <div class="cookierus-tip">
                 <h5><span class="dashicons dashicons-shield-alt"></span> Блокируйте трекеры</h5>
-                <p>Укажите ID GA, Яндекс.Метрики, Meta Pixel в разделе «Блокировка трекеров». Иначе данные уходят в США ещё до согласия — прямое нарушение 152-ФЗ.</p>
+                <p>Укажите ID Яндекс.Метрики, Meta Pixel и других сервисов в разделе «Блокировка трекеров». Любые сторонние скрипты должны загружаться только после согласия.</p>
             </div>
             <div class="cookierus-tip">
                 <h5><span class="dashicons dashicons-admin-page"></span> Актуальная политика</h5>
@@ -357,7 +357,7 @@ if (!defined('ABSPATH')) exit; ?>
             </div>
             <div class="cookierus-tip">
                 <h5><span class="dashicons dashicons-location-alt"></span> Российские аналоги</h5>
-                <p>РКН рекомендует Яндекс.Метрику вместо GA. Если используете GA — оформите уведомление о трансграничной передаче через портал РКН.</p>
+                <p>Яндекс.Метрика относится к российским сервисам, но её всё равно нужно указать в политике и загрузить только после согласия пользователя.</p>
             </div>
             <div class="cookierus-tip">
                 <h5><span class="dashicons dashicons-update"></span> Регулярная проверка</h5>
@@ -372,13 +372,13 @@ if (!defined('ABSPATH')) exit; ?>
                 <li>В баннере есть кнопки «Принять все», «Отклонить» и «Настроить»</li>
                 <li>В баннере есть кликабельная ссылка на политику конфиденциальности</li>
                 <li>Кнопка «Отклонить» ведёт на страницу с инструкцией по настройке браузера</li>
-                <li>Google Analytics, Яндекс.Метрика, Meta Pixel заблокированы до согласия</li>
+                <li>Яндекс.Метрика, Meta Pixel и другие сторонние скрипты заблокированы до согласия</li>
                 <li>Ведётся и экспортируется журнал согласий (хранение ≥ 12 месяцев)</li>
                 <li>Политика конфиденциальности размещена на отдельной странице</li>
                 <li>Ссылка на политику есть в футере на каждой странице</li>
                 <li>В политике указаны все используемые трекеры и сроки хранения cookie</li>
                 <li>Персональные данные граждан РФ хранятся на серверах в РФ</li>
-                <li>Если используется GA/Meta — подано уведомление о трансграничной передаче в РКН</li>
+                <li>Если используются иностранные сервисы — выполнены требования о трансграничной передаче в РКН</li>
             </ul>
         </div>
     </div>
@@ -406,7 +406,7 @@ if (!defined('ABSPATH')) exit; ?>
                 <p style="margin:0;font-size:12px;color:#555;line-height:1.6;">
                     Плагин CookieRus распространяется <strong>бесплатно</strong> под лицензией GPL v2.<br><br>
                     GitHub: <a href="https://github.com/RuCoder-sudo/cookierus" target="_blank" rel="noopener">github.com/RuCoder-sudo/cookierus</a><br><br>
-                    Версия плагина: <strong><?php echo defined('COOKIERUS_VERSION') ? esc_html(COOKIERUS_VERSION) : '1.0.6'; ?></strong>
+                    Версия плагина: <strong><?php echo defined('COOKIERUS_VERSION') ? esc_html(COOKIERUS_VERSION) : '1.1.0'; ?></strong>
                 </p>
             </div>
         </div>
