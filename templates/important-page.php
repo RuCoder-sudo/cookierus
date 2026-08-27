@@ -1,7 +1,7 @@
 <?php
 /**
  * CookieRus — Вкладка ВАЖНО (Инструкция по уведомлению Роскомнадзора)
- * v1.0.6
+ * v1.1.0
  */
 if (!defined('ABSPATH')) exit;
 ?>
@@ -282,7 +282,7 @@ if (!defined('ABSPATH')) exit;
             <li><a href="#cr-errors">Частые ошибки</a></li>
             <li><a href="#cr-after">После подачи</a></li>
             <li><a href="#cr-cross">Трансграничная передача</a></li>
-            <li><a href="#cr-ga">Google Analytics и Яндекс.Метрика</a></li>
+                            <li><a href="#cr-analytics">Аналитика и Яндекс.Метрика</a></li>
             <li><a href="#cr-policy">Политика конфиденциальности</a></li>
             <li><a href="#cr-site">Что должно быть на сайте</a></li>
         </ol>
@@ -434,7 +434,7 @@ if (!defined('ABSPATH')) exit;
                         <li>Какие формы на сайте собирают данные</li>
                         <li>Есть ли согласие перед отправкой каждой формы</li>
                         <li>Размещена ли политика на страницах со сбором данных</li>
-                        <li>Какие аналитические системы используются (GA, Метрика, Hotjar)</li>
+                        <li>Какие аналитические системы используются (Метрика, Hotjar и другие сервисы)</li>
                         <li>Как оформлен сбор cookie (баннер согласия ✅ — этот плагин закрывает данный пункт)</li>
                     </ul>
                 </div>
@@ -444,7 +444,7 @@ if (!defined('ABSPATH')) exit;
                 <div class="cr-step-body">
                     <strong>Проверить места хранения данных</strong>
                     <div class="cr-alert cr-alert-red" style="margin-top:6px;">
-                        <strong>Данные граждан РФ обязаны храниться на серверах, физически расположенных в РФ!</strong> Нарушение — штраф до 6 000 000 ₽ (ч.8-9 ст.13.11 КоАП).
+                        <strong>При сборе персональных данных граждан РФ через интернет оператор должен использовать базы данных, находящиеся на территории РФ.</strong> Это требование первичного сбора установлено ч. 5 ст. 18 152-ФЗ; конкретные операции и санкции нужно оценивать по фактической схеме обработки.
                     </div>
                 </div>
             </li>
@@ -457,7 +457,7 @@ if (!defined('ABSPATH')) exit;
                         <div class="cr-service-card"><strong>CRM / ERP</strong><span>Системы учёта клиентов</span></div>
                         <div class="cr-service-card"><strong>Хостинг</strong><span>Адрес ЦОД, ИНН, ОГРН</span></div>
                         <div class="cr-service-card"><strong>Почтовые сервисы</strong><span>Unisender, MailChimp и др.</span></div>
-                        <div class="cr-service-card"><strong>Аналитика</strong><span>GA, Метрика, Hotjar</span></div>
+                        <div class="cr-service-card"><strong>Аналитика</strong><span>Метрика, Hotjar и другие сервисы</span></div>
                         <div class="cr-service-card"><strong>Облака</strong><span>Яндекс.Диск, Bitrix24</span></div>
                         <div class="cr-service-card"><strong>Платёжные системы</strong><span>ЮКасса, Робокасса</span></div>
                     </div>
@@ -653,7 +653,7 @@ if (!defined('ABSPATH')) exit;
     <div class="cr-imp-section" id="cr-cross">
         <h2><span class="dashicons dashicons-admin-site"></span> Трансграничная передача данных</h2>
         <div class="cr-alert cr-alert-orange">
-            <strong>⚠️ Использование Google Analytics, Meta Pixel, Hotjar, Mailchimp и других иностранных сервисов — это трансграничная передача ПД.</strong> Требует отдельного уведомления в РКН.
+            <strong>⚠️ Использование Meta Pixel, Hotjar, Mailchimp и других иностранных сервисов может повлечь трансграничную передачу ПД.</strong> Проверьте требования к уведомлению РКН до включения такого сервиса.
         </div>
         <h3>Когда нужно уведомление о трансграничной передаче:</h3>
         <ul>
@@ -669,33 +669,21 @@ if (!defined('ABSPATH')) exit;
             <li>Только после этого можно начинать передачу данных</li>
         </ol>
         <div class="cr-alert cr-alert-green">
-            <strong>✅ Альтернатива:</strong> Использовать российские аналоги — Яндекс.Метрика вместо Google Analytics, Unisender вместо Mailchimp. Это снимает необходимость в трансграничном уведомлении.
+            <strong>✅ Альтернатива:</strong> Использовать российские аналоги — Яндекс.Метрика и Unisender. Это может уменьшить объём трансграничной передачи, но состав сервисов всё равно нужно проверить по факту.
         </div>
         <a href="https://pd.rkn.gov.ru/docs/primer_zapolnenija_uvedomlenija_TPdn.pdf" target="_blank" rel="noopener" class="cr-imp-link">📄 Пример уведомления о трансграничной передаче (PDF)</a>
         <a href="https://pd.rkn.gov.ru/cross-border-transfer/form/" target="_blank" rel="noopener" class="cr-imp-link">🌐 Форма уведомления о трансграничной передаче</a>
     </div>
 
     <!-- ══════════════════════════════════════════
-         11. GOOGLE ANALYTICS И МЕТРИКА
+         11. АНАЛИТИКА И МЕТРИКА
     ══════════════════════════════════════════ -->
-    <div class="cr-imp-section" id="cr-ga">
-        <h2><span class="dashicons dashicons-chart-bar"></span> Google Analytics и Яндекс.Метрика</h2>
-
-        <h3>🔴 Google Analytics</h3>
-        <div class="cr-alert cr-alert-red">
-            <strong>Google Analytics передаёт данные на серверы Google (США) — это трансграничная передача ПД без явного разрешения РКН.</strong> РКН неоднократно штрафовал организации за использование GA без надлежащего уведомления.
-        </div>
-        <p>Что нужно сделать:</p>
-        <ul>
-            <li>Подать уведомление о трансграничной передаче в РКН (GA = передача в США)</li>
-            <li>Указать в политике конфиденциальности, что используется GA и данные передаются в Google</li>
-            <li>Убедиться что GA загружается <strong>только после согласия пользователя</strong> (плагин CookieRus закрывает этот пункт ✅)</li>
-            <li>Рассмотреть переход на GA4 с включённой анонимизацией IP</li>
-        </ul>
+    <div class="cr-imp-section" id="cr-analytics">
+        <h2><span class="dashicons dashicons-chart-bar"></span> Аналитика и Яндекс.Метрика</h2>
 
         <h3>🟢 Яндекс.Метрика</h3>
         <div class="cr-alert cr-alert-green">
-            <strong>Яндекс.Метрика — российский сервис, данные хранятся в РФ.</strong> Является предпочтительным вариантом с точки зрения соответствия 152-ФЗ.
+            <strong>Яндекс.Метрика — российский сервис, но одного этого недостаточно для вывода о соответствии.</strong> Проверьте актуальные условия сервиса, настройки передачи и то, где фактически обрабатываются данные вашего сайта.
         </div>
         <p>Требования для легализации:</p>
         <ul>
@@ -722,7 +710,7 @@ if (!defined('ABSPATH')) exit;
             <li>Цели обработки каждой категории данных</li>
             <li>Правовое основание обработки (согласие / договор / законный интерес)</li>
             <li>Порядок и сроки хранения данных (для cookie — конкретные сроки)</li>
-            <li>Перечень третьих лиц, которым передаются данные (Google, Яндекс, хостинг)</li>
+            <li>Перечень третьих лиц, которым передаются данные (Яндекс, хостинг, рекламные платформы и другие сервисы)</li>
             <li>Права субъекта ПД: доступ, исправление, удаление, отзыв согласия</li>
             <li>Контакты ответственного за обработку ПД</li>
             <li>Дата последнего обновления документа</li>
@@ -766,7 +754,7 @@ if (!defined('ABSPATH')) exit;
                 </tr>
                 <tr>
                     <td><strong>Блокировка трекеров</strong></td>
-                    <td>GA, Метрика, Meta Pixel не должны загружаться до согласия</td>
+                    <td>Метрика, Meta Pixel и другие сторонние скрипты не должны загружаться до согласия</td>
                     <td style="color:#16a34a;font-weight:600;">✅ Плагин</td>
                 </tr>
                 <tr>
@@ -791,7 +779,7 @@ if (!defined('ABSPATH')) exit;
                 </tr>
                 <tr>
                     <td><strong>Трансграничное уведомление</strong></td>
-                    <td>При использовании GA, Meta Pixel, иностранных CRM</td>
+                    <td>При использовании Meta Pixel, иностранных CRM и других иностранных сервисов</td>
                     <td style="color:#d97706;font-weight:600;">⚠️ Ваша задача</td>
                 </tr>
                 <tr>
