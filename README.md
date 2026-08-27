@@ -40,7 +40,7 @@
 #### **Аналитика**
 - Анализ поведения пользователей
 - Источники трафика, количество посетителей, показатель отказов  
-- Примеры сервисов: **Яндекс Метрика**, **Google Analytics**
+- Примеры сервисов: **Яндекс.Метрика** и другие подключенные сервисы
 
 #### **Производительность**
 - Анализ производительности сайта
@@ -94,6 +94,13 @@
 - Статистика пользовательских решений
 
 ---
+
+### Изменения в версии 1.1.0
+- Сторонний менеджер тегов и связанные с ним настройки полностью удалены.
+- В окно «Настройки согласия» добавлена вкладка «Упоминания» с правилами регистрации и входа для сайта, WooCommerce и `/wp-admin/`.
+- Регистрация, вход, изменение email и восстановление доступа ограничиваются российскими почтовыми доменами `mail.ru`, `yandex.ru`, `rambler.ru`, `bk.ru`, а также зонами `.ru`, `.su` и `.рф`.
+- Исправлена очистка устаревших настроек трекеров при сохранении.
+- Юридическая справка уточнена: плагин не заменяет проверку политики обработки данных, уведомлений и фактических мест хранения.
 
 ### Исправления в версии 1.0.8
 - Технические ответы WordPress больше не изменяются HTML-кодом баннера CookieRus.
@@ -158,7 +165,7 @@ It provides a customizable cookie banner, detailed consent categories, user acti
 #### **Analytics**
 - Helps understand user behavior
 - Traffic sources, visitors, bounce rate  
-- Examples: **Google Analytics**, **Yandex Metrica**
+- Examples: **Yandex Metrica** and other connected services
 
 #### **Performance**
 - Website performance measurement
@@ -212,6 +219,13 @@ It provides a customizable cookie banner, detailed consent categories, user acti
 - User consent statistics
 
 ---
+
+### Changes in version 1.1.0
+- The third-party tag manager and its related settings have been removed completely.
+- The consent settings window now includes a “Mentions” tab covering registration and login rules for the site, WooCommerce, and `/wp-admin/`.
+- Registration, login, email changes, and access recovery are limited to `mail.ru`, `yandex.ru`, `rambler.ru`, `bk.ru`, and the `.ru`, `.su`, and `.рф` zones.
+- Stale tracker settings are removed when settings are saved.
+- Legal guidance now clarifies that the plugin does not replace an operator’s full review of data-processing obligations.
 
 ### Fixes in version 1.0.8
 - WordPress technical responses are no longer modified with CookieRus banner HTML.
