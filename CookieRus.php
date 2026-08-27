@@ -3,7 +3,7 @@
  * Plugin Name: CookieRus
  * Plugin URI: https://github.com/RuCoder-sudo/cookierus
  * Description: Простой способ убедиться, что ваш сайт соответствует Закону России о файлах cookie.
- * Version: 1.0.8
+ * Version: 1.1.0
  * Author: Сергей Солошенко (RuCoder)
  * Author URI: https://рукодер.рф
  * License: GPL v2 or later
@@ -29,12 +29,15 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('COOKIERUS_VERSION', '1.0.8');
+define('COOKIERUS_VERSION', '1.1.0');
 define('COOKIERUS_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('COOKIERUS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
 if (file_exists(plugin_dir_path(__FILE__) . 'includes/class-cookierus-updater.php')) {
     require_once plugin_dir_path(__FILE__) . 'includes/class-cookierus-updater.php';
+}
+if (file_exists(plugin_dir_path(__FILE__) . 'includes/class-cookierus-compliance.php')) {
+    require_once plugin_dir_path(__FILE__) . 'includes/class-cookierus-compliance.php';
 }
 
 class CookieRus {
@@ -50,6 +53,7 @@ class CookieRus {
     private function __construct() {
         add_action('admin_menu', [$this, 'add_admin_menu']);
         add_action('admin_init', [$this, 'register_settings']);
+        add_action('admin_init', [$this, 'remove_legacy_tracker_settings'], 20);
         add_action('wp_enqueue_scripts', [$this, 'enqueue_assets']);
         add_action('wp_footer', [$this, 'render_banner']);
         add_action('template_redirect', [$this, 'start_output_buffer']);
@@ -59,6 +63,10 @@ class CookieRus {
         add_action('admin_init', [$this, 'handle_clear_logs']);
         add_action('before_woocommerce_init', [$this, 'declare_woo_compatibility']);
         register_activation_hook(__FILE__, [$this, 'activate']);
+
+        if (class_exists('CookieRus_Compliance')) {
+            CookieRus_Compliance::boot();
+        }
 
         // Инициализация автообновления через GitHub
         if (class_exists('CookieRus_Updater')) {
@@ -175,6 +183,8 @@ class CookieRus {
     public function ajax_log_consent() {
         global $wpdb;
         $table_name = $wpdb->prefix . 'cookierus_logs';
+
+        check_ajax_referer('cookierus_log_consent', 'nonce');
         
         $status = sanitize_text_field($_POST['status'] ?? '');
         $categories = sanitize_text_field($_POST['categories'] ?? '');
@@ -184,7 +194,7 @@ class CookieRus {
             wp_send_json_error(['message' => 'Missing data', 'post' => $_POST]);
         }
 
-        $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+        $ip = $this->anonymize_ip($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0');
         
         $result = $wpdb->insert($table_name, [
             'uid' => $uid,
@@ -192,7 +202,7 @@ class CookieRus {
             'status' => $status,
             'categories' => $categories,
             'user_id' => get_current_user_id(),
-            'country' => 'Russia',
+            'country' => '',
         ]);
 
         if ($result === false) {
@@ -230,6 +240,22 @@ class CookieRus {
         dbDelta($sql);
     }
 
+    private function anonymize_ip($ip) {
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            $parts = explode('.', $ip);
+            $parts[3] = '0';
+            return implode('.', $parts);
+        }
+
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            $parts = explode(':', $ip);
+            $parts = array_slice($parts, 0, 4);
+            return implode(':', $parts) . ':0:0:0:0';
+        }
+
+        return '0.0.0.0';
+    }
+
     public function add_admin_menu() {
         $page = add_menu_page(
             'CookieRus',
@@ -248,7 +274,50 @@ class CookieRus {
     }
 
     public function register_settings() {
-        register_setting('cookierus_settings_group', 'cookierus_settings');
+        register_setting('cookierus_settings_group', 'cookierus_settings', [
+            'sanitize_callback' => [$this, 'sanitize_settings'],
+        ]);
+    }
+
+    /**
+     * Удаляет устаревшие идентификаторы сторонних трекеров при сохранении.
+     *
+     * @param mixed $value
+     * @return array
+     */
+    public function sanitize_settings($value) {
+        if (!is_array($value)) {
+            return [];
+        }
+
+        if (isset($value['trackers']) && is_array($value['trackers'])) {
+            $allowed_trackers = ['ym_id', 'meta_id', 'vk_id'];
+            $value['trackers'] = array_intersect_key(
+                $value['trackers'],
+                array_flip($allowed_trackers)
+            );
+        }
+
+        return $value;
+    }
+
+    /**
+     * Удаляет ранее сохранённые настройки устаревшего трекера после обновления.
+     */
+    public function remove_legacy_tracker_settings() {
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+
+        $settings = get_option('cookierus_settings');
+        if (!is_array($settings) || !isset($settings['trackers']) || !is_array($settings['trackers'])) {
+            return;
+        }
+
+        $clean_settings = $this->sanitize_settings($settings);
+        if ($clean_settings !== $settings) {
+            update_option('cookierus_settings', $clean_settings);
+        }
     }
 
     private function get_default_settings() {
@@ -287,11 +356,9 @@ class CookieRus {
                 'animation'            => 'slide',
             ],
             'trackers' => [
-                'ga4_id'   => '',
                 'ym_id'    => '',
                 'meta_id'  => '',
                 'vk_id'    => '',
-                'gtm_id'   => '',
             ],
             'goals' => [
                 'storage'      => 1,
