@@ -790,7 +790,7 @@ $sections = $settings['sections'] ?? [];
                         <strong><?php echo $label; ?></strong>
                     </label>
                     <div class="section-desc" style="<?php echo empty($sections[$key]) ? 'display:none;' : ''; ?>">
-                        <div style="font-size:12px; margin-bottom:5px; color:#666;">Используемые сервисы (например: Яндекс Метрика, Google Analytics):</div>
+                        <div style="font-size:12px; margin-bottom:5px; color:#666;">Используемые сервисы (например: Яндекс.Метрика):</div>
                         <input type="text" name="cookierus_settings[sections][<?php echo $key; ?>_desc]" value="<?php echo esc_attr($sections[$key.'_desc'] ?? ''); ?>" class="large-text" placeholder="Введите список сервисов">
                     </div>
                 </div>
@@ -809,23 +809,11 @@ $sections = $settings['sections'] ?? [];
             <h4><span class="dashicons dashicons-shield"></span> Блокировка трекеров до согласия</h4>
             <div style="background:linear-gradient(135deg,#fef3c7,#fde68a);border-left:4px solid #f59e0b;padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:18px;">
                 <strong style="color:#92400e;">⚠️ Требование 152-ФЗ и РКН</strong>
-                <p style="margin:5px 0 0;font-size:12px;color:#78350f;">Счётчики аналитики и маркетинговые пиксели (GA, Яндекс.Метрика, Meta Pixel) должны загружаться <strong>только после</strong> нажатия пользователем кнопки «Принять». До согласия — никаких хитов в США или ЕС.</p>
+                <p style="margin:5px 0 0;font-size:12px;color:#78350f;">Счётчики аналитики и маркетинговые пиксели (Яндекс.Метрика, Meta Pixel и другие подключенные сервисы) должны загружаться <strong>только после</strong> нажатия пользователем кнопки «Принять». До согласия сторонние скрипты не загружаются.</p>
             </div>
             <p class="description" style="margin-bottom:15px;">Укажите ID ваших трекеров. Плагин автоматически загрузит их только после получения согласия. Оставьте поле пустым если не используете сервис.</p>
 
             <?php $trackers = $settings['trackers'] ?? []; ?>
-
-            <div class="cookierus-form-group">
-                <label>Google Analytics 4 (Measurement ID)</label>
-                <input type="text" name="cookierus_settings[trackers][ga4_id]" value="<?php echo esc_attr($trackers['ga4_id'] ?? ''); ?>" class="regular-text" placeholder="G-XXXXXXXXXX">
-                <p style="margin:3px 0 0;font-size:11px;color:#888;">Формат: G-XXXXXXXXXX — найдёте в Google Analytics → Администратор → Потоки данных</p>
-            </div>
-
-            <div class="cookierus-form-group">
-                <label>Google Tag Manager (Container ID)</label>
-                <input type="text" name="cookierus_settings[trackers][gtm_id]" value="<?php echo esc_attr($trackers['gtm_id'] ?? ''); ?>" class="regular-text" placeholder="GTM-XXXXXXX">
-                <p style="margin:3px 0 0;font-size:11px;color:#888;">Формат: GTM-XXXXXXX</p>
-            </div>
 
             <div class="cookierus-form-group">
                 <label>Яндекс Метрика (ID счётчика)</label>
