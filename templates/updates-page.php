@@ -1,6 +1,6 @@
 <?php
 /**
- * CookieRus Updates Page — v1.0.8
+ * CookieRus Updates Page — v1.1.0
  */
 if (!defined('ABSPATH')) exit; ?>
 
@@ -124,10 +124,24 @@ if (!defined('ABSPATH')) exit; ?>
     <div class="cr-updates-section">
         <h3><span class="dashicons dashicons-backup"></span> История версий CookieRus</h3>
 
+        <!-- v1.1.0 -->
+        <div class="cr-version-block">
+            <div>
+                <span class="cr-version-tag cr-latest">✅ v1.1.0 <span class="cr-version-date">— 27 августа 2026</span></span>
+            </div>
+            <ul class="cr-change-list">
+                <li class="cr-fix"><strong>Удалено:</strong> сторонний менеджер тегов и все связанные с ним настройки и загрузка скриптов.</li>
+                <li class="cr-new"><strong>Добавлено:</strong> вкладка «Упоминания» в окне «Настройки согласия» с правилами регистрации и входа для сайта, WooCommerce и <code>/wp-admin/</code>.</li>
+                <li class="cr-fix"><strong>Исправлено:</strong> единая проверка российских почтовых доменов для регистрации, входа, профиля и восстановления доступа.</li>
+                <li class="cr-new"><strong>Добавлено:</strong> автоматическое удаление устаревших настроек трекеров при сохранении настроек.</li>
+                <li class="cr-fix"><strong>Уточнено:</strong> юридические формулировки в справке не обещают автоматическое соответствие всем требованиям без проверки настроек сайта и оператора.</li>
+            </ul>
+        </div>
+
         <!-- v1.0.8 -->
         <div class="cr-version-block">
             <div>
-                <span class="cr-version-tag cr-latest">✅ v1.0.8 <span class="cr-version-date">— 2 августа 2026</span></span>
+                <span class="cr-version-tag">v1.0.8 <span class="cr-version-date">— 2 августа 2026</span></span>
             </div>
             <ul class="cr-change-list">
                 <li class="cr-fix"><strong>Исправлено:</strong> технические ответы WordPress больше не получают HTML-код баннера CookieRus.</li>
