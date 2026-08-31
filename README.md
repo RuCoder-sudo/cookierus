@@ -95,6 +95,9 @@
 
 ---
 
+### Изменения в версии 1.1.1
+- Исправлена критическая ошибка регистрации: вместо отсутствующего метода `WP_Error::get_error()` используется штатный `WP_Error::get_error_codes()`.
+
 ### Изменения в версии 1.1.0
 - Сторонний менеджер тегов и связанные с ним настройки полностью удалены.
 - В окно «Настройки согласия» добавлена вкладка «Упоминания» с правилами регистрации и входа для сайта, WooCommerce и `/wp-admin/`.
@@ -219,6 +222,9 @@ It provides a customizable cookie banner, detailed consent categories, user acti
 - User consent statistics
 
 ---
+
+### Changes in version 1.1.1
+- Fixed a critical registration error by replacing the unavailable `WP_Error::get_error()` call with the standard `WP_Error::get_error_codes()` method.
 
 ### Changes in version 1.1.0
 - The third-party tag manager and its related settings have been removed completely.
