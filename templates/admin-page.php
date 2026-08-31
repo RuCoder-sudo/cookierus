@@ -2,7 +2,7 @@
 <div class="wrap cookierus-admin-wrap">
     <div class="cookierus-admin-title-row">
         <h1>CookieRus — Настройка согласия с файлами cookie</h1>
-        <span class="cookierus-version">v<?php echo defined('COOKIERUS_VERSION') ? esc_html(COOKIERUS_VERSION) : '1.1.0'; ?></span>
+        <span class="cookierus-version">v<?php echo defined('COOKIERUS_VERSION') ? esc_html(COOKIERUS_VERSION) : '1.1.1'; ?></span>
     </div>
 
     <nav class="cookierus-nav-tabs">
