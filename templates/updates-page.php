@@ -1,6 +1,6 @@
 <?php
 /**
- * CookieRus Updates Page — v1.1.0
+ * CookieRus Updates Page — v1.1.1
  */
 if (!defined('ABSPATH')) exit; ?>
 
@@ -124,10 +124,21 @@ if (!defined('ABSPATH')) exit; ?>
     <div class="cr-updates-section">
         <h3><span class="dashicons dashicons-backup"></span> История версий CookieRus</h3>
 
+        <!-- v1.1.1 -->
+        <div class="cr-version-block">
+            <div>
+                <span class="cr-version-tag cr-latest">✅ v1.1.1 <span class="cr-version-date">— 31 августа 2026</span></span>
+            </div>
+            <ul class="cr-change-list">
+                <li class="cr-fix"><strong>Исправлено:</strong> устранена критическая ошибка регистрации на сайтах, где WordPress не предоставляет метод <code>WP_Error::get_error()</code>.</li>
+                <li class="cr-fix"><strong>Исправлено:</strong> проверка существующих ошибок теперь использует штатный метод <code>WP_Error::get_error_codes()</code>.</li>
+            </ul>
+        </div>
+
         <!-- v1.1.0 -->
         <div class="cr-version-block">
             <div>
-                <span class="cr-version-tag cr-latest">✅ v1.1.0 <span class="cr-version-date">— 27 августа 2026</span></span>
+                <span class="cr-version-tag">v1.1.0 <span class="cr-version-date">— 27 августа 2026</span></span>
             </div>
             <ul class="cr-change-list">
                 <li class="cr-fix"><strong>Удалено:</strong> сторонний менеджер тегов и все связанные с ним настройки и загрузка скриптов.</li>
