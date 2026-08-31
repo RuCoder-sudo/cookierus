@@ -5,6 +5,11 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/),
 и этот проект придерживается [Semantic Versioning](https://semver.org/lang/ru/).
 
+## [1.1.1] - 2026-08-31
+
+### Fixed
+- Исправлена критическая ошибка регистрации: `WP_Error::get_error()` заменён на штатный метод `WP_Error::get_error_codes()`, доступный в поддерживаемых версиях WordPress.
+
 ## [1.1.0] - 2026-08-27
 
 ### Changed
