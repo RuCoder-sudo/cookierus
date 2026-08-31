@@ -165,7 +165,7 @@ class CookieRus_Compliance {
     }
 
     private static function add_email_error($errors) {
-        if ($errors instanceof WP_Error && !$errors->get_error(self::ERROR_CODE)) {
+        if ($errors instanceof WP_Error && !in_array(self::ERROR_CODE, $errors->get_error_codes(), true)) {
             $errors->add(
                 self::ERROR_CODE,
                 'Используйте email российского почтового сервиса или домен .ru, .su, .рф (например, mail.ru, yandex.ru, rambler.ru или bk.ru).'
