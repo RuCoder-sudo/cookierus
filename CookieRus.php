@@ -3,7 +3,7 @@
  * Plugin Name: CookieRus
  * Plugin URI: https://github.com/RuCoder-sudo/cookierus
  * Description: Простой способ убедиться, что ваш сайт соответствует Закону России о файлах cookie.
- * Version: 1.1.0
+ * Version: 1.1.1
  * Author: Сергей Солошенко (RuCoder)
  * Author URI: https://рукодер.рф
  * License: GPL v2 or later
@@ -29,7 +29,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('COOKIERUS_VERSION', '1.1.0');
+define('COOKIERUS_VERSION', '1.1.1');
 define('COOKIERUS_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('COOKIERUS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
