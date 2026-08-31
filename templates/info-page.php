@@ -1,6 +1,6 @@
 <?php
 /**
- * CookieRus Info Page — v1.1.0
+ * CookieRus Info Page — v1.1.1
  */
 if (!defined('ABSPATH')) exit; ?>
 
@@ -406,7 +406,7 @@ if (!defined('ABSPATH')) exit; ?>
                 <p style="margin:0;font-size:12px;color:#555;line-height:1.6;">
                     Плагин CookieRus распространяется <strong>бесплатно</strong> под лицензией GPL v2.<br><br>
                     GitHub: <a href="https://github.com/RuCoder-sudo/cookierus" target="_blank" rel="noopener">github.com/RuCoder-sudo/cookierus</a><br><br>
-                    Версия плагина: <strong><?php echo defined('COOKIERUS_VERSION') ? esc_html(COOKIERUS_VERSION) : '1.1.0'; ?></strong>
+                    Версия плагина: <strong><?php echo defined('COOKIERUS_VERSION') ? esc_html(COOKIERUS_VERSION) : '1.1.1'; ?></strong>
                 </p>
             </div>
         </div>
