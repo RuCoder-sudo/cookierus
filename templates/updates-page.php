@@ -1,6 +1,6 @@
 <?php
 /**
- * CookieRus Updates Page — v1.1.1
+ * CookieRus Updates Page — v1.1.3
  */
 if (!defined('ABSPATH')) exit; ?>
 
@@ -124,10 +124,41 @@ if (!defined('ABSPATH')) exit; ?>
     <div class="cr-updates-section">
         <h3><span class="dashicons dashicons-backup"></span> История версий CookieRus</h3>
 
+         <!-- v1.1.3 -->
+         <div class="cr-version-block">
+             <div>
+                 <span class="cr-version-tag cr-latest">✅ v1.1.3 <span class="cr-version-date">— 5 сентября 2026</span></span>
+             </div>
+             <ul class="cr-change-list">
+                 <li class="cr-fix"><strong>Исправлено:</strong> восстановлена корректная вложенность карточек в настройках — разделы больше не собираются в один общий блок.</li>
+                 <li class="cr-new"><strong>Улучшено:</strong> модальное окно «Настроить» стало широким, структурированным и адаптивным для компьютеров и мобильных устройств.</li>
+                 <li class="cr-new"><strong>Изменено:</strong> на вкладке «Информация» оставлена нейтральная подпись «Разработчик плагина CookieRus» без персональных контактных данных.</li>
+             </ul>
+         </div>
+
+         <!-- v1.1.2 -->
+        <div class="cr-version-block">
+            <div>
+                <span class="cr-version-tag">v1.1.2 <span class="cr-version-date">— 5 сентября 2026</span></span>
+            </div>
+            <ul class="cr-change-list">
+                <li class="cr-new"><strong>Добавлено:</strong> строгая защита до согласия: блокируются статические и динамически добавленные скрипты, пиксели, iframe, изображения, fetch, XMLHttpRequest, sendBeacon и Callibri-виджет.</li>
+                <li class="cr-new"><strong>Добавлено:</strong> пользовательские категории согласия с названием, описанием, ссылкой на политику и переключателем.</li>
+                <li class="cr-new"><strong>Добавлено:</strong> пользовательские цели обработки с настраиваемым заголовком, описанием и включением/выключением.</li>
+                <li class="cr-new"><strong>Добавлено:</strong> поле для вставки Callibri-кода, который запускается только после согласия на аналитику.</li>
+                <li class="cr-fix"><strong>Исправлено:</strong> после нажатия «Принять» отложенные inline-скрипты запускаются через новый элемент <code>&lt;script&gt;</code>, а не остаются неисполняемыми.</li>
+                <li class="cr-fix"><strong>Исправлено:</strong> защита иностранных OAuth-маршрутов теперь работает в AJAX-запросах, в шапке сайта и для динамически появившихся кнопок.</li>
+                <li class="cr-new"><strong>Добавлено:</strong> автоматическая миграция новых настроек для существующих установок без перезаписи выбора администратора.</li>
+                <li class="cr-new"><strong>Добавлено:</strong> в настройках целей доступны «Ретаргетинг», «Создание профиля пользователя» и «Передача данных третьим лицам».</li>
+                <li class="cr-new"><strong>Добавлено:</strong> настраиваемый срок хранения функциональных cookie, ссылки на политики сервисов, кнопка отзыва согласия и очистка логов старше 1 года.</li>
+                <li class="cr-fix"><strong>Исправлено:</strong> названия сервисов и версия 1.1.2 выровнены в баннере, админке и документации.</li>
+            </ul>
+        </div>
+
         <!-- v1.1.1 -->
         <div class="cr-version-block">
             <div>
-                <span class="cr-version-tag cr-latest">✅ v1.1.1 <span class="cr-version-date">— 31 августа 2026</span></span>
+                <span class="cr-version-tag">v1.1.1 <span class="cr-version-date">— 31 августа 2026</span></span>
             </div>
             <ul class="cr-change-list">
                 <li class="cr-fix"><strong>Исправлено:</strong> устранена критическая ошибка регистрации на сайтах, где WordPress не предоставляет метод <code>WP_Error::get_error()</code>.</li>
@@ -229,7 +260,7 @@ if (!defined('ABSPATH')) exit; ?>
                 <span class="cr-version-tag">v1.0.2</span>
             </div>
             <ul class="cr-change-list">
-                <li class="cr-new"><strong>Добавлено:</strong> логирование согласий с IP и страной, экспорт в CSV, генератор политики cookie.</li>
+                <li class="cr-new"><strong>Добавлено:</strong> логирование согласий с IP и страной и экспорт в CSV.</li>
             </ul>
         </div>
 
