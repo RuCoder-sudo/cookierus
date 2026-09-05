@@ -79,13 +79,6 @@
 
 ---
 
-### Генератор политики cookie
-- Встроенный генератор политики использования cookie
-- Соответствие требованиям **152-ФЗ**
-- Удобен для быстрого добавления на сайт
-
----
-
 ### Панель управления
 - Статус баннера
 - Состояние логирования
@@ -94,6 +87,24 @@
 - Статистика пользовательских решений
 
 ---
+
+### Изменения в версии 1.1.3
+- **Исправлено:** вложенность карточек настроек — разделы больше не объединяются в один визуальный блок.
+- **Улучшено:** модальное окно «Настроить» стало широким, структурированным и адаптивным для desktop и мобильных устройств.
+- **Изменено:** на вкладке «Информация» оставлена подпись «Разработчик плагина CookieRus» без персональных контактных данных.
+
+### Изменения в версии 1.1.2
+- **Добавлено:** строгая многоуровневая блокировка аналитики и маркетинговых трекеров до нажатия кнопки согласия, включая статические и динамические скрипты, DOM-узлы, изображения, iframe, fetch, XMLHttpRequest и sendBeacon.
+- **Добавлено:** свои категории согласия с названием, описанием, ссылкой на политику и отдельным переключателем в модальном окне «Настроить».
+- **Добавлено:** свои цели обработки с заголовком, описанием и включением или выключением в настройках.
+- **Добавлено:** поле для вставки Callibri-кода с запуском только после согласия на аналитику.
+- **Исправлено:** отложенные inline-скрипты после согласия теперь запускаются через новый элемент `script`.
+- **Исправлено:** Callibri-виджет и его сетевые запросы не запускаются до разрешения аналитики.
+- **Добавлено:** настройка полного запрета авторизации через иностранные OAuth/social-login сервисы, включая AJAX, шапку сайта и динамические кнопки.
+- **Добавлено:** цели «Ретаргетинг», «Создание профиля пользователя» и «Передача данных третьим лицам».
+- **Добавлено:** срок хранения функциональных cookie, ссылки на политики категорий, кнопка отзыва согласия и очистка логов старше одного года.
+- **Исправлено:** новые настройки мигрируют на существующие установки без перезаписи выбора администратора.
+- **Исправлено:** версия 1.1.2 и название «Колибри» выровнены в админке, баннере и документации.
 
 ### Изменения в версии 1.1.1
 - Исправлена критическая ошибка регистрации: вместо отсутствующего метода `WP_Error::get_error()` используется штатный `WP_Error::get_error_codes()`.
@@ -207,13 +218,6 @@ It provides a customizable cookie banner, detailed consent categories, user acti
 
 ---
 
-### 📜 Cookie Policy Generator
-- Built-in cookie policy generator
-- Helps meet legal requirements
-- Quick integration into any website
-
----
-
 ### 🧠 Admin Dashboard
 - Banner status
 - Logging status
@@ -222,6 +226,24 @@ It provides a customizable cookie banner, detailed consent categories, user acti
 - User consent statistics
 
 ---
+
+### Changes in version 1.1.3
+- **Fixed:** settings cards no longer collapse into one combined visual block.
+- **Improved:** the “Configure” modal is now wide, structured, and responsive on desktop and mobile.
+- **Changed:** the Information tab now shows only “Разработчик плагина CookieRus” without personal contact details.
+
+### Changes in version 1.1.2
+- **Added:** strict multi-layer blocking of analytics and marketing trackers before consent, including static and dynamic scripts, DOM nodes, images, iframes, fetch, XMLHttpRequest, and sendBeacon.
+- **Added:** custom consent categories with a title, description, privacy-policy link, and independent toggle in the “Configure” modal.
+- **Added:** custom processing purposes with configurable title, description, and enabled state.
+- **Added:** a Callibri code field that executes only after analytics consent.
+- **Fixed:** deferred inline scripts now start through a new executable `script` element after consent.
+- **Fixed:** the Callibri widget and its network requests cannot start before analytics consent.
+- **Added:** an administrator setting to block foreign OAuth/social-login providers in AJAX, page headers, and dynamically loaded buttons.
+- **Added:** the Retargeting, User profiling, and Third-party data transfer processing purposes.
+- **Added:** configurable functional-cookie retention, service privacy-policy links, consent withdrawal, and deletion of logs older than one year.
+- **Fixed:** new settings migrate to existing installations without overwriting administrator choices.
+- **Fixed:** version 1.1.2 and the Callibri/«Колибри» naming are consistent across the UI and documentation.
 
 ### Changes in version 1.1.1
 - Fixed a critical registration error by replacing the unavailable `WP_Error::get_error()` call with the standard `WP_Error::get_error_codes()` method.
