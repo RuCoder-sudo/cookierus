@@ -1,15 +1,47 @@
 <?php
 /**
- * CookieRus Banner Template — v1.1.1
+ * CookieRus Banner Template — v1.1.3
  * Рендерится на фронтенде: баннер + модал настроек (3 вкладки) + блокировка трекеров
  */
 if (!defined('ABSPATH')) exit;
 
-$settings  = get_option('cookierus_settings');
+$settings  = get_option('cookierus_settings', []);
+$settings  = is_array($settings) ? $settings : [];
 $banner    = $settings['banner']   ?? [];
 $sections  = $settings['sections'] ?? [];
 $trackers  = $settings['trackers'] ?? [];
 $goals_cfg = $settings['goals']    ?? [];
+$custom_categories = is_array($settings['custom_categories'] ?? null)
+    ? $settings['custom_categories']
+    : [];
+$custom_goals = is_array($settings['custom_goals'] ?? null)
+    ? $settings['custom_goals']
+    : [];
+$custom_category_ids = [];
+foreach ($custom_categories as $custom_category) {
+    if (!empty($custom_category['enabled']) && !empty($custom_category['id'])) {
+        $custom_category_ids[] = sanitize_key($custom_category['id']);
+    }
+}
+$goals_cfg = array_replace([
+    'storage' => 1,
+    'analytics' => 1,
+    'personalized' => 1,
+    'retargeting' => 1,
+    'profiling' => 1,
+    'third_party' => 1,
+], $goals_cfg);
+$policy_links = [
+    'functional'  => $sections['functional_policy_url'] ?? '',
+    'analytics'   => $sections['analytics_policy_url'] ?? '',
+    'performance' => $sections['performance_policy_url'] ?? '',
+    'advertising' => $sections['advertising_policy_url'] ?? '',
+];
+$functional_retention_days = max(1, absint($sections['functional_retention_days'] ?? 365));
+$analytics_services = $sections['analytics_services'] ?? ['yandex_metrika' => 1];
+$advertising_services = $sections['advertising_services'] ?? ['yandex_ads' => 1];
+$foreign_auth_block_enabled = class_exists('CookieRus_Compliance')
+    && CookieRus_Compliance::is_foreign_auth_block_enabled();
 
 // Animation class
 $anim_class = 'cookierus-animate-' . ($banner['animation'] ?? 'slide');
@@ -157,6 +189,12 @@ $show_goals = [
          alt="" role="presentation" width="28" height="28">
 </button>
 <?php endif; ?>
+<?php if (($banner['show_revoke_button'] ?? true)): ?>
+<button type="button" id="cookierus-revoke" class="cookierus-revoke-btn"
+        style="display:none;" title="Отозвать согласие" aria-label="Отозвать согласие">
+    Отозвать согласие
+</button>
+<?php endif; ?>
 
 <!-- ═══════════════════════════════════════════════════════
      МОДАЛЬНОЕ ОКНО "Настроить"
@@ -219,14 +257,18 @@ $show_goals = [
                 <div class="cookierus-category-header">
                     <div class="cr-cat-info">
                         <span class="cr-cat-name">Функциональные</span>
-                        <span class="cr-cat-meta">До 12 мес.</span>
+                        <span class="cr-cat-meta">До <?php echo esc_html($functional_retention_days); ?> дней</span>
                     </div>
                     <label class="cr-toggle">
                         <input type="checkbox" id="cat-functional" checked>
                         <span class="cr-toggle-track"><span class="cr-toggle-thumb"></span></span>
                     </label>
                 </div>
-                <p class="cr-cat-desc">Запоминают ваши настройки и предпочтения (язык интерфейса, регион, оформление). Помогают сделать сайт удобнее при повторных визитах. <?php echo esc_html($sections['functional_desc'] ?? ''); ?></p>
+                <p class="cr-cat-desc">Запоминают ваши настройки и предпочтения (язык интерфейса, регион, оформление). Помогают сделать сайт удобнее при повторных визитах. <?php echo esc_html($sections['functional_desc'] ?? ''); ?>
+                    <?php if (!empty($policy_links['functional'])): ?>
+                        <a href="<?php echo esc_url($policy_links['functional']); ?>" target="_blank" rel="noopener noreferrer">Политика сервиса</a>
+                    <?php endif; ?>
+                </p>
             </div>
             <?php endif; ?>
 
@@ -235,14 +277,26 @@ $show_goals = [
                 <div class="cookierus-category-header">
                     <div class="cr-cat-info">
                         <span class="cr-cat-name">Аналитические</span>
-                        <span class="cr-cat-meta">До 24 мес.</span>
+                        <span class="cr-cat-meta">До <?php echo esc_html($sections['analytics_retention_days'] ?? 730); ?> дней</span>
                     </div>
                     <label class="cr-toggle">
                         <input type="checkbox" id="cat-analytics" checked>
                         <span class="cr-toggle-track"><span class="cr-toggle-thumb"></span></span>
                     </label>
                 </div>
-                <p class="cr-cat-desc">Позволяют анализировать посещаемость и поведение пользователей (например, Яндекс.Метрика и другие подключенные сервисы). Помогают улучшать сайт. Данные обезличены и агрегированы. <?php echo esc_html($sections['analytics_desc'] ?? ''); ?></p>
+                <p class="cr-cat-desc">Позволяют анализировать посещаемость и поведение пользователей. Помогают улучшать сайт. Данные обезличены и агрегированы.
+                    <?php
+                    $analytics_labels = ['yandex_metrika' => 'Яндекс.Метрика', 'mailru_counters' => 'Счётчики Mail.ru', 'callibri' => 'Колибри'];
+                    $enabled_analytics = [];
+                    foreach ($analytics_labels as $service_key => $service_label) {
+                        if (!empty($analytics_services[$service_key])) $enabled_analytics[] = $service_label;
+                    }
+                    if ($enabled_analytics) echo ' Сервисы: ' . esc_html(implode(', ', $enabled_analytics)) . '.';
+                    ?>
+                    <?php if (!empty($policy_links['analytics'])): ?>
+                        <a href="<?php echo esc_url($policy_links['analytics']); ?>" target="_blank" rel="noopener noreferrer">Политика сервиса</a>
+                    <?php endif; ?>
+                </p>
             </div>
             <?php endif; ?>
 
@@ -258,7 +312,11 @@ $show_goals = [
                         <span class="cr-toggle-track"><span class="cr-toggle-thumb"></span></span>
                     </label>
                 </div>
-                <p class="cr-cat-desc">Используются для оптимизации скорости загрузки и мониторинга технических показателей сайта. Не содержат личной информации. <?php echo esc_html($sections['performance_desc'] ?? ''); ?></p>
+                <p class="cr-cat-desc">Используются для оптимизации скорости загрузки и мониторинга технических показателей сайта. Не содержат личной информации. <?php echo esc_html($sections['performance_desc'] ?? ''); ?>
+                    <?php if (!empty($policy_links['performance'])): ?>
+                        <a href="<?php echo esc_url($policy_links['performance']); ?>" target="_blank" rel="noopener noreferrer">Политика сервиса</a>
+                    <?php endif; ?>
+                </p>
             </div>
             <?php endif; ?>
 
@@ -267,16 +325,56 @@ $show_goals = [
                 <div class="cookierus-category-header">
                     <div class="cr-cat-info">
                         <span class="cr-cat-name">Маркетинговые</span>
-                        <span class="cr-cat-meta">До 90 дней</span>
+                        <span class="cr-cat-meta">До <?php echo esc_html($sections['advertising_retention_days'] ?? 90); ?> дней</span>
                     </div>
                     <label class="cr-toggle">
                         <input type="checkbox" id="cat-advertising">
                         <span class="cr-toggle-track"><span class="cr-toggle-thumb"></span></span>
                     </label>
                 </div>
-                <p class="cr-cat-desc">Используются для показа персонализированной рекламы на основе ваших интересов (Meta Pixel, VK Реклама и аналоги). Данные могут передаваться рекламным партнёрам. <?php echo esc_html($sections['advertising_desc'] ?? ''); ?></p>
+                <p class="cr-cat-desc">Используются для показа персонализированной рекламы на основе ваших интересов. Данные могут передаваться рекламным партнёрам.
+                    <?php
+                    $advertising_labels = ['vk_ads' => 'VK Реклама', 'yandex_ads' => 'Яндекс.Реклама'];
+                    $enabled_advertising = [];
+                    foreach ($advertising_labels as $service_key => $service_label) {
+                        if (!empty($advertising_services[$service_key])) $enabled_advertising[] = $service_label;
+                    }
+                    if ($enabled_advertising) echo ' Сервисы: ' . esc_html(implode(', ', $enabled_advertising)) . '.';
+                    ?>
+                    <?php if (!empty($policy_links['advertising'])): ?>
+                        <a href="<?php echo esc_url($policy_links['advertising']); ?>" target="_blank" rel="noopener noreferrer">Политика сервиса</a>
+                    <?php endif; ?>
+                </p>
             </div>
             <?php endif; ?>
+
+            <?php foreach ($custom_categories as $custom_category): ?>
+                <?php if (empty($custom_category['enabled']) || empty($custom_category['title']) || empty($custom_category['id'])) continue; ?>
+                <?php $custom_category_id = sanitize_key($custom_category['id']); ?>
+                <div class="cookierus-category">
+                    <div class="cookierus-category-header">
+                        <div class="cr-cat-info">
+                            <span class="cr-cat-name"><?php echo esc_html($custom_category['title']); ?></span>
+                            <span class="cr-cat-meta">Пользовательская категория</span>
+                        </div>
+                        <label class="cr-toggle">
+                            <input type="checkbox"
+                                   id="cat-<?php echo esc_attr($custom_category_id); ?>"
+                                   data-cookierus-custom-category="<?php echo esc_attr($custom_category_id); ?>"
+                                   checked>
+                            <span class="cr-toggle-track"><span class="cr-toggle-thumb"></span></span>
+                        </label>
+                    </div>
+                    <?php if (!empty($custom_category['description']) || !empty($custom_category['policy_url'])): ?>
+                        <p class="cr-cat-desc">
+                            <?php echo esc_html($custom_category['description']); ?>
+                            <?php if (!empty($custom_category['policy_url'])): ?>
+                                <a href="<?php echo esc_url($custom_category['policy_url']); ?>" target="_blank" rel="noopener noreferrer">Политика сервиса</a>
+                            <?php endif; ?>
+                        </p>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
         </div>
 
         <!-- ── ПАНЕЛЬ: ЦЕЛИ ───────────────────────────── -->
@@ -350,6 +448,28 @@ $show_goals = [
                 <p class="cr-cat-desc"><?php echo esc_html($g['desc']); ?></p>
             </div>
             <?php endforeach; ?>
+            <?php foreach ($custom_goals as $custom_goal): ?>
+                <?php if (empty($custom_goal['enabled']) || empty($custom_goal['title']) || empty($custom_goal['id'])) continue; ?>
+                <?php $custom_goal_id = sanitize_key($custom_goal['id']); ?>
+                <div class="cookierus-category">
+                    <div class="cookierus-category-header">
+                        <div class="cr-cat-info">
+                            <span class="cr-cat-name"><?php echo esc_html($custom_goal['title']); ?></span>
+                            <span class="cr-cat-meta">Пользовательская цель</span>
+                        </div>
+                        <label class="cr-toggle">
+                            <input type="checkbox"
+                                   id="goal-<?php echo esc_attr($custom_goal_id); ?>"
+                                   name="cr-goal-<?php echo esc_attr($custom_goal_id); ?>"
+                                   checked>
+                            <span class="cr-toggle-track"><span class="cr-toggle-thumb"></span></span>
+                        </label>
+                    </div>
+                    <?php if (!empty($custom_goal['description'])): ?>
+                        <p class="cr-cat-desc"><?php echo esc_html($custom_goal['description']); ?></p>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
         </div>
 
         <!-- ── ПАНЕЛЬ: УПОМНАНИЯ ───────────────────────── -->
@@ -368,7 +488,9 @@ $show_goals = [
                     Регистрация и вход на сайте, включая WooCommerce и раздел /wp-admin/, запрещены с email-адресов иностранных почтовых сервисов. Разрешены только российские почтовые домены: mail.ru, yandex.ru, rambler.ru, bk.ru, а также другие домены в зонах .ru, .su и .рф.
                 </p>
                 <p class="cr-cat-desc">
-                    Это фактическое ограничение, включённое владельцем сайта. Федеральный закон от 31.07.2023 № 406-ФЗ регулирует способы авторизации на отдельных российских ресурсах, но не устанавливает универсальный запрет всех иностранных email-доменов. Само наличие этой настройки не подтверждает полное соответствие требованиям законодательства.
+                    <?php echo $foreign_auth_block_enabled
+                        ? 'Дополнительно включён полный запрет кнопок и OAuth-маршрутов Google, Apple ID и других иностранных систем авторизации.'
+                        : 'Полный запрет входа через Google, Apple ID и другие иностранные системы можно включить администратору в настройках CookieRus.'; ?>
                 </p>
             </div>
         </div>
@@ -382,25 +504,34 @@ $show_goals = [
     </div><!-- .cookierus-modal-content -->
 </div><!-- #cookierus-modal -->
 
-<script>
-/* CookieRus v1.1.1 — frontend script */
+<script id="cookierus-banner-script">
+/* CookieRus v1.1.3 — frontend script */
 (function() {
     'use strict';
 
     var REPEAT_SHOW    = <?php echo json_encode($repeat_show); ?>;
     var ALLOW_MINIMIZE = <?php echo $allow_minimize ? 'true' : 'false'; ?>;
+    var REVOKE_ENABLED = <?php echo (($banner['show_revoke_button'] ?? true) ? 'true' : 'false'); ?>;
     var DECLINE_URL    = <?php echo json_encode($decline_url); ?>;
     var LOG_NONCE      = <?php echo json_encode(wp_create_nonce('cookierus_log_consent')); ?>;
     var TRACKERS       = <?php echo json_encode([
         'ym_id'   => $trackers['ym_id']   ?? '',
-        'meta_id' => $trackers['meta_id'] ?? '',
         'vk_id'   => $trackers['vk_id']   ?? '',
     ]); ?>;
+    var CALLIBRI_CODE  = <?php echo wp_json_encode($trackers['callibri_code'] ?? ''); ?>;
+    var SERVICES       = <?php echo json_encode([
+        'yandex_metrika' => !empty($analytics_services['yandex_metrika']),
+        'mailru_counters' => !empty($analytics_services['mailru_counters']),
+        'callibri' => !empty($analytics_services['callibri']),
+        'vk_ads' => !empty($advertising_services['vk_ads']),
+        'yandex_ads' => !empty($advertising_services['yandex_ads']),
+    ]); ?>;
+    var CUSTOM_CATEGORY_IDS = <?php echo json_encode(array_values(array_unique($custom_category_ids))); ?>;
 
     /* ── Cookie helpers ──────────────────────────────── */
     function setCookie(name, value, days) {
         var expiry = '';
-        if (days && days > 0) {
+        if (typeof days === 'number' && days !== 0) {
             var d = new Date();
             d.setTime(d.getTime() + days * 86400000);
             expiry = '; expires=' + d.toUTCString();
@@ -412,15 +543,62 @@ $show_goals = [
         return m ? decodeURIComponent(m[1]) : null;
     }
 
-    /* ── Tracker loader ──────────────────────────────── */
-    function loadTrackers(categories) {
+    function normalizeCategories(categories) {
         var cats = Array.isArray(categories) ? categories : (categories || 'all').split(',');
+        var allCategories = ['necessary', 'functional', 'analytics', 'performance', 'advertising']
+            .concat(CUSTOM_CATEGORY_IDS);
+        return (cats.indexOf('all') !== -1 || cats.indexOf('accepted') !== -1)
+            ? allCategories
+            : cats;
+    }
+
+    function updateFirewall(categories) {
+        var state = window.__cookierusConsentState || {categories: [], blockedDomains: []};
+        state.categories = normalizeCategories(categories);
+        window.__cookierusConsentState = state;
+        if (typeof window.CookieRusReleaseBlockedResources === 'function') {
+            window.CookieRusReleaseBlockedResources();
+        }
+        document.dispatchEvent(new CustomEvent('cookierus:consent', {
+            detail: {categories: state.categories}
+        }));
+    }
+
+    /* ── Tracker loader ──────────────────────────────── */
+    function loadCallibriCode() {
+        if (!CALLIBRI_CODE || !SERVICES.callibri || window.__cookierusCallibriLoaded) return;
+
+        var holder = document.createElement('div');
+        holder.innerHTML = CALLIBRI_CODE;
+        var scripts = holder.querySelectorAll('script');
+
+        if (!scripts.length) {
+            var inlineScript = document.createElement('script');
+            inlineScript.text = CALLIBRI_CODE;
+            document.head.appendChild(inlineScript);
+        } else {
+            scripts.forEach(function(script) {
+                var replacement = document.createElement('script');
+                for (var i = 0; i < script.attributes.length; i++) {
+                    replacement.setAttribute(script.attributes[i].name, script.attributes[i].value);
+                }
+                replacement.text = script.textContent || '';
+                document.head.appendChild(replacement);
+            });
+        }
+
+        window.__cookierusCallibriLoaded = true;
+    }
+
+    function loadTrackers(categories) {
+        var cats = normalizeCategories(categories);
         var all  = cats.indexOf('all') !== -1 || cats.indexOf('accepted') !== -1;
         var analytics  = all || cats.indexOf('analytics')   !== -1;
         var marketing  = all || cats.indexOf('advertising') !== -1;
+        if (!getCookie('cookierus_consent') || getCookie('cookierus_consent') === 'declined') return;
 
         /* Яндекс Метрика */
-        if (TRACKERS.ym_id && analytics) {
+        if (TRACKERS.ym_id && analytics && SERVICES.yandex_metrika && !window.ym) {
             (function(m,e,t,r,i,k,a){
                 m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
                 m[i].l=1*new Date();
@@ -430,21 +608,8 @@ $show_goals = [
             ym(parseInt(TRACKERS.ym_id,10),'init',{clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:true});
         }
 
-        /* Meta Pixel */
-        if (TRACKERS.meta_id && marketing) {
-            !function(f,b,e,v,n,t,s){
-                if(f.fbq)return; n=f.fbq=function(){n.callMethod?
-                n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-                if(!f._fbq)f._fbq=n; n.push=n; n.loaded=!0; n.version='2.0';
-                n.queue=[]; t=b.createElement(e); t.async=!0; t.src=v;
-                s=b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t,s);
-            }(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', TRACKERS.meta_id);
-            fbq('track','PageView');
-        }
-
         /* VK Пиксель */
-        if (TRACKERS.vk_id && marketing) {
+        if (TRACKERS.vk_id && marketing && SERVICES.vk_ads && !document.querySelector('script[src*="vk.com/js/api"]')) {
             var vk = document.createElement('script');
             vk.async = true;
             vk.src = 'https://vk.com/js/api/openapi.js?169';
@@ -456,6 +621,10 @@ $show_goals = [
             };
             document.head.appendChild(vk);
         }
+
+        if (analytics && SERVICES.callibri) {
+            loadCallibriCode();
+        }
     }
 
     /* Если согласие уже дано — сразу загружаем трекеры */
@@ -463,6 +632,7 @@ $show_goals = [
         var consent = getCookie('cookierus_consent');
         if (consent && consent !== 'declined') {
             var cats = getCookie('cookierus_categories') || 'all';
+            updateFirewall(cats);
             loadTrackers(cats);
         }
     })();
@@ -474,6 +644,7 @@ $show_goals = [
         var backdrop     = document.getElementById('cookierus-modal-backdrop');
         var minBtn       = document.getElementById('cookierus-minimized-btn');
         var minimizeBtn  = document.getElementById('cookierus-minimize');
+        var revokeBtn    = document.getElementById('cookierus-revoke');
         var acceptBtn    = document.getElementById('cookierus-accept');
         var declineBtn   = document.getElementById('cookierus-decline');
         var openSettings = document.getElementById('cookierus-open-settings');
@@ -482,15 +653,14 @@ $show_goals = [
         var closeModal   = document.getElementById('cookierus-close-modal');
         var tabBtns      = document.querySelectorAll('.cr-modal-tab');
 
-        if (!banner) return;
-
         /* Показывать ли баннер? */
-        if (REPEAT_SHOW !== 'always' && getCookie('cookierus_consent')) {
+        if (banner && REPEAT_SHOW !== 'always' && getCookie('cookierus_consent')) {
             banner.remove();
-            return;
         }
 
-        document.body.classList.add('cookierus-show-banner');
+        if (banner && !getCookie('cookierus_consent')) {
+            document.body.classList.add('cookierus-show-banner');
+        }
 
         /* ── Отправка согласия ───────────────────────── */
         function logConsent(status, categories) {
@@ -508,6 +678,7 @@ $show_goals = [
             setCookie('cookierus_categories', categories, days);
 
             if (status !== 'declined') {
+                updateFirewall(categories);
                 loadTrackers(categories);
             }
 
@@ -524,6 +695,25 @@ $show_goals = [
             document.body.classList.remove('cookierus-show-banner');
             if (modal) modal.style.display = 'none';
             if (minBtn) minBtn.style.display = 'none';
+            if (revokeBtn && REVOKE_ENABLED) revokeBtn.style.display = 'block';
+        }
+
+        function revokeConsent() {
+            ['cookierus_consent', 'cookierus_categories', 'cookierus_goals'].forEach(function(name) {
+                setCookie(name, '', -1);
+            });
+            try {
+                localStorage.removeItem('cookierus_consent');
+                localStorage.removeItem('cookierus_consent_time');
+            } catch (e) {}
+            window.location.reload();
+        }
+
+        if (revokeBtn && REVOKE_ENABLED) {
+            revokeBtn.style.display = getCookie('cookierus_consent') ? 'block' : 'none';
+            revokeBtn.addEventListener('click', function() {
+                revokeConsent();
+            });
         }
 
         /* ── Свернуть / развернуть ───────────────────── */
@@ -540,7 +730,7 @@ $show_goals = [
         }
 
         /* ── Ripple на кнопках ───────────────────────── */
-        banner.querySelectorAll('.cookierus-btn').forEach(function(btn) {
+        if (banner) banner.querySelectorAll('.cookierus-btn').forEach(function(btn) {
             btn.addEventListener('click', function(e) {
                 var r = document.createElement('span');
                 r.className = 'cr-ripple';
@@ -613,8 +803,36 @@ $show_goals = [
                 var el = document.getElementById(id);
                 if (el && el.checked) cats.push(checkMap[id]);
             });
+            document.querySelectorAll('[data-cookierus-custom-category]:checked').forEach(function(el) {
+                cats.push(el.getAttribute('data-cookierus-custom-category'));
+            });
+            var goals = [];
+            document.querySelectorAll('[id^="goal-"]:checked').forEach(function(el) {
+                goals.push(el.id.replace('goal-', ''));
+            });
+            var days = REPEAT_SHOW === '7days' ? 7 : (REPEAT_SHOW === '30days' ? 30 : 365);
+            setCookie('cookierus_goals', goals.join(','), days);
             logConsent('accepted', cats.join(','));
         });
+
+        if (getCookie('cookierus_categories')) {
+            var selected = normalizeCategories(getCookie('cookierus_categories'));
+            ['functional', 'analytics', 'performance', 'advertising'].forEach(function(category) {
+                var checkbox = document.getElementById('cat-' + category);
+                if (checkbox) checkbox.checked = selected.indexOf(category) !== -1;
+            });
+            document.querySelectorAll('[data-cookierus-custom-category]').forEach(function(checkbox) {
+                checkbox.checked = selected.indexOf(
+                    checkbox.getAttribute('data-cookierus-custom-category')
+                ) !== -1;
+            });
+        }
+        if (getCookie('cookierus_goals')) {
+            var selectedGoals = getCookie('cookierus_goals').split(',');
+            document.querySelectorAll('[id^="goal-"]').forEach(function(checkbox) {
+                checkbox.checked = selectedGoals.indexOf(checkbox.id.replace('goal-', '')) !== -1;
+            });
+        }
     }
 
     if (document.readyState === 'loading') {
