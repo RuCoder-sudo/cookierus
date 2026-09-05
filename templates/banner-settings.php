@@ -2,13 +2,23 @@
 $settings = get_option('cookierus_settings');
 $banner = $settings['banner'] ?? [];
 $sections = $settings['sections'] ?? [];
+$analytics_services = $sections['analytics_services'] ?? [
+    'yandex_metrika' => 1,
+    'mailru_counters' => 0,
+    'callibri' => 0,
+];
+$advertising_services = $sections['advertising_services'] ?? [
+    'vk_ads' => 0,
+    'yandex_ads' => 1,
+];
 ?>
 <style>
 .cookierus-settings-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 25px;
     margin-top: 20px;
+    width: 100%;
 }
 /* Section divider labels spanning full grid width */
 .cr-settings-section-label {
@@ -37,6 +47,52 @@ $sections = $settings['sections'] ?? [];
     border-radius: 12px;
     padding: 25px;
     box-shadow: 0 4px 15px rgba(7, 96, 210, 0.05);
+    min-width: 0;
+    box-sizing: border-box;
+}
+.cookierus-settings-card input[type="text"],
+.cookierus-settings-card input[type="url"],
+.cookierus-settings-card input[type="number"],
+.cookierus-settings-card textarea,
+.cookierus-settings-card select {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+.cr-modal-settings-card,
+.cr-tracker-settings-card,
+.cr-goals-settings-card {
+    grid-column: 1 / -1;
+}
+.cr-custom-item {
+    padding: 14px;
+    margin: 0 0 12px;
+    background: #f8fafc;
+    border: 1px solid #dbe5f0;
+    border-radius: 10px;
+}
+.cr-custom-item:last-child { margin-bottom: 14px; }
+.cr-custom-item input[type="text"],
+.cr-custom-item input[type="url"],
+.cr-custom-item textarea { width: 100%; }
+.cr-custom-item > div[style*="grid-template-columns"] {
+    min-width: 0;
+}
+@media (max-width: 900px) {
+    .cookierus-settings-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 16px;
+    }
+    .cr-modal-settings-card,
+    .cr-tracker-settings-card,
+    .cr-goals-settings-card {
+        grid-column: auto;
+    }
+}
+@media (max-width: 600px) {
+    .cookierus-settings-card { padding: 18px; }
+    .cr-custom-item > div[style*="grid-template-columns"] {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
 }
 .cookierus-settings-card h4 {
     margin-top: 0;
@@ -760,6 +816,18 @@ $sections = $settings['sections'] ?? [];
                 </div>
                 <p class="description" style="margin-top:5px;">Если включено, пользователь может нажать × и свернуть баннер в маленькую круглую иконку cookie. При клике на иконку баннер возвращается.</p>
             </div>
+
+            <div class="cookierus-form-group" style="border-top: 1px solid #f0f0f1; padding-top: 15px;">
+                <label>Отзыв согласия</label>
+                <div class="cookierus-toggle-row">
+                    <label class="cookierus-switch" style="display:inline-block; width:46px; height:24px;">
+                        <input type="checkbox" name="cookierus_settings[banner][show_revoke_button]" value="1" id="revoke-toggle" <?php checked(1, $banner['show_revoke_button'] ?? 1); ?>>
+                        <span class="cookierus-slider" style="background-color:<?php echo !empty($banner['show_revoke_button']) ? '#10b981' : '#ccc'; ?>;"></span>
+                    </label>
+                    <label class="toggle-label" for="revoke-toggle">Показать кнопку отзыва согласия на сайте</label>
+                </div>
+                <p class="description" style="margin-top:5px;">После согласия в правом нижнем углу появится кнопка «Настройки cookie». Она снова открывает настройки и позволяет отозвать согласие.</p>
+            </div>
         </div>
 
         <!-- ─────────────────────────────────────────────────────
@@ -770,7 +838,7 @@ $sections = $settings['sections'] ?? [];
         </div>
 
         <!-- Группа 8: Категории -->
-        <div class="cookierus-settings-card">
+        <div class="cookierus-settings-card cr-modal-settings-card">
             <h4><span class="dashicons dashicons-admin-generic"></span> Категории согласия</h4>
             <p class="description" style="margin-bottom:15px;">Выберите категории, которые пользователь может настроить, и укажите используемые сервисы.</p>
             
@@ -778,9 +846,9 @@ $sections = $settings['sections'] ?? [];
                 <?php 
                 $sects = [
                     'functional' => 'Функциональные',
-                    'analytics' => 'Аналитика',
+                    'analytics' => 'Аналитические',
                     'performance' => 'Производительность',
-                    'advertising' => 'Реклама'
+                    'advertising' => 'Маркетинговые'
                 ];
                 foreach ($sects as $key => $label):
                 ?>
@@ -790,11 +858,79 @@ $sections = $settings['sections'] ?? [];
                         <strong><?php echo $label; ?></strong>
                     </label>
                     <div class="section-desc" style="<?php echo empty($sections[$key]) ? 'display:none;' : ''; ?>">
-                        <div style="font-size:12px; margin-bottom:5px; color:#666;">Используемые сервисы (например: Яндекс.Метрика):</div>
-                        <input type="text" name="cookierus_settings[sections][<?php echo $key; ?>_desc]" value="<?php echo esc_attr($sections[$key.'_desc'] ?? ''); ?>" class="large-text" placeholder="Введите список сервисов">
+                        <?php if ($key === 'functional'): ?>
+                            <label style="display:block;font-size:12px;margin-bottom:5px;color:#666;">Срок хранения (дней):</label>
+                            <input type="number" min="1" max="3650" name="cookierus_settings[sections][functional_retention_days]" value="<?php echo esc_attr($sections['functional_retention_days'] ?? 365); ?>" class="small-text">
+                        <?php elseif ($key === 'analytics'): ?>
+                            <div style="font-size:12px; margin-bottom:5px; color:#666;">Разрешённые аналитические сервисы:</div>
+                            <?php foreach (['yandex_metrika' => 'Яндекс.Метрика', 'mailru_counters' => 'Счётчики Mail.ru', 'callibri' => 'Колибри'] as $service_key => $service_label): ?>
+                                <label style="display:block;margin:5px 0;">
+                                    <input type="checkbox" name="cookierus_settings[sections][analytics_services][<?php echo esc_attr($service_key); ?>]" value="1" <?php checked(1, $analytics_services[$service_key] ?? 0); ?>>
+                                    <?php echo esc_html($service_label); ?>
+                                </label>
+                            <?php endforeach; ?>
+                        <?php elseif ($key === 'advertising'): ?>
+                            <div style="font-size:12px; margin-bottom:5px; color:#666;">Разрешённые маркетинговые сервисы:</div>
+                            <?php foreach (['vk_ads' => 'VK Реклама', 'yandex_ads' => 'Яндекс.Реклама'] as $service_key => $service_label): ?>
+                                <label style="display:block;margin:5px 0;">
+                                    <input type="checkbox" name="cookierus_settings[sections][advertising_services][<?php echo esc_attr($service_key); ?>]" value="1" <?php checked(1, $advertising_services[$service_key] ?? 0); ?>>
+                                    <?php echo esc_html($service_label); ?>
+                                </label>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <div style="font-size:12px; margin-bottom:5px; color:#666;">Описание категории:</div>
+                            <input type="text" name="cookierus_settings[sections][<?php echo $key; ?>_desc]" value="<?php echo esc_attr($sections[$key.'_desc'] ?? ''); ?>" class="large-text">
+                        <?php endif; ?>
+                        <?php if ($key !== 'functional'): ?>
+                            <label style="display:block;font-size:12px;margin:10px 0 5px;color:#666;">Ссылка на политику конфиденциальности сервиса:</label>
+                            <input type="url" name="cookierus_settings[sections][<?php echo esc_attr($key); ?>_policy_url]" value="<?php echo esc_attr($sections[$key.'_policy_url'] ?? ''); ?>" class="large-text" placeholder="https://example.ru/privacy">
+                        <?php else: ?>
+                            <label style="display:block;font-size:12px;margin:10px 0 5px;color:#666;">Ссылка на политику конфиденциальности сервиса:</label>
+                            <input type="url" name="cookierus_settings[sections][functional_policy_url]" value="<?php echo esc_attr($sections['functional_policy_url'] ?? ''); ?>" class="large-text" placeholder="https://example.ru/privacy">
+                        <?php endif; ?>
                     </div>
                 </div>
                 <?php endforeach; ?>
+            </div>
+            <div style="margin-top:18px;padding-top:16px;border-top:1px solid #e5e7eb;">
+                <strong style="display:block;margin-bottom:6px;">Свои категории</strong>
+                <p class="description" style="margin:0 0 12px;">Добавьте свой пункт в модальное окно «Настроить»: укажите название, описание и ссылку на политику сервиса.</p>
+                <div id="cr-custom-categories-list">
+                    <?php
+                    $custom_categories_admin = is_array($settings['custom_categories'] ?? null)
+                        ? $settings['custom_categories']
+                        : [];
+                    foreach ($custom_categories_admin as $custom_index => $custom_category):
+                    ?>
+                    <div class="cr-custom-item" data-custom-row>
+                        <input type="hidden" name="cookierus_settings[custom_categories][<?php echo esc_attr($custom_index); ?>][id]" value="<?php echo esc_attr($custom_category['id'] ?? ''); ?>">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                            <input type="text" name="cookierus_settings[custom_categories][<?php echo esc_attr($custom_index); ?>][title]" value="<?php echo esc_attr($custom_category['title'] ?? ''); ?>" placeholder="Название категории" class="large-text">
+                            <input type="url" name="cookierus_settings[custom_categories][<?php echo esc_attr($custom_index); ?>][policy_url]" value="<?php echo esc_attr($custom_category['policy_url'] ?? ''); ?>" placeholder="Ссылка на политику" class="large-text">
+                        </div>
+                        <textarea name="cookierus_settings[custom_categories][<?php echo esc_attr($custom_index); ?>][description]" rows="2" placeholder="Краткое описание категории" class="large-text" style="margin-top:8px;"><?php echo esc_textarea($custom_category['description'] ?? ''); ?></textarea>
+                        <div style="display:flex;align-items:center;gap:12px;margin-top:8px;">
+                            <label><input type="checkbox" name="cookierus_settings[custom_categories][<?php echo esc_attr($custom_index); ?>][enabled]" value="1" <?php checked(1, $custom_category['enabled'] ?? 1); ?>> Показывать в настройках</label>
+                            <button type="button" class="button-link-delete cr-remove-custom">Удалить</button>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+                <button type="button" class="button" id="cr-add-custom-category">+ Добавить свою категорию</button>
+                <template id="cr-custom-category-template">
+                    <div class="cr-custom-item" data-custom-row>
+                        <input type="hidden" name="cookierus_settings[custom_categories][__INDEX__][id]" value="">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                            <input type="text" name="cookierus_settings[custom_categories][__INDEX__][title]" value="" placeholder="Название категории" class="large-text">
+                            <input type="url" name="cookierus_settings[custom_categories][__INDEX__][policy_url]" value="" placeholder="Ссылка на политику" class="large-text">
+                        </div>
+                        <textarea name="cookierus_settings[custom_categories][__INDEX__][description]" rows="2" placeholder="Краткое описание категории" class="large-text" style="margin-top:8px;"></textarea>
+                        <div style="display:flex;align-items:center;gap:12px;margin-top:8px;">
+                            <label><input type="checkbox" name="cookierus_settings[custom_categories][__INDEX__][enabled]" value="1" checked> Показывать в настройках</label>
+                            <button type="button" class="button-link-delete cr-remove-custom">Удалить</button>
+                        </div>
+                    </div>
+                </template>
             </div>
         </div>
         <!-- ─────────────────────────────────────────────────────
@@ -805,11 +941,11 @@ $sections = $settings['sections'] ?? [];
         </div>
 
         <!-- Группа 9: Блокировка трекеров -->
-        <div class="cookierus-settings-card">
+        <div class="cookierus-settings-card cr-tracker-settings-card">
             <h4><span class="dashicons dashicons-shield"></span> Блокировка трекеров до согласия</h4>
             <div style="background:linear-gradient(135deg,#fef3c7,#fde68a);border-left:4px solid #f59e0b;padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:18px;">
                 <strong style="color:#92400e;">⚠️ Требование 152-ФЗ и РКН</strong>
-                <p style="margin:5px 0 0;font-size:12px;color:#78350f;">Счётчики аналитики и маркетинговые пиксели (Яндекс.Метрика, Meta Pixel и другие подключенные сервисы) должны загружаться <strong>только после</strong> нажатия пользователем кнопки «Принять». До согласия сторонние скрипты не загружаются.</p>
+                <p style="margin:5px 0 0;font-size:12px;color:#78350f;">Счётчики аналитики и маркетинговые пиксели должны загружаться <strong>только после</strong> нажатия пользователем кнопки «Принять». До согласия сторонние скрипты не загружаются.</p>
             </div>
             <p class="description" style="margin-bottom:15px;">Укажите ID ваших трекеров. Плагин автоматически загрузит их только после получения согласия. Оставьте поле пустым если не используете сервис.</p>
 
@@ -822,24 +958,39 @@ $sections = $settings['sections'] ?? [];
             </div>
 
             <div class="cookierus-form-group">
-                <label>Meta Pixel / Facebook Pixel</label>
-                <input type="text" name="cookierus_settings[trackers][meta_id]" value="<?php echo esc_attr($trackers['meta_id'] ?? ''); ?>" class="regular-text" placeholder="1234567890123456">
-                <p style="margin:3px 0 0;font-size:11px;color:#888;">15-16 цифр — ID пикселя в Events Manager</p>
-            </div>
-
-            <div class="cookierus-form-group">
                 <label>VK Пиксель</label>
                 <input type="text" name="cookierus_settings[trackers][vk_id]" value="<?php echo esc_attr($trackers['vk_id'] ?? ''); ?>" class="regular-text" placeholder="VK-RTRG-XXXXXXX-XXXX">
                 <p style="margin:3px 0 0;font-size:11px;color:#888;">Формат: VK-RTRG-XXXXXXX-XXXX</p>
             </div>
 
+            <div class="cookierus-form-group">
+                <label>Колибри — код или скрипт</label>
+                <textarea name="cookierus_settings[trackers][callibri_code]" rows="6" class="large-text" placeholder="<script>...</script>"><?php echo esc_textarea($trackers['callibri_code'] ?? ''); ?></textarea>
+                <p style="margin:3px 0 0;font-size:11px;color:#888;">Вставьте код Callibri целиком. Он не выводится и не исполняется до согласия с категорией «Аналитические» и включённым сервисом «Колибри».</p>
+            </div>
+
+            <div class="cookierus-form-group">
+                <label>Дополнительные домены для блокировки</label>
+                <textarea name="cookierus_settings[security][blocked_domains]" rows="3" class="large-text" placeholder="tracker.example.ru&#10;pixel.example.com"><?php echo esc_textarea($settings['security']['blocked_domains'] ?? ''); ?></textarea>
+                <p style="margin:3px 0 0;font-size:11px;color:#888;">По одному домену или через запятую. Известные аналитические и рекламные домены уже блокируются автоматически.</p>
+            </div>
+
+            <div class="cookierus-toggle-row" style="border-top:1px solid #f0f0f1;padding-top:15px;">
+                <label class="cookierus-switch" style="display:inline-block; width:46px; height:24px;">
+                    <input type="checkbox" name="cookierus_settings[security][foreign_auth_block]" value="1" id="foreign-auth-toggle" <?php checked(1, $settings['security']['foreign_auth_block'] ?? 0); ?>>
+                    <span class="cookierus-slider" style="background-color:<?php echo !empty($settings['security']['foreign_auth_block']) ? '#10b981' : '#ccc'; ?>;"></span>
+                </label>
+                <label class="toggle-label" for="foreign-auth-toggle">Запретить авторизацию через иностранные сервисы</label>
+            </div>
+            <p class="description">Блокирует кнопки и типовые OAuth-маршруты Google, Apple ID, Facebook, Microsoft и других иностранных провайдеров, а также фильтры популярных social-login плагинов.</p>
+
             <div style="background:#f0fdf4;border:1px solid #86efac;padding:12px 16px;border-radius:8px;margin-top:10px;">
-                <p style="margin:0;font-size:12px;color:#166534;">✅ <strong>Как это работает:</strong> указанные трекеры заблокированы по умолчанию. После того как пользователь нажимает «Принять все», скрипты загружаются динамически. При «Отклонить» — не загружаются никогда. При «Настроить» — загружаются только те, которые соответствуют выбранным категориям.</p>
+                <p style="margin:0;font-size:12px;color:#166534;">✅ <strong>Как это работает:</strong> CookieRus блокирует известные трекинговые домены в HTML, динамическом DOM и сетевых API. После согласия разрешаются только домены выбранных категорий. Это также покрывает код из head, footer, темы и сторонних плагинов.</p>
             </div>
         </div>
 
         <!-- Группа 10: Цели обработки -->
-        <div class="cookierus-settings-card">
+        <div class="cookierus-settings-card cr-goals-settings-card">
             <h4><span class="dashicons dashicons-list-view"></span> Цели обработки данных (вкладка «Цели»)</h4>
             <p class="description" style="margin-bottom:15px;">Выберите, какие цели обработки отображать пользователю во вкладке «Цели» в окне настроек. Эти цели соответствуют принципам IAB TCF и требованиям 152-ФЗ.</p>
 
@@ -869,6 +1020,40 @@ $sections = $settings['sections'] ?? [];
                 </div>
             </div>
             <?php endforeach; ?>
+            <div style="margin-top:18px;padding-top:16px;border-top:1px solid #e5e7eb;">
+                <strong style="display:block;margin-bottom:6px;">Свои цели обработки</strong>
+                <p class="description" style="margin:0 0 12px;">Добавьте собственную цель: задайте заголовок и описание, а затем включите или выключите её отображение в модальном окне.</p>
+                <div id="cr-custom-goals-list">
+                    <?php
+                    $custom_goals_admin = is_array($settings['custom_goals'] ?? null)
+                        ? $settings['custom_goals']
+                        : [];
+                    foreach ($custom_goals_admin as $custom_index => $custom_goal):
+                    ?>
+                    <div class="cr-custom-item" data-custom-row>
+                        <input type="hidden" name="cookierus_settings[custom_goals][<?php echo esc_attr($custom_index); ?>][id]" value="<?php echo esc_attr($custom_goal['id'] ?? ''); ?>">
+                        <input type="text" name="cookierus_settings[custom_goals][<?php echo esc_attr($custom_index); ?>][title]" value="<?php echo esc_attr($custom_goal['title'] ?? ''); ?>" placeholder="Заголовок цели" class="large-text">
+                        <textarea name="cookierus_settings[custom_goals][<?php echo esc_attr($custom_index); ?>][description]" rows="2" placeholder="Описание цели" class="large-text" style="margin-top:8px;"><?php echo esc_textarea($custom_goal['description'] ?? ''); ?></textarea>
+                        <div style="display:flex;align-items:center;gap:12px;margin-top:8px;">
+                            <label><input type="checkbox" name="cookierus_settings[custom_goals][<?php echo esc_attr($custom_index); ?>][enabled]" value="1" <?php checked(1, $custom_goal['enabled'] ?? 1); ?>> Показывать в настройках</label>
+                            <button type="button" class="button-link-delete cr-remove-custom">Удалить</button>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+                <button type="button" class="button" id="cr-add-custom-goal">+ Добавить свою цель</button>
+                <template id="cr-custom-goal-template">
+                    <div class="cr-custom-item" data-custom-row>
+                        <input type="hidden" name="cookierus_settings[custom_goals][__INDEX__][id]" value="">
+                        <input type="text" name="cookierus_settings[custom_goals][__INDEX__][title]" value="" placeholder="Заголовок цели" class="large-text">
+                        <textarea name="cookierus_settings[custom_goals][__INDEX__][description]" rows="2" placeholder="Описание цели" class="large-text" style="margin-top:8px;"></textarea>
+                        <div style="display:flex;align-items:center;gap:12px;margin-top:8px;">
+                            <label><input type="checkbox" name="cookierus_settings[custom_goals][__INDEX__][enabled]" value="1" checked> Показывать в настройках</label>
+                            <button type="button" class="button-link-delete cr-remove-custom">Удалить</button>
+                        </div>
+                    </div>
+                </template>
+            </div>
         </div>
     </div>
 
@@ -893,6 +1078,20 @@ jQuery(document).ready(function($) {
     });
     $('#minimize-toggle').on('change', function() {
         $(this).next('.cookierus-slider').css('background-color', this.checked ? '#10b981' : '#ccc');
+    });
+    function addCustomSettingRow(buttonId, templateId, listId) {
+        $('#' + buttonId).on('click', function() {
+            var template = document.getElementById(templateId);
+            if (!template) return;
+            var index = 'new_' + Date.now();
+            var html = template.innerHTML.split('__INDEX__').join(index);
+            $('#' + listId).append(html);
+        });
+    }
+    addCustomSettingRow('cr-add-custom-category', 'cr-custom-category-template', 'cr-custom-categories-list');
+    addCustomSettingRow('cr-add-custom-goal', 'cr-custom-goal-template', 'cr-custom-goals-list');
+    $(document).on('click', '.cr-remove-custom', function() {
+        $(this).closest('[data-custom-row]').remove();
     });
 
     // ── Предпросмотр ─────────────────────────────────────
