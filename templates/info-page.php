@@ -1,6 +1,6 @@
 <?php
 /**
- * CookieRus Info Page — v1.1.1
+ * CookieRus Info Page — v1.1.3
  */
 if (!defined('ABSPATH')) exit; ?>
 
@@ -155,6 +155,16 @@ if (!defined('ABSPATH')) exit; ?>
 .cr-compliance-item.cr-ok   p { color: #166534; }
 .cr-compliance-item.cr-warn p { color: #78350f; }
 .cr-compliance-item.cr-bad  p { color: #7f1d1d; }
+.cookierus-info-developer-label {
+    margin-top: 18px;
+    padding: 12px 16px;
+    border: 1px solid #e1e9f5;
+    border-radius: 10px;
+    background: #f8faff;
+    color: #6b7280;
+    text-align: center;
+    font-size: 12px;
+}
 </style>
 
 <div class="cookierus-info-page">
@@ -169,7 +179,7 @@ if (!defined('ABSPATH')) exit; ?>
     ════════════════════════════════════════ -->
     <div class="cr-disclaimer-box">
         <h3>⚖️ Отказ от ответственности разработчика плагина</h3>
-        <p><strong>Разработчик плагина CookieRus — Сергей Солошенко (RuCoder) — не несёт никакой юридической ответственности</strong> за соответствие деятельности оператора требованиям Федерального закона № 152-ФЗ «О персональных данных», требованиям Роскомнадзора, а также требованиям любых иных нормативных актов.</p>
+        <p><strong>Разработчик плагина CookieRus не несёт никакой юридической ответственности</strong> за соответствие деятельности оператора требованиям Федерального закона № 152-ФЗ «О персональных данных», требованиям Роскомнадзора, а также требованиям любых иных нормативных актов.</p>
         <p>Плагин является <strong>техническим инструментом</strong>, упрощающим реализацию механизма получения cookie-согласия. Вся полнота ответственности за соблюдение законодательства о персональных данных лежит <strong>исключительно на операторе персональных данных</strong> — лице, осуществляющем деятельность на сайте, на котором установлен плагин.</p>
         <p>В частности, оператор самостоятельно несёт ответственность за:</p>
         <ul>
@@ -217,7 +227,7 @@ if (!defined('ABSPATH')) exit; ?>
             </div>
             <div class="cr-compliance-item cr-warn">
                 <h5>⚠️ 6. Описание категорий cookie</h5>
-                <p>В политике должно быть подробное описание каждой категории с указанием конкретных сервисов и сроков хранения. Используйте генератор политики в соответствующей вкладке.</p>
+                <p>В политике должно быть подробное описание каждой категории с указанием конкретных сервисов и сроков хранения. Поддерживайте этот документ на отдельной странице сайта.</p>
             </div>
             <div class="cr-compliance-item cr-warn">
                 <h5>⚠️ 7. Инструкция по отказу через браузер</h5>
@@ -225,7 +235,7 @@ if (!defined('ABSPATH')) exit; ?>
             </div>
             <div class="cr-compliance-item cr-ok">
                 <h5>✅ 8. Блокировка трекинга до согласия</h5>
-                <p>Плагин блокирует Яндекс.Метрику, Meta Pixel и VK Pixel до нажатия «Принять». Укажите ID трекеров в настройках → «Блокировка трекеров».</p>
+                <p>Плагин блокирует Яндекс.Метрику, VK Pixel и другие известные сборщики до нажатия «Принять». Укажите разрешённые ID трекеров в настройках → «Блокировка трекеров».</p>
             </div>
             <div class="cr-warn" style="padding:14px 16px;border-radius:10px;border:1px solid #fcd34d;background:#fffbeb;">
                 <h5 style="margin:0 0 6px 0;font-size:12.5px;font-weight:700;color:#92400e;">⚠️ 9. Сроки хранения cookie</h5>
@@ -345,7 +355,7 @@ if (!defined('ABSPATH')) exit; ?>
             </div>
             <div class="cookierus-tip">
                 <h5><span class="dashicons dashicons-shield-alt"></span> Блокируйте трекеры</h5>
-                <p>Укажите ID Яндекс.Метрики, Meta Pixel и других сервисов в разделе «Блокировка трекеров». Любые сторонние скрипты должны загружаться только после согласия.</p>
+                <p>Укажите ID разрешённых сервисов в разделе «Блокировка трекеров». Любые сторонние скрипты должны загружаться только после согласия.</p>
             </div>
             <div class="cookierus-tip">
                 <h5><span class="dashicons dashicons-admin-page"></span> Актуальная политика</h5>
@@ -372,7 +382,7 @@ if (!defined('ABSPATH')) exit; ?>
                 <li>В баннере есть кнопки «Принять все», «Отклонить» и «Настроить»</li>
                 <li>В баннере есть кликабельная ссылка на политику конфиденциальности</li>
                 <li>Кнопка «Отклонить» ведёт на страницу с инструкцией по настройке браузера</li>
-                <li>Яндекс.Метрика, Meta Pixel и другие сторонние скрипты заблокированы до согласия</li>
+                <li>Яндекс.Метрика, VK Pixel и другие сторонние скрипты заблокированы до согласия</li>
                 <li>Ведётся и экспортируется журнал согласий (хранение ≥ 12 месяцев)</li>
                 <li>Политика конфиденциальности размещена на отдельной странице</li>
                 <li>Ссылка на политику есть в футере на каждой странице</li>
@@ -383,33 +393,6 @@ if (!defined('ABSPATH')) exit; ?>
         </div>
     </div>
 
-    <!-- ════════════════════════════════════════
-         КОНТАКТЫ РАЗРАБОТЧИКА
-    ════════════════════════════════════════ -->
-    <div class="cookierus-info-section">
-        <h3><span class="dashicons dashicons-admin-users"></span> О разработчике</h3>
-        <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;">
-            <div style="flex:1;min-width:220px;">
-                <p style="margin:0 0 10px;font-size:13px;color:#374151;line-height:1.6;">
-                    <strong>Сергей Солошенко (RuCoder)</strong><br>
-                    Веб-разработчик с 2018 года<br>
-                    Специализация: WordPress / Full Stack
-                </p>
-                <p style="margin:0;font-size:13px;color:#374151;">
-                    📞 <a href="tel:+79859855397">+7 (985) 985-53-97</a><br>
-                    📧 <a href="mailto:support@рукодер.рф">support@рукодер.рф</a><br>
-                    💬 Telegram: <a href="https://t.me/RussCoder" target="_blank" rel="noopener">@RussCoder</a><br>
-                    🌐 <a href="https://рукодер.рф" target="_blank" rel="noopener">рукодер.рф</a>
-                </p>
-            </div>
-            <div style="flex:1;min-width:220px;background:#f8faff;padding:14px;border-radius:10px;border:1px solid #e1e9f5;">
-                <p style="margin:0;font-size:12px;color:#555;line-height:1.6;">
-                    Плагин CookieRus распространяется <strong>бесплатно</strong> под лицензией GPL v2.<br><br>
-                    GitHub: <a href="https://github.com/RuCoder-sudo/cookierus" target="_blank" rel="noopener">github.com/RuCoder-sudo/cookierus</a><br><br>
-                    Версия плагина: <strong><?php echo defined('COOKIERUS_VERSION') ? esc_html(COOKIERUS_VERSION) : '1.1.1'; ?></strong>
-                </p>
-            </div>
-        </div>
-    </div>
+    <div class="cookierus-info-developer-label">Разработчик плагина CookieRus</div>
 
 </div>
