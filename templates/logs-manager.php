@@ -10,6 +10,11 @@ $logs = $wpdb->get_results("SELECT * FROM $table_name ORDER BY created_at DESC L
         <p>Логи успешно очищены.</p>
     </div>
 <?php endif; ?>
+<?php if (isset($_GET['cleared_old']) && $_GET['cleared_old'] == '1'): ?>
+    <div class="notice notice-success is-dismissible">
+        <p>Логи старше одного года успешно удалены.</p>
+    </div>
+<?php endif; ?>
 
 <p>Здесь отображаются последние 100 записей о действиях пользователей с файлами cookie.</p>
 
@@ -33,8 +38,17 @@ $logs = $wpdb->get_results("SELECT * FROM $table_name ORDER BY created_at DESC L
     ); 
     ?>
     <a href="<?php echo $clear_url; ?>" class="button button-secondary" style="color: #d63638; border-color: #d63638;" onclick="return confirm('Вы уверены, что хотите очистить все логи?');">Очистить все логи</a>
+
+    <?php
+    $clear_old_url = wp_nonce_url(
+        admin_url('admin.php?page=cookierus&action=cookierus_clear_old_logs'),
+        'cookierus_clear_old_logs_action',
+        'cookierus_nonce'
+    );
+    ?>
+    <a href="<?php echo esc_url($clear_old_url); ?>" class="button button-secondary" style="color:#8a5a00;border-color:#c58b00;" onclick="return confirm('Удалить только логи старше одного года?');">Очистить логи старше 1 года</a>
     
-    <span class="description" style="margin-left: 10px;">Скачать полную историю согласий в формате CSV или полностью очистить таблицу.</span>
+    <span class="description" style="margin-left: 10px;">Скачать историю, удалить всю таблицу или удалить только записи старше одного года.</span>
 </div>
 
 <table class="wp-list-table widefat fixed striped">
