@@ -370,9 +370,6 @@ $decline_rate = $total_users > 0 ? round(($declined_users / $total_users) * 100,
             <a href="?page=cookierus&tab=logs" class="cookierus-quick-btn">
                 <span class="dashicons dashicons-list-view"></span> Просмотр логов
             </a>
-            <a href="?page=cookierus&tab=policy" class="cookierus-quick-btn">
-                <span class="dashicons dashicons-media-document"></span> Генератор политики
-            </a>
         </div>
     </div>
 </div>
