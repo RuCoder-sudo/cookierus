@@ -163,7 +163,7 @@ class CookieRus_Updater {
             'requires_php'  => '7.4',
             'last_updated'  => $release['published_at'] ?? '',
             'sections'      => array(
-                'description' => 'Простой способ убедиться, что ваш сайт соответствует законодательству о файлах cookie. Красивый баннер согласия, логирование согласий, генератор политики cookie.',
+                'description' => 'Простой способ управлять согласием с файлами cookie. Красивый баннер согласия, логирование, пользовательские категории и строгая блокировка трекеров.',
                 'changelog'   => $changelog,
             ),
             'download_link' => "https://github.com/{$this->github_user}/{$this->github_repo}/archive/refs/tags/{$release['tag_name']}.zip",
