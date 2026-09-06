@@ -3,7 +3,7 @@
  * Plugin Name: CookieRus
  * Plugin URI: https://github.com/RuCoder-sudo/cookierus
  * Description: Простой способ убедиться, что ваш сайт соответствует Закону России о файлах cookie.
- * Version: 1.1.3
+ * Version: 1.1.4
  * Author: Сергей Солошенко (RuCoder)
  * Author URI: https://рукодер.рф
  * License: GPL v2 or later
@@ -29,7 +29,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('COOKIERUS_VERSION', '1.1.3');
+define('COOKIERUS_VERSION', '1.1.4');
 define('COOKIERUS_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('COOKIERUS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
@@ -82,6 +82,8 @@ class CookieRus {
 
         $settings = get_option('cookierus_settings', []);
         $settings = is_array($settings) ? $settings : [];
+        $is_revoke_request = isset($_GET['cookierus_revoke'])
+            && sanitize_text_field(wp_unslash($_GET['cookierus_revoke'])) === '1';
         /*
          * The blocker must remain active even if an administrator temporarily
          * hides the banner. Otherwise a script in a theme/footer can collect
@@ -89,15 +91,16 @@ class CookieRus {
          */
         $strict_blocking = !isset($settings['security']['strict_blocking'])
             || !empty($settings['security']['strict_blocking']);
-        if (!$strict_blocking && empty($settings['banner']['enabled'])) return;
+        if (!$strict_blocking && empty($settings['banner']['enabled']) && !$is_revoke_request) return;
 
         // When repeat_show=always, show banner on every page load (session cookie is cleared between visits)
         $repeat_show = $settings['banner']['repeat_show'] ?? 'never';
-        $needs_banner_markup = !empty($settings['banner']['enabled'])
-            && ($repeat_show === 'always'
+        $revoke_enabled = !empty($settings['banner']['show_revoke_button']);
+        $needs_banner_markup = ($is_revoke_request || !empty($settings['banner']['enabled']))
+            && ($is_revoke_request
+                || $repeat_show === 'always'
                 || !isset($_COOKIE['cookierus_consent'])
-                || !isset($settings['banner']['show_revoke_button'])
-                || !empty($settings['banner']['show_revoke_button']));
+                || $revoke_enabled);
         if ($needs_banner_markup) {
             ob_start();
             include plugin_dir_path(__FILE__) . 'templates/banner-template.php';
@@ -820,6 +823,16 @@ class CookieRus {
             $settings = $this->get_default_settings();
         }
 
+        /*
+         * The revoke control used to be enabled by default. Apply the new
+         * default once to existing installations, then respect the
+         * administrator's choice going forward.
+         */
+        if (!get_option('cookierus_revoke_button_default_migrated')) {
+            $settings['banner']['show_revoke_button'] = 0;
+            update_option('cookierus_revoke_button_default_migrated', COOKIERUS_VERSION);
+        }
+
         $clean_settings = $this->sanitize_settings(
             array_replace_recursive($this->get_default_settings(), $settings)
         );
@@ -868,7 +881,7 @@ class CookieRus {
                 'btn_hover'            => 'lift',
                 'repeat_show'          => 'never',
                 'allow_minimize'       => false,
-                'show_revoke_button'   => true,
+                'show_revoke_button'   => false,
                 'animation'            => 'slide',
             ],
             'trackers' => [
