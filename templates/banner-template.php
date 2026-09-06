@@ -63,6 +63,8 @@ $btn_hover     = $banner['btn_hover']     ?? 'lift';
 $btn_layout    = $banner['btn_layout']    ?? 'column';
 $repeat_show   = $banner['repeat_show']   ?? 'never';
 $allow_minimize = !empty($banner['allow_minimize']);
+$revoke_requested = isset($_GET['cookierus_revoke'])
+    && sanitize_text_field(wp_unslash($_GET['cookierus_revoke'])) === '1';
 $decline_url   = $banner['btn_decline_url'] ?? '';
 
 $plugin_url = defined('COOKIERUS_PLUGIN_URL') ? COOKIERUS_PLUGIN_URL : plugin_dir_url(dirname(__FILE__));
@@ -189,7 +191,7 @@ $show_goals = [
          alt="" role="presentation" width="28" height="28">
 </button>
 <?php endif; ?>
-<?php if (($banner['show_revoke_button'] ?? true)): ?>
+<?php if (!empty($banner['show_revoke_button'])): ?>
 <button type="button" id="cookierus-revoke" class="cookierus-revoke-btn"
         style="display:none;" title="Отозвать согласие" aria-label="Отозвать согласие">
     Отозвать согласие
@@ -505,13 +507,14 @@ $show_goals = [
 </div><!-- #cookierus-modal -->
 
 <script id="cookierus-banner-script">
-/* CookieRus v1.1.3 — frontend script */
+/* CookieRus v1.1.4 — frontend script */
 (function() {
     'use strict';
 
     var REPEAT_SHOW    = <?php echo json_encode($repeat_show); ?>;
     var ALLOW_MINIMIZE = <?php echo $allow_minimize ? 'true' : 'false'; ?>;
-    var REVOKE_ENABLED = <?php echo (($banner['show_revoke_button'] ?? true) ? 'true' : 'false'); ?>;
+    var REVOKE_ENABLED = <?php echo !empty($banner['show_revoke_button']) ? 'true' : 'false'; ?>;
+    var REVOKE_REQUESTED = <?php echo $revoke_requested ? 'true' : 'false'; ?>;
     var DECLINE_URL    = <?php echo json_encode($decline_url); ?>;
     var LOG_NONCE      = <?php echo json_encode(wp_create_nonce('cookierus_log_consent')); ?>;
     var TRACKERS       = <?php echo json_encode([
@@ -706,6 +709,14 @@ $show_goals = [
                 localStorage.removeItem('cookierus_consent');
                 localStorage.removeItem('cookierus_consent_time');
             } catch (e) {}
+
+            if (REVOKE_REQUESTED) {
+                var cleanUrl = new URL(window.location.href);
+                cleanUrl.searchParams.delete('cookierus_revoke');
+                window.location.replace(cleanUrl.toString());
+                return;
+            }
+
             window.location.reload();
         }
 
@@ -714,6 +725,11 @@ $show_goals = [
             revokeBtn.addEventListener('click', function() {
                 revokeConsent();
             });
+        }
+
+        if (REVOKE_REQUESTED) {
+            revokeConsent();
+            return;
         }
 
         /* ── Свернуть / развернуть ───────────────────── */
