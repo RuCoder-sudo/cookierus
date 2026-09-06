@@ -821,12 +821,24 @@ $advertising_services = $sections['advertising_services'] ?? [
                 <label>Отзыв согласия</label>
                 <div class="cookierus-toggle-row">
                     <label class="cookierus-switch" style="display:inline-block; width:46px; height:24px;">
-                        <input type="checkbox" name="cookierus_settings[banner][show_revoke_button]" value="1" id="revoke-toggle" <?php checked(1, $banner['show_revoke_button'] ?? 1); ?>>
+                        <input type="checkbox" name="cookierus_settings[banner][show_revoke_button]" value="1" id="revoke-toggle" <?php checked(1, $banner['show_revoke_button'] ?? 0); ?>>
                         <span class="cookierus-slider" style="background-color:<?php echo !empty($banner['show_revoke_button']) ? '#10b981' : '#ccc'; ?>;"></span>
                     </label>
                     <label class="toggle-label" for="revoke-toggle">Показать кнопку отзыва согласия на сайте</label>
                 </div>
-                <p class="description" style="margin-top:5px;">После согласия в правом нижнем углу появится кнопка «Настройки cookie». Она снова открывает настройки и позволяет отозвать согласие.</p>
+                <p class="description" style="margin-top:5px;">По умолчанию кнопка выключена. Если включить её, после согласия в правом нижнем углу появится кнопка «Отозвать согласие».</p>
+                <?php
+                $revoke_link = add_query_arg('cookierus_revoke', '1', home_url('/'));
+                ?>
+                <div class="cookierus-revoke-link-box" style="margin-top:14px; padding:14px; background:#f8fafc; border:1px solid #dbe5f0; border-radius:8px;">
+                    <strong style="display:block; margin-bottom:6px;">Ссылка для страницы политики</strong>
+                    <p class="description" style="margin:0 0 10px;">Вставьте эту ссылку в политику конфиденциальности или на отдельную страницу. При переходе по ней согласие пользователя будет отозвано.</p>
+                    <div style="display:flex; gap:8px; align-items:center; max-width:620px;">
+                        <input type="url" id="cookierus-revoke-link" value="<?php echo esc_attr($revoke_link); ?>" readonly class="large-text" style="flex:1; min-width:0;">
+                        <button type="button" class="button button-secondary" id="cookierus-copy-revoke-link">Копировать</button>
+                    </div>
+                    <span id="cookierus-copy-revoke-status" role="status" aria-live="polite" style="display:block; margin-top:7px; color:#16803c;"></span>
+                </div>
             </div>
         </div>
 
@@ -1061,6 +1073,40 @@ $advertising_services = $sections['advertising_services'] ?? [
         <?php submit_button('Сохранить все изменения', 'button-primary button-hero', 'submit', false); ?>
     </div>
 </form>
+
+<script>
+(function() {
+    var copyButton = document.getElementById('cookierus-copy-revoke-link');
+    var linkInput = document.getElementById('cookierus-revoke-link');
+    var status = document.getElementById('cookierus-copy-revoke-status');
+
+    if (!copyButton || !linkInput || !status) return;
+
+    function showCopied() {
+        status.textContent = 'Ссылка скопирована.';
+        window.setTimeout(function() {
+            status.textContent = '';
+        }, 2500);
+    }
+
+    function copyWithFallback() {
+        linkInput.focus();
+        linkInput.select();
+        if (document.execCommand('copy')) {
+            showCopied();
+        }
+    }
+
+    copyButton.addEventListener('click', function() {
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(linkInput.value).then(showCopied).catch(copyWithFallback);
+            return;
+        }
+
+        copyWithFallback();
+    });
+})();
+</script>
 
 <script>
 jQuery(document).ready(function($) {
