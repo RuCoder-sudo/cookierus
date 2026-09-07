@@ -1,6 +1,6 @@
 <?php
 /**
- * CookieRus Banner Template — v1.1.6
+ * CookieRus Banner Template — v1.1.7
  * Рендерится на фронтенде: баннер + модал настроек (3 вкладки) + блокировка трекеров
  */
 if (!defined('ABSPATH')) exit;
@@ -42,8 +42,7 @@ $analytics_services = $sections['analytics_services'] ?? ['yandex_metrika' => 1]
 $advertising_services = $sections['advertising_services'] ?? ['yandex_ads' => 1];
 $foreign_auth_block_enabled = class_exists('CookieRus_Compliance')
     && CookieRus_Compliance::is_foreign_auth_block_enabled();
-$russian_email_auth_block_enabled = class_exists('CookieRus_Compliance')
-    && CookieRus_Compliance::is_russian_email_auth_block_enabled();
+$russian_email_auth_block_enabled = !empty($settings['security']['russian_email_auth_block']);
 
 // Animation class
 $anim_class = 'cookierus-animate-' . ($banner['animation'] ?? 'slide');
@@ -505,7 +504,7 @@ $show_goals = [
 </div><!-- #cookierus-modal -->
 
 <script id="cookierus-banner-script">
-/* CookieRus v1.1.6 — frontend script */
+/* CookieRus v1.1.7 — frontend script */
 (function() {
     'use strict';
 
