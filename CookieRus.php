@@ -3,7 +3,7 @@
  * Plugin Name: CookieRus
  * Plugin URI: https://github.com/RuCoder-sudo/cookierus
  * Description: Простой способ убедиться, что ваш сайт соответствует Закону России о файлах cookie.
- * Version: 1.1.6
+ * Version: 1.1.7
  * Author: Сергей Солошенко (RuCoder)
  * Author URI: https://рукодер.рф
  * License: GPL v2 or later
@@ -29,7 +29,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('COOKIERUS_VERSION', '1.1.6');
+define('COOKIERUS_VERSION', '1.1.7');
 define('COOKIERUS_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('COOKIERUS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
@@ -824,7 +824,7 @@ class CookieRus {
             $settings = $this->get_default_settings();
         }
 
-        // CookieRus v1.1.6 keeps the policy page as the recommended decline
+        // CookieRus v1.1.7 keeps the policy page as the recommended decline
         // destination. Fill it only when the administrator has no URL yet.
         if (empty($settings['banner']['btn_decline_url'])) {
             $settings['banner']['btn_decline_url'] = 'http://ovva-ru.ovva.tech/cookie-policy/';
