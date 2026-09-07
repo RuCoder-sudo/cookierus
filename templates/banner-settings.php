@@ -967,6 +967,15 @@ $advertising_services = $sections['advertising_services'] ?? [
 
             <div class="cookierus-toggle-row" style="border-top:1px solid #f0f0f1;padding-top:15px;">
                 <label class="cookierus-switch" style="display:inline-block; width:46px; height:24px;">
+                    <input type="checkbox" name="cookierus_settings[security][russian_email_auth_block]" value="1" id="russian-email-auth-toggle" <?php checked(1, $settings['security']['russian_email_auth_block'] ?? 0); ?>>
+                    <span class="cookierus-slider" style="background-color:<?php echo !empty($settings['security']['russian_email_auth_block']) ? '#10b981' : '#ccc'; ?>;"></span>
+                </label>
+                <label class="toggle-label" for="russian-email-auth-toggle">Ограничить регистрацию и вход российскими email-доменами</label>
+            </div>
+            <p class="description">Если включено, регистрация, восстановление доступа и вход по email разрешены только для российских почтовых сервисов и доменов .ru, .su или .рф. Вход по имени пользователя не проверяется по email и остаётся доступен. Администраторы также могут войти по своему email.</p>
+
+            <div class="cookierus-toggle-row" style="border-top:1px solid #f0f0f1;padding-top:15px;">
+                <label class="cookierus-switch" style="display:inline-block; width:46px; height:24px;">
                     <input type="checkbox" name="cookierus_settings[security][foreign_auth_block]" value="1" id="foreign-auth-toggle" <?php checked(1, $settings['security']['foreign_auth_block'] ?? 0); ?>>
                     <span class="cookierus-slider" style="background-color:<?php echo !empty($settings['security']['foreign_auth_block']) ? '#10b981' : '#ccc'; ?>;"></span>
                 </label>
