@@ -1,6 +1,6 @@
 <?php
 /**
- * CookieRus Updates Page — v1.1.3
+ * CookieRus Updates Page — v1.1.5
  */
 if (!defined('ABSPATH')) exit; ?>
 
@@ -124,10 +124,23 @@ if (!defined('ABSPATH')) exit; ?>
     <div class="cr-updates-section">
         <h3><span class="dashicons dashicons-backup"></span> История версий CookieRus</h3>
 
+         <!-- v1.1.5 -->
+         <div class="cr-version-block">
+             <div>
+                 <span class="cr-version-tag cr-latest">✅ v1.1.5 <span class="cr-version-date">— 7 сентября 2026</span></span>
+             </div>
+             <ul class="cr-change-list">
+                 <li class="cr-fix"><strong>Исправлено:</strong> после принятия согласия страница обновляется, поэтому Яндекс.Метрика и Callibri корректно догружаются и инициализируются.</li>
+                 <li class="cr-new"><strong>Изменено:</strong> кнопка «Отозвать согласие» и её настройка полностью убраны из интерфейса сайта и админки.</li>
+                 <li class="cr-new"><strong>Добавлено:</strong> ссылка <code>/?cookierus_revoke=1</code> для размещения в политике конфиденциальности и резервный переход на неё при пустом URL отказа.</li>
+                 <li class="cr-new"><strong>Изменено:</strong> URL страницы политики по умолчанию — <code>http://ovva-ru.ovva.tech/cookie-policy/</code>.</li>
+             </ul>
+         </div>
+
          <!-- v1.1.3 -->
          <div class="cr-version-block">
              <div>
-                 <span class="cr-version-tag cr-latest">✅ v1.1.3 <span class="cr-version-date">— 5 сентября 2026</span></span>
+                 <span class="cr-version-tag">v1.1.3 <span class="cr-version-date">— 5 сентября 2026</span></span>
              </div>
              <ul class="cr-change-list">
                  <li class="cr-fix"><strong>Исправлено:</strong> восстановлена корректная вложенность карточек в настройках — разделы больше не собираются в один общий блок.</li>
