@@ -1,6 +1,6 @@
 <?php
 /**
- * CookieRus Info Page — v1.1.5
+ * CookieRus Info Page — v1.1.6
  */
 if (!defined('ABSPATH')) exit; ?>
 
