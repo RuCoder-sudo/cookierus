@@ -1,6 +1,6 @@
 <?php
 /**
- * CookieRus Updates Page — v1.1.5
+ * CookieRus Updates Page — v1.1.6
  */
 if (!defined('ABSPATH')) exit; ?>
 
@@ -124,10 +124,24 @@ if (!defined('ABSPATH')) exit; ?>
     <div class="cr-updates-section">
         <h3><span class="dashicons dashicons-backup"></span> История версий CookieRus</h3>
 
+         <!-- v1.1.6 -->
+         <div class="cr-version-block">
+             <div>
+                 <span class="cr-version-tag cr-latest">✅ v1.1.6 <span class="cr-version-date">— 7 сентября 2026</span></span>
+             </div>
+             <ul class="cr-change-list">
+                 <li class="cr-new"><strong>Добавлено:</strong> отдельный тумблер «Ограничить регистрацию и вход российскими email-доменами».</li>
+                 <li class="cr-fix"><strong>Исправлено:</strong> ограничение по умолчанию выключено, поэтому существующие администраторы не теряют доступ после обновления.</li>
+                 <li class="cr-fix"><strong>Исправлено:</strong> вход по имени пользователя больше не блокируется из-за иностранного email в профиле пользователя.</li>
+                 <li class="cr-new"><strong>Добавлено:</strong> администраторы могут войти по иностранному email даже при включённом ограничении.</li>
+                 <li class="cr-new"><strong>Изменено:</strong> вкладка «Упоминания» показывает фактическое состояние ограничения.</li>
+             </ul>
+         </div>
+
          <!-- v1.1.5 -->
          <div class="cr-version-block">
              <div>
-                 <span class="cr-version-tag cr-latest">✅ v1.1.5 <span class="cr-version-date">— 7 сентября 2026</span></span>
+                 <span class="cr-version-tag">v1.1.5 <span class="cr-version-date">— 7 сентября 2026</span></span>
              </div>
              <ul class="cr-change-list">
                  <li class="cr-fix"><strong>Исправлено:</strong> после принятия согласия страница обновляется, поэтому Яндекс.Метрика и Callibri корректно догружаются и инициализируются.</li>
