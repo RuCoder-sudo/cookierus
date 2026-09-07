@@ -1,6 +1,6 @@
 <?php
 /**
- * CookieRus Updates Page — v1.1.6
+ * CookieRus Updates Page — v1.1.7
  */
 if (!defined('ABSPATH')) exit; ?>
 
@@ -124,10 +124,22 @@ if (!defined('ABSPATH')) exit; ?>
     <div class="cr-updates-section">
         <h3><span class="dashicons dashicons-backup"></span> История версий CookieRus</h3>
 
+         <!-- v1.1.7 -->
+         <div class="cr-version-block">
+             <div>
+                 <span class="cr-version-tag cr-latest">✅ v1.1.7 <span class="cr-version-date">— 7 сентября 2026</span></span>
+             </div>
+             <ul class="cr-change-list">
+                 <li class="cr-fix"><strong>Исправлено:</strong> устранена причина критической ошибки на фронтенде после обновления до 1.1.6.</li>
+                 <li class="cr-fix"><strong>Изменено:</strong> состояние тумблера теперь читается напрямую из сохранённых настроек, без зависимости от дополнительного метода класса.</li>
+                 <li class="cr-fix"><strong>Улучшено:</strong> совместимость с частично обновлёнными файлами и старым OPcache.</li>
+             </ul>
+         </div>
+
          <!-- v1.1.6 -->
          <div class="cr-version-block">
              <div>
-                 <span class="cr-version-tag cr-latest">✅ v1.1.6 <span class="cr-version-date">— 7 сентября 2026</span></span>
+                 <span class="cr-version-tag">v1.1.6 <span class="cr-version-date">— 7 сентября 2026</span></span>
              </div>
              <ul class="cr-change-list">
                  <li class="cr-new"><strong>Добавлено:</strong> отдельный тумблер «Ограничить регистрацию и вход российскими email-доменами».</li>
