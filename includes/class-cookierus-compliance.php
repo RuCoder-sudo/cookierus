@@ -1,10 +1,9 @@
 <?php
 /**
- * CookieRus — ограничения регистрации и входа по домену email.
+ * CookieRus — необязательное ограничение регистрации и входа по домену email.
  *
- * Ограничение применяется к стандартному WordPress, WooCommerce и
- * авторизации в wp-admin. Список разрешённых зон соответствует настройке
- * CookieRus: mail.ru, yandex.ru, rambler.ru, bk.ru и домены .ru/.su/.рф.
+ * Ограничение применяется только при включённом переключателе администратора.
+ * Вход по имени пользователя никогда не проверяется по email пользователя.
  */
 
 if (!defined('ABSPATH')) {
@@ -22,9 +21,6 @@ class CookieRus_Compliance {
 
         // Проверка до стандартной авторизации, если пользователь вводит email.
         add_filter('authenticate', [__CLASS__, 'reject_email_login'], 5, 3);
-        // Проверка после поиска пользователя, если вход выполнен по логину.
-        add_filter('authenticate', [__CLASS__, 'reject_authenticated_user'], 30, 3);
-
         // Не даём создать или сохранить в профиле пользователя запрещённый email.
         add_filter('user_profile_update_errors', [__CLASS__, 'validate_profile_email'], 10, 3);
         // Дополнительная защита для программного создания или изменения пользователя.
@@ -52,6 +48,11 @@ class CookieRus_Compliance {
     public static function is_foreign_auth_block_enabled() {
         $settings = get_option('cookierus_settings', []);
         return !empty($settings['security']['foreign_auth_block']);
+    }
+
+    public static function is_russian_email_auth_block_enabled() {
+        $settings = get_option('cookierus_settings', []);
+        return !empty($settings['security']['russian_email_auth_block']);
     }
 
     public static function filter_foreign_providers($providers) {
@@ -201,6 +202,10 @@ class CookieRus_Compliance {
     }
 
     public static function validate_registration($errors, $username = '', $email = '') {
+        if (!self::is_russian_email_auth_block_enabled()) {
+            return $errors;
+        }
+
         if (!self::is_allowed_email($email)) {
             self::add_email_error($errors);
         }
@@ -209,6 +214,10 @@ class CookieRus_Compliance {
     }
 
     public static function validate_checkout_account($data, $errors) {
+        if (!self::is_russian_email_auth_block_enabled()) {
+            return;
+        }
+
         if (!empty($_POST['createaccount']) && !empty($data['billing_email'])) {
             if (!self::is_allowed_email($data['billing_email'])) {
                 self::add_email_error($errors);
@@ -217,6 +226,10 @@ class CookieRus_Compliance {
     }
 
     public static function validate_woocommerce_registration($errors, $username = '', $password = '', $email = '') {
+        if (!self::is_russian_email_auth_block_enabled()) {
+            return $errors;
+        }
+
         if (!self::is_allowed_email($email)) {
             self::add_email_error($errors);
         }
@@ -225,19 +238,18 @@ class CookieRus_Compliance {
     }
 
     public static function reject_email_login($user, $username, $password) {
-        if ($user instanceof WP_Error) {
+        if (!self::is_russian_email_auth_block_enabled() || $user instanceof WP_Error) {
             return $user;
         }
 
         if (is_email($username) && !self::is_allowed_email($username)) {
-            return self::email_error();
-        }
+            // Администратор должен иметь аварийный доступ даже при иностранном
+            // email. Вход по имени пользователя разрешён независимо от домена.
+            $existing_user = get_user_by('email', $username);
+            if ($existing_user instanceof WP_User && user_can($existing_user, 'manage_options')) {
+                return $user;
+            }
 
-        return $user;
-    }
-
-    public static function reject_authenticated_user($user, $username, $password) {
-        if ($user instanceof WP_User && !self::is_allowed_email($user->user_email)) {
             return self::email_error();
         }
 
@@ -245,6 +257,10 @@ class CookieRus_Compliance {
     }
 
     public static function validate_profile_email($errors, $update, $user) {
+        if (!self::is_russian_email_auth_block_enabled()) {
+            return $errors;
+        }
+
         $email = isset($_POST['email']) ? sanitize_text_field(wp_unslash($_POST['email'])) : '';
         if ($email !== '' && !self::is_allowed_email($email)) {
             self::add_email_error($errors);
@@ -254,6 +270,10 @@ class CookieRus_Compliance {
     }
 
     public static function validate_user_data($data, $update, $user_id, $userdata) {
+        if (!self::is_russian_email_auth_block_enabled()) {
+            return $data;
+        }
+
         if (isset($data['user_email']) && $data['user_email'] !== '' && !self::is_allowed_email($data['user_email'])) {
             // Оставляем стандартному WordPress задачу остановить операцию с невалидным email.
             $data['user_email'] = 'cookierus-invalid-email';
@@ -263,6 +283,10 @@ class CookieRus_Compliance {
     }
 
     public static function validate_lostpassword_email($errors, $user_data = null) {
+        if (!self::is_russian_email_auth_block_enabled()) {
+            return $errors;
+        }
+
         if ($user_data instanceof WP_User && !self::is_allowed_email($user_data->user_email)) {
             self::add_email_error($errors);
         }
