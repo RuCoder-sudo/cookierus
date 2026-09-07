@@ -1,6 +1,6 @@
 <?php
 /**
- * CookieRus Banner Template — v1.1.3
+ * CookieRus Banner Template — v1.1.5
  * Рендерится на фронтенде: баннер + модал настроек (3 вкладки) + блокировка трекеров
  */
 if (!defined('ABSPATH')) exit;
@@ -65,7 +65,8 @@ $repeat_show   = $banner['repeat_show']   ?? 'never';
 $allow_minimize = !empty($banner['allow_minimize']);
 $revoke_requested = isset($_GET['cookierus_revoke'])
     && sanitize_text_field(wp_unslash($_GET['cookierus_revoke'])) === '1';
-$decline_url   = $banner['btn_decline_url'] ?? '';
+$decline_url   = trim((string) ($banner['btn_decline_url'] ?? ''));
+$revoke_url    = add_query_arg('cookierus_revoke', '1', home_url('/'));
 
 $plugin_url = defined('COOKIERUS_PLUGIN_URL') ? COOKIERUS_PLUGIN_URL : plugin_dir_url(dirname(__FILE__));
 
@@ -191,13 +192,6 @@ $show_goals = [
          alt="" role="presentation" width="28" height="28">
 </button>
 <?php endif; ?>
-<?php if (!empty($banner['show_revoke_button'])): ?>
-<button type="button" id="cookierus-revoke" class="cookierus-revoke-btn"
-        style="display:none;" title="Отозвать согласие" aria-label="Отозвать согласие">
-    Отозвать согласие
-</button>
-<?php endif; ?>
-
 <!-- ═══════════════════════════════════════════════════════
      МОДАЛЬНОЕ ОКНО "Настроить"
 ═══════════════════════════════════════════════════════ -->
@@ -507,15 +501,15 @@ $show_goals = [
 </div><!-- #cookierus-modal -->
 
 <script id="cookierus-banner-script">
-/* CookieRus v1.1.4 — frontend script */
+/* CookieRus v1.1.5 — frontend script */
 (function() {
     'use strict';
 
     var REPEAT_SHOW    = <?php echo json_encode($repeat_show); ?>;
     var ALLOW_MINIMIZE = <?php echo $allow_minimize ? 'true' : 'false'; ?>;
-    var REVOKE_ENABLED = <?php echo !empty($banner['show_revoke_button']) ? 'true' : 'false'; ?>;
     var REVOKE_REQUESTED = <?php echo $revoke_requested ? 'true' : 'false'; ?>;
     var DECLINE_URL    = <?php echo json_encode($decline_url); ?>;
+    var REVOKE_URL     = <?php echo json_encode($revoke_url); ?>;
     var LOG_NONCE      = <?php echo json_encode(wp_create_nonce('cookierus_log_consent')); ?>;
     var TRACKERS       = <?php echo json_encode([
         'ym_id'   => $trackers['ym_id']   ?? '',
@@ -647,7 +641,6 @@ $show_goals = [
         var backdrop     = document.getElementById('cookierus-modal-backdrop');
         var minBtn       = document.getElementById('cookierus-minimized-btn');
         var minimizeBtn  = document.getElementById('cookierus-minimize');
-        var revokeBtn    = document.getElementById('cookierus-revoke');
         var acceptBtn    = document.getElementById('cookierus-accept');
         var declineBtn   = document.getElementById('cookierus-decline');
         var openSettings = document.getElementById('cookierus-open-settings');
@@ -698,7 +691,14 @@ $show_goals = [
             document.body.classList.remove('cookierus-show-banner');
             if (modal) modal.style.display = 'none';
             if (minBtn) minBtn.style.display = 'none';
-            if (revokeBtn && REVOKE_ENABLED) revokeBtn.style.display = 'block';
+            if (status === 'accepted') {
+                // Reload the page so scripts that were blocked in the initial
+                // HTML (including Callibri) are rendered and initialized with
+                // the newly saved consent.
+                window.setTimeout(function() {
+                    window.location.reload();
+                }, 100);
+            }
         }
 
         function revokeConsent() {
@@ -718,13 +718,6 @@ $show_goals = [
             }
 
             window.location.reload();
-        }
-
-        if (revokeBtn && REVOKE_ENABLED) {
-            revokeBtn.style.display = getCookie('cookierus_consent') ? 'block' : 'none';
-            revokeBtn.addEventListener('click', function() {
-                revokeConsent();
-            });
         }
 
         if (REVOKE_REQUESTED) {
@@ -765,9 +758,7 @@ $show_goals = [
 
         if (declineBtn) declineBtn.addEventListener('click', function() {
             logConsent('declined', 'none');
-            if (DECLINE_URL) {
-                window.location.href = DECLINE_URL;
-            }
+            window.location.href = DECLINE_URL || REVOKE_URL;
         });
 
         if (openSettings) openSettings.addEventListener('click', function() {
