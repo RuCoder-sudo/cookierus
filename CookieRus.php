@@ -3,7 +3,7 @@
  * Plugin Name: CookieRus
  * Plugin URI: https://github.com/RuCoder-sudo/cookierus
  * Description: Простой способ убедиться, что ваш сайт соответствует Закону России о файлах cookie.
- * Version: 1.1.5
+ * Version: 1.1.6
  * Author: Сергей Солошенко (RuCoder)
  * Author URI: https://рукодер.рф
  * License: GPL v2 or later
@@ -29,7 +29,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('COOKIERUS_VERSION', '1.1.5');
+define('COOKIERUS_VERSION', '1.1.6');
 define('COOKIERUS_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('COOKIERUS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
@@ -688,6 +688,7 @@ class CookieRus {
         // policy-link endpoint and discard the obsolete saved setting.
         unset($value['banner']['show_revoke_button']);
         $value['security']['strict_blocking'] = 1;
+        $value['security']['russian_email_auth_block'] = !empty($value['security']['russian_email_auth_block']) ? 1 : 0;
         $value['security']['foreign_auth_block'] = !empty($value['security']['foreign_auth_block']) ? 1 : 0;
         $value['security']['blocked_domains'] = sanitize_textarea_field($value['security']['blocked_domains'] ?? '');
 
@@ -823,7 +824,7 @@ class CookieRus {
             $settings = $this->get_default_settings();
         }
 
-        // CookieRus v1.1.5 uses the policy page as the recommended decline
+        // CookieRus v1.1.6 keeps the policy page as the recommended decline
         // destination. Fill it only when the administrator has no URL yet.
         if (empty($settings['banner']['btn_decline_url'])) {
             $settings['banner']['btn_decline_url'] = 'http://ovva-ru.ovva.tech/cookie-policy/';
@@ -922,6 +923,7 @@ class CookieRus {
                 // This is deliberately not exposed as an off switch: the
                 // consent firewall must remain active for the guarantee.
                 'strict_blocking' => 1,
+                'russian_email_auth_block' => 0,
                 'foreign_auth_block' => 0,
                 'blocked_domains' => '',
             ],
