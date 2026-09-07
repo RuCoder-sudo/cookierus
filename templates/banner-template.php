@@ -1,6 +1,6 @@
 <?php
 /**
- * CookieRus Banner Template — v1.1.5
+ * CookieRus Banner Template — v1.1.6
  * Рендерится на фронтенде: баннер + модал настроек (3 вкладки) + блокировка трекеров
  */
 if (!defined('ABSPATH')) exit;
@@ -42,6 +42,8 @@ $analytics_services = $sections['analytics_services'] ?? ['yandex_metrika' => 1]
 $advertising_services = $sections['advertising_services'] ?? ['yandex_ads' => 1];
 $foreign_auth_block_enabled = class_exists('CookieRus_Compliance')
     && CookieRus_Compliance::is_foreign_auth_block_enabled();
+$russian_email_auth_block_enabled = class_exists('CookieRus_Compliance')
+    && CookieRus_Compliance::is_russian_email_auth_block_enabled();
 
 // Animation class
 $anim_class = 'cookierus-animate-' . ($banner['animation'] ?? 'slide');
@@ -481,7 +483,9 @@ $show_goals = [
                     </div>
                 </div>
                 <p class="cr-cat-desc">
-                    Регистрация и вход на сайте, включая WooCommerce и раздел /wp-admin/, запрещены с email-адресов иностранных почтовых сервисов. Разрешены только российские почтовые домены: mail.ru, yandex.ru, rambler.ru, bk.ru, а также другие домены в зонах .ru, .su и .рф.
+                    <?php echo $russian_email_auth_block_enabled
+                        ? 'Ограничение российских почтовых доменов включено администратором: регистрация и вход по email разрешены только для mail.ru, yandex.ru, rambler.ru, bk.ru и других доменов в зонах .ru, .su и .рф. Вход по имени пользователя не ограничивается.'
+                        : 'Ограничение российских почтовых доменов отключено. Регистрация и вход по email разрешены без проверки зоны домена. Вход по имени пользователя всегда работает независимо от email пользователя.'; ?>
                 </p>
                 <p class="cr-cat-desc">
                     <?php echo $foreign_auth_block_enabled
@@ -501,7 +505,7 @@ $show_goals = [
 </div><!-- #cookierus-modal -->
 
 <script id="cookierus-banner-script">
-/* CookieRus v1.1.5 — frontend script */
+/* CookieRus v1.1.6 — frontend script */
 (function() {
     'use strict';
 
