@@ -1,6 +1,6 @@
 <?php
 /**
- * CookieRus Updates Page — v1.1.7
+ * CookieRus Updates Page — v1.1.8
  */
 if (!defined('ABSPATH')) exit; ?>
 
@@ -124,10 +124,28 @@ if (!defined('ABSPATH')) exit; ?>
     <div class="cr-updates-section">
         <h3><span class="dashicons dashicons-backup"></span> История версий CookieRus</h3>
 
+         <!-- v1.1.8 -->
+         <div class="cr-version-block">
+             <div>
+                 <span class="cr-version-tag cr-latest">✅ v1.1.8 <span class="cr-version-date">— 14 сентября 2026</span></span>
+             </div>
+             <ul class="cr-change-list">
+                 <li class="cr-fix"><strong>Исправлено:</strong> выключенные аналитические и маркетинговые сервисы больше не включаются после сохранения и обновления страницы.</li>
+                 <li class="cr-fix"><strong>Исправлено:</strong> вкладка «Цели обработки» теперь показывает сохранённое администратором состояние целей.</li>
+                 <li class="cr-new"><strong>Добавлено:</strong> Mail.ru Top по ID, инструкции для Метрики и Callibri, popup по центру и затемнение страницы.</li>
+                 <li class="cr-new"><strong>Добавлено:</strong> отдельное предупреждаемое разрешение на раннюю загрузку аналитики до согласия.</li>
+                  <li class="cr-new"><strong>Добавлено:</strong> внутренние вкладки «Содержимое», «Внешний вид», «Категории», «Сервисы и цели» и «Поведение» для аккуратной навигации по настройкам баннера.</li>
+                  <li class="cr-fix"><strong>Исправлено:</strong> кнопки в popup с иконкой теперь выравниваются по ширине баннера, затемнение работает для любой позиции, а Яндекс.Метрика запускается после согласия даже при отключённой загрузке до согласия.</li>
+                  <li class="cr-new"><strong>Добавлено:</strong> управление вкладкой «Упоминания»: готовые уведомления включаются отдельно, а администратор может создавать свои заголовки и описания.</li>
+                  <li class="cr-fix"><strong>Исправлено:</strong> из пользовательской вкладки «Упоминания» убраны технические сведения о WooCommerce, <code>/wp-admin/</code>, Google и Apple ID; стандартные тексты заменены на короткие правила закона и безопасности сайта.</li>
+                  <li class="cr-new"><strong>Добавлено:</strong> отдельные готовые уведомления о том, что Google reCAPTCHA, Google Analytics, Google Maps и Google Tag Manager не используются; каждое уведомление можно включать и выключать.</li>
+             </ul>
+         </div>
+
          <!-- v1.1.7 -->
          <div class="cr-version-block">
              <div>
-                 <span class="cr-version-tag cr-latest">✅ v1.1.7 <span class="cr-version-date">— 7 сентября 2026</span></span>
+                 <span class="cr-version-tag">v1.1.7 <span class="cr-version-date">— 7 сентября 2026</span></span>
              </div>
              <ul class="cr-change-list">
                  <li class="cr-fix"><strong>Исправлено:</strong> устранена причина критической ошибки на фронтенде после обновления до 1.1.6.</li>
