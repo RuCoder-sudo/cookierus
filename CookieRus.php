@@ -3,7 +3,7 @@
  * Plugin Name: CookieRus
  * Plugin URI: https://github.com/RuCoder-sudo/cookierus
  * Description: Простой способ убедиться, что ваш сайт соответствует Закону России о файлах cookie.
- * Version: 1.1.7
+ * Version: 1.1.8
  * Author: Сергей Солошенко (RuCoder)
  * Author URI: https://рукодер.рф
  * License: GPL v2 or later
@@ -29,7 +29,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('COOKIERUS_VERSION', '1.1.7');
+define('COOKIERUS_VERSION', '1.1.8');
 define('COOKIERUS_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('COOKIERUS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
@@ -158,19 +158,35 @@ class CookieRus {
             return [];
         }
 
+        $settings = get_option('cookierus_settings', []);
+        $sections = is_array($settings['sections'] ?? null) ? $settings['sections'] : [];
+        $category_defaults = [
+            'functional' => 1,
+            'analytics' => 1,
+            'performance' => 0,
+            'advertising' => 1,
+        ];
+        $enabled_categories = ['necessary'];
+        foreach ($category_defaults as $category => $default) {
+            if (!array_key_exists($category, $sections) ? $default : !empty($sections[$category])) {
+                $enabled_categories[] = $category;
+            }
+        }
+        $enabled_categories = array_merge($enabled_categories, self::get_custom_category_ids());
+
         $raw = isset($_COOKIE['cookierus_categories'])
             ? sanitize_text_field(wp_unslash($_COOKIE['cookierus_categories']))
             : 'all';
         $categories = array_filter(array_map('sanitize_key', explode(',', $raw)));
 
         if (in_array('all', $categories, true) || in_array('accepted', $categories, true)) {
-            return array_values(array_unique(array_merge(
-                ['necessary', 'functional', 'analytics', 'performance', 'advertising'],
-                self::get_custom_category_ids()
-            )));
+            return array_values(array_unique($enabled_categories));
         }
 
-        return array_values(array_unique(array_merge(['necessary'], $categories)));
+        return array_values(array_unique(array_intersect(
+            array_merge(['necessary'], $categories),
+            $enabled_categories
+        )));
     }
 
     /**
@@ -340,8 +356,17 @@ class CookieRus {
         if (!$matches) return false;
 
         $categories = self::get_consent_categories();
+        if ($this->analytics_allowed_before_consent()
+            && $this->tracker_category_for_url($url) === 'analytics'
+            && $this->service_is_allowed($url)) {
+            return false;
+        }
         return !in_array($this->tracker_category_for_url($url), $categories, true)
             || !$this->service_is_allowed($url);
+    }
+
+    private function analytics_allowed_before_consent() {
+        return !empty($this->get_setting_value('security.allow_analytics_before_consent', 0));
     }
 
     private function is_blocked_inline_script($script) {
@@ -388,7 +413,12 @@ class CookieRus {
                 $src = html_entity_decode($src_match[2], ENT_QUOTES, 'UTF-8');
             }
 
-            if (($src && $this->should_block_url($src)) || (!$src && $this->is_blocked_inline_script($body))) {
+            $inline_preconsent_allowed = !$src
+                && $this->analytics_allowed_before_consent()
+                && $this->tracker_category_for_url($body) === 'analytics'
+                && $this->service_is_allowed($body);
+            if (($src && $this->should_block_url($src))
+                || (!$src && $this->is_blocked_inline_script($body) && !$inline_preconsent_allowed)) {
                 $category = $this->tracker_category_for_url($src ?: $body);
                 $attributes = preg_replace('/\s+type\s*=\s*(["\'])(.*?)\1/i', '', $attributes);
                 $attributes .= ' type="application/x-cookierus-blocked" data-cookierus-blocked-category="' . esc_attr($category) . '"';
@@ -437,6 +467,7 @@ class CookieRus {
         $state = [
             'categories' => array_values($categories),
             'blockedDomains' => array_values($blocked_domains),
+            'allowAnalyticsBeforeConsent' => !empty($this->get_setting_value('security.allow_analytics_before_consent', 0)),
             'services' => [
                 'yandex_metrika' => (bool) $this->get_setting_value('sections.analytics_services.yandex_metrika', 1),
                 'mailru_counters' => (bool) $this->get_setting_value('sections.analytics_services.mailru_counters', 0),
@@ -462,16 +493,17 @@ class CookieRus {
             'if(/facebook|google-analytics|analytics\\.google|googletagmanager|doubleclick|googlesyndication|googleadservices|hotjar|clarity\\.ms|matomo|bat\\.bing|yadro\\.ru|rambler|pixel\\.wp\\.com|stats\\.wp\\.com/.test(u))return false;' .
             'return true;}' .
              'function inlineCategory(v){return /vk\\.com|vk\\.ru|facebook|doubleclick|googlesyndication|googleadservices|ads\\.yandex|an\\.yandex/.test(String(v||"").toLowerCase())?"advertising":"analytics"}' .
-             'function inlineBlocked(v){return /mc\\.yandex\\.ru|yastatic\\.net|callibri|top\\.mail\\.ru|vk\\.com\\/js|connect\\.facebook\\.net|google-analytics|googletagmanager|doubleclick|googlesyndication|googleadservices|hotjar|clarity\\.ms|yaCounter\\d*|_ym[a-z_]*|\\bym\\s*\\(/i.test(String(v||""))}' .
-             'function blocked(u){var raw=String(u||"").toLowerCase(),h=host(u),local=/wp[-_]yandex[-_]metrika|yandex[-_]metrika|callibri|top[-.]fwz1[-.]mail[-.]ru/.test(raw);if(!h&&!local)return false;var hit=local||st.blockedDomains.some(function(x){return h===x||h.slice(-(x.length+1))==="."+x});return hit&&(st.categories.indexOf(cat(u))<0||!serviceAllowed(u))}' .
+             'function inlineBlocked(v){return /mc\\.yandex\\.ru|yastatic\\.net|callibri|top[-.]fwz1[-.]mail\\.ru|top\\.mail\\.ru|vk\\.com\\/js|connect\\.facebook\\.net|google-analytics|googletagmanager|doubleclick|googlesyndication|googleadservices|hotjar|clarity\\.ms|yaCounter\\d*|_ym[a-z_]*|\\bym\\s*\\(/i.test(String(v||""))}' .
+             'function categoryAllowed(c){return st.categories.indexOf(c)>=0||(c==="analytics"&&!!st.allowAnalyticsBeforeConsent)}' .
+             'function blocked(u){var raw=String(u||"").toLowerCase(),h=host(u),local=/wp[-_]yandex[-_]metrika|yandex[-_]metrika|callibri|top[-.]fwz1[-.]mail[-.]ru/.test(raw);if(!h&&!local)return false;var hit=local||st.blockedDomains.some(function(x){return h===x||h.slice(-(x.length+1))==="."+x});return hit&&(!categoryAllowed(cat(u))||!serviceAllowed(u))}' .
             'w.CookieRusIsBlocked=blocked;' .
-            'var callibriAllowed=st.categories.indexOf("analytics")>=0&&!!(st.services&&st.services.callibri);' .
+             'var callibriAllowed=categoryAllowed("analytics")&&!!(st.services&&st.services.callibri);' .
             'function callibriNode(el){if(!el||(el.nodeType!==1&&el.nodeType!==11))return false;var id=String(el.id||""),cn=typeof el.className==="string"?el.className:"";return /^cbw-/.test(id)||/(^|\\s)cbw-/.test(cn)||(el.querySelector&&!!el.querySelector("[id^=cbw-],[class*=cbw-]"))}' .
             'function callibriBlocked(el){return !callibriAllowed&&callibriNode(el)}' .
             'var widgetStyle=d.createElement("style");widgetStyle.id="cookierus-callibri-firewall-style";widgetStyle.textContent="#cbw-buttonContainer,#cbw-popupContainer,[id^=cbw-],[class*=cbw-]{display:none!important;visibility:hidden!important;pointer-events:none!important}";(d.head||d.documentElement).appendChild(widgetStyle);' .
-            'function release(){callibriAllowed=st.categories.indexOf("analytics")>=0&&!!(st.services&&st.services.callibri);d.querySelectorAll("[data-cookierus-blocked-src]").forEach(function(el){var u=el.getAttribute("data-cookierus-blocked-src"),svc=el.getAttribute("data-cookierus-blocked-service");if(!u||blocked(u)||(svc&&!st.services[svc]))return;el.removeAttribute("data-cookierus-blocked-src");if(el.tagName==="SCRIPT"&&el.type==="application/x-cookierus-blocked")el.removeAttribute("type");el.setAttribute("src",u)});d.querySelectorAll("script[data-cookierus-blocked-inline]").forEach(function(el){var svc=el.getAttribute("data-cookierus-blocked-service");if(st.categories.indexOf(el.getAttribute("data-cookierus-blocked-category"))<0||!serviceAllowed(el.textContent||"")||(svc&&!st.services[svc]))return;var replacement=d.createElement("script");for(var i=0;i<el.attributes.length;i++){var attr=el.attributes[i];if(attr.name!=="type"&&attr.name!=="data-cookierus-blocked-inline"&&attr.name!=="data-cookierus-blocked-category"&&attr.name!=="data-cookierus-blocked-service")replacement.setAttribute(attr.name,attr.value)}replacement.text=el.textContent||"";if(el.parentNode)el.parentNode.replaceChild(replacement,el)});if(callibriAllowed){var ws=d.getElementById("cookierus-callibri-firewall-style");if(ws)ws.remove()}}' .
+             'function release(){callibriAllowed=categoryAllowed("analytics")&&!!(st.services&&st.services.callibri);d.querySelectorAll("[data-cookierus-blocked-src]").forEach(function(el){var u=el.getAttribute("data-cookierus-blocked-src"),svc=el.getAttribute("data-cookierus-blocked-service");if(!u||blocked(u)||(svc&&!st.services[svc]))return;el.removeAttribute("data-cookierus-blocked-src");if(el.tagName==="SCRIPT"&&el.type==="application/x-cookierus-blocked")el.removeAttribute("type");el.setAttribute("src",u)});d.querySelectorAll("script[data-cookierus-blocked-inline]").forEach(function(el){var svc=el.getAttribute("data-cookierus-blocked-service"),c=el.getAttribute("data-cookierus-blocked-category");if(!categoryAllowed(c)||!serviceAllowed(el.textContent||"")||(svc&&!st.services[svc]))return;var replacement=d.createElement("script");for(var i=0;i<el.attributes.length;i++){var attr=el.attributes[i];if(attr.name!=="type"&&attr.name!=="data-cookierus-blocked-inline"&&attr.name!=="data-cookierus-blocked-category"&&attr.name!=="data-cookierus-blocked-service")replacement.setAttribute(attr.name,attr.value)}replacement.text=el.textContent||"";if(el.parentNode)el.parentNode.replaceChild(replacement,el)});if(callibriAllowed){var ws=d.getElementById("cookierus-callibri-firewall-style");if(ws)ws.remove()}}' .
             'w.CookieRusReleaseBlockedResources=release;' .
-             'function guardNode(el){if(callibriBlocked(el))return null;if(!el||!el.getAttribute)return el;var u=el.getAttribute("src")||el.getAttribute("poster");if(u&&blocked(u)){el.setAttribute("data-cookierus-blocked-src",u);el.removeAttribute("src");el.removeAttribute("poster");if(el.tagName==="SCRIPT")el.type="application/x-cookierus-blocked"}if(el.tagName==="SCRIPT"&&!u&&inlineBlocked(el.textContent||"")&&(st.categories.indexOf(inlineCategory(el.textContent||""))<0||!serviceAllowed(el.textContent||""))){el.setAttribute("data-cookierus-blocked-inline","1");el.setAttribute("data-cookierus-blocked-category",inlineCategory(el.textContent||""));el.type="application/x-cookierus-blocked"}return el}' .
+             'function guardNode(el){if(callibriBlocked(el))return null;if(!el||!el.getAttribute)return el;var u=el.getAttribute("src")||el.getAttribute("poster");if(u&&blocked(u)){el.setAttribute("data-cookierus-blocked-src",u);el.removeAttribute("src");el.removeAttribute("poster");if(el.tagName==="SCRIPT")el.type="application/x-cookierus-blocked"}if(el.tagName==="SCRIPT"&&!u&&inlineBlocked(el.textContent||"")&&(!categoryAllowed(inlineCategory(el.textContent||""))||!serviceAllowed(el.textContent||""))){el.setAttribute("data-cookierus-blocked-inline","1");el.setAttribute("data-cookierus-blocked-category",inlineCategory(el.textContent||""));el.type="application/x-cookierus-blocked"}return el}' .
             'var ap=Node.prototype.appendChild,ib=Node.prototype.insertBefore;' .
             'Node.prototype.appendChild=function(el){var guarded=guardNode(el);return guarded?ap.call(this,guarded):el};' .
             'Node.prototype.insertBefore=function(el,ref){var guarded=guardNode(el);return guarded?ib.call(this,guarded,ref):el};' .
@@ -481,7 +513,7 @@ class CookieRus {
             'var ih=Object.getOwnPropertyDescriptor(Element.prototype,"innerHTML");if(ih&&ih.set){Object.defineProperty(Element.prototype,"innerHTML",{configurable:ih.configurable,enumerable:ih.enumerable,get:ih.get,set:function(v){if(!callibriAllowed&&/cbw-/.test(String(v)))return;return ih.set.call(this,v)}})}' .
             'var osa=Element.prototype.setAttribute;' .
             'Element.prototype.setAttribute=function(k,v){if((k==="src"||k==="poster")&&blocked(v)){osa.call(this,"data-cookierus-blocked-src",v);return}return osa.call(this,k,v)};' .
-             'if(d.write){var dw=d.write;d.write=function(v){if(inlineBlocked(v)&&st.categories.indexOf(inlineCategory(v))<0)return;return dw.call(d,v)}}' .
+             'if(d.write){var dw=d.write;d.write=function(v){if(inlineBlocked(v)&&(!categoryAllowed(inlineCategory(v))||!serviceAllowed(v)))return;return dw.call(d,v)}}' .
             'if(w.fetch){var f=w.fetch;w.fetch=function(u,o){if(blocked(typeof u==="string"?u:u&&u.url))return Promise.reject(new Error("CookieRus blocked tracking request"));return f.apply(this,arguments)}}' .
             'if(w.XMLHttpRequest){var xo=w.XMLHttpRequest.prototype.open,xs=w.XMLHttpRequest.prototype.send;w.XMLHttpRequest.prototype.open=function(m,u){this.__cookierusBlocked=blocked(u);if(this.__cookierusBlocked)return;return xo.apply(this,arguments)};w.XMLHttpRequest.prototype.send=function(){if(this.__cookierusBlocked)return;return xs.apply(this,arguments)}}' .
             'if(n&&n.sendBeacon){var sb=n.sendBeacon.bind(n);n.sendBeacon=function(u){if(blocked(u))return true;return sb.apply(n,arguments)}}' .
@@ -672,6 +704,12 @@ class CookieRus {
         $value['banner'] = is_array($value['banner'] ?? null) ? $value['banner'] : [];
         $value['sections'] = is_array($value['sections'] ?? null) ? $value['sections'] : [];
         $value['security'] = is_array($value['security'] ?? null) ? $value['security'] : [];
+        $value['mentions'] = is_array($value['mentions'] ?? null) ? $value['mentions'] : [];
+        $allowed_positions = ['bottom', 'top', 'bottom-left', 'bottom-right', 'center'];
+        $value['banner']['position'] = in_array($value['banner']['position'] ?? '', $allowed_positions, true)
+            ? $value['banner']['position']
+            : 'bottom';
+        $value['banner']['overlay_enabled'] = !empty($value['banner']['overlay_enabled']) ? 1 : 0;
 
         $allowed_trackers = ['ym_id', 'vk_id'];
         $trackers = is_array($value['trackers'] ?? null) ? $value['trackers'] : [];
@@ -679,6 +717,7 @@ class CookieRus {
         foreach ($allowed_trackers as $tracker_key) {
             $value['trackers'][$tracker_key] = sanitize_text_field($trackers[$tracker_key] ?? '');
         }
+        $value['trackers']['mailru_id'] = sanitize_text_field($trackers['mailru_id'] ?? '');
         $callibri_code = is_string($trackers['callibri_code'] ?? null)
             ? wp_unslash($trackers['callibri_code'])
             : '';
@@ -688,20 +727,27 @@ class CookieRus {
         // policy-link endpoint and discard the obsolete saved setting.
         unset($value['banner']['show_revoke_button']);
         $value['security']['strict_blocking'] = 1;
+        $value['security']['allow_analytics_before_consent'] = !empty($value['security']['allow_analytics_before_consent']) ? 1 : 0;
         $value['security']['russian_email_auth_block'] = !empty($value['security']['russian_email_auth_block']) ? 1 : 0;
         $value['security']['foreign_auth_block'] = !empty($value['security']['foreign_auth_block']) ? 1 : 0;
         $value['security']['blocked_domains'] = sanitize_textarea_field($value['security']['blocked_domains'] ?? '');
 
         $allowed_analytics_services = ['yandex_metrika', 'mailru_counters', 'callibri'];
         $allowed_advertising_services = ['vk_ads', 'yandex_ads'];
-        $value['sections']['analytics_services'] = array_fill_keys(
-            array_intersect($allowed_analytics_services, array_keys((array) ($value['sections']['analytics_services'] ?? []))),
-            1
-        );
-        $value['sections']['advertising_services'] = array_fill_keys(
-            array_intersect($allowed_advertising_services, array_keys((array) ($value['sections']['advertising_services'] ?? []))),
-            1
-        );
+        $submitted_analytics_services = (array) ($value['sections']['analytics_services'] ?? []);
+        $submitted_advertising_services = (array) ($value['sections']['advertising_services'] ?? []);
+        $value['sections']['analytics_services'] = array_fill_keys($allowed_analytics_services, 0);
+        $value['sections']['advertising_services'] = array_fill_keys($allowed_advertising_services, 0);
+        foreach ($allowed_analytics_services as $service) {
+            if (!empty($submitted_analytics_services[$service])) {
+                $value['sections']['analytics_services'][$service] = 1;
+            }
+        }
+        foreach ($allowed_advertising_services as $service) {
+            if (!empty($submitted_advertising_services[$service])) {
+                $value['sections']['advertising_services'][$service] = 1;
+            }
+        }
         $value['sections']['functional_retention_days'] = max(
             1,
             min(3650, absint($value['sections']['functional_retention_days'] ?? 365))
@@ -746,6 +792,27 @@ class CookieRus {
             $value['custom_goals'] ?? [],
             'goal'
         );
+        $submitted_built_in_mentions = is_array($value['mentions']['built_in'] ?? null)
+            ? $value['mentions']['built_in']
+            : [];
+        $allowed_built_in_mentions = [
+            'russian_email_auth',
+            'foreign_auth',
+            'google_recaptcha',
+            'google_analytics',
+            'google_maps',
+            'google_tag_manager',
+        ];
+        $value['mentions']['built_in'] = array_fill_keys($allowed_built_in_mentions, 0);
+        foreach ($allowed_built_in_mentions as $mention_key) {
+            if (!empty($submitted_built_in_mentions[$mention_key])) {
+                $value['mentions']['built_in'][$mention_key] = 1;
+            }
+        }
+        $value['mentions']['custom'] = $this->sanitize_custom_items(
+            $value['mentions']['custom'] ?? [],
+            'mention'
+        );
 
         return $value;
     }
@@ -762,7 +829,9 @@ class CookieRus {
             return [];
         }
 
-        $prefix = $type === 'goal' ? 'custom_goal_' : 'custom_category_';
+        $prefix = $type === 'goal'
+            ? 'custom_goal_'
+            : ($type === 'mention' ? 'custom_mention_' : 'custom_category_');
         $clean = [];
         $used_ids = [];
         $index = 0;
@@ -824,7 +893,7 @@ class CookieRus {
             $settings = $this->get_default_settings();
         }
 
-        // CookieRus v1.1.7 keeps the policy page as the recommended decline
+        // CookieRus v1.1.8 keeps the policy page as the recommended decline
         // destination. Fill it only when the administrator has no URL yet.
         if (empty($settings['banner']['btn_decline_url'])) {
             $settings['banner']['btn_decline_url'] = 'http://ovva-ru.ovva.tech/cookie-policy/';
@@ -862,6 +931,7 @@ class CookieRus {
                 'btn_bg'               => '#0760D2',
                 'btn_text'             => '#ffffff',
                 'position'             => 'bottom',
+                'overlay_enabled'      => true,
                 'radius'               => 8,
                 'show_icon'            => false,
                 'icon_size'            => 'medium',
@@ -882,13 +952,26 @@ class CookieRus {
             ],
             'trackers' => [
                 'ym_id'         => '',
+                'mailru_id'     => '',
                 'vk_id'         => '',
                 'callibri_code' => '',
             ],
             'custom_categories' => [],
             'custom_goals' => [],
+            'mentions' => [
+                'built_in' => [
+                    'russian_email_auth' => 0,
+                    'foreign_auth' => 0,
+                    'google_recaptcha' => 0,
+                    'google_analytics' => 0,
+                    'google_maps' => 0,
+                    'google_tag_manager' => 0,
+                ],
+                'custom' => [],
+            ],
             'goals' => [
                 'storage'      => 1,
+                'personalized_content' => 1,
                 'personalized' => 1,
                 'retargeting'  => 1,
                 'profiling'    => 1,
@@ -896,6 +979,7 @@ class CookieRus {
                 'ad_measure'   => 1,
                 'content_measure' => 0,
                 'analytics'    => 1,
+                'geolocation'  => 0,
                 'development'  => 0,
                 'limited_ads'  => 0,
             ],
@@ -923,6 +1007,7 @@ class CookieRus {
                 // This is deliberately not exposed as an off switch: the
                 // consent firewall must remain active for the guarantee.
                 'strict_blocking' => 1,
+                'allow_analytics_before_consent' => 0,
                 'russian_email_auth_block' => 0,
                 'foreign_auth_block' => 0,
                 'blocked_domains' => '',
