@@ -1,5 +1,5 @@
 /**
- * CookieRus banner styles — v1.1.7
+ * CookieRus banner styles — v1.1.8
  */
 
 /* ─── Base banner ─────────────────────────────────── */
@@ -309,6 +309,44 @@
     gap: 10px;
 }
 
+/* Centered consent popup */
+.cookierus-banner.pos-center {
+    top: 50%;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    width: min(520px, calc(100vw - 32px));
+    max-width: 520px;
+    flex-direction: column;
+    align-items: stretch;
+    border-radius: 16px !important;
+    transform: translate(-50%, -50%);
+}
+.cookierus-banner.pos-center.cookierus-animate-slide,
+.cookierus-banner.pos-center.cookierus-animate-fade,
+.cookierus-banner.pos-center.cookierus-animate-bounce,
+.cookierus-banner.pos-center.cookierus-animate-zoom,
+.cookierus-banner.pos-center.cookierus-animate-flip {
+    animation-name: cookierusCenterIn;
+}
+@keyframes cookierusCenterIn {
+    from { transform: translate(-50%, -46%) scale(0.96); opacity: 0; }
+    to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+/* Optional page dimming */
+.cookierus-banner-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 999998;
+    background: rgba(0, 0, 0, 0.42);
+    pointer-events: auto;
+}
+body.cookierus-show-banner #cookierus-banner ~ #cookierus-banner-overlay {
+    display: block;
+}
+
 /* ─── Button container base ───────────────────────── */
 .cookierus-buttons {
     display: flex;
@@ -316,6 +354,20 @@
     flex-wrap: wrap;
     align-items: stretch;
     width: 100%;
+}
+
+/* В popup кнопки идут по ширине текста, а не начинаются под иконкой. */
+.cookierus-banner.pos-center .cookierus-buttons {
+    display: flex;
+    width: 100%;
+    justify-content: stretch;
+    align-items: stretch;
+}
+.cookierus-banner.pos-center .cookierus-buttons .cookierus-btn {
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto;
+    text-align: center;
 }
 /* Bar banners (full-width): row, right-aligned */
 .pos-bottom .cookierus-buttons,
@@ -438,6 +490,10 @@
     /* Только колонна-режим. cr-btns-row переопределяется ниже через ID */
     .cookierus-buttons:not(.cr-btns-row-buttons) { flex-direction: column; width: 100%; }
     .cookierus-btn { width: 100%; padding: 12px; }
+    .cookierus-banner.pos-center .cookierus-buttons .cookierus-btn {
+        flex: none;
+        width: 100%;
+    }
     .cookierus-minimized-btn { bottom: 14px; left: 14px; }
 }
 
