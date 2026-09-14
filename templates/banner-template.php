@@ -1,6 +1,6 @@
 <?php
 /**
- * CookieRus Banner Template — v1.1.7
+ * CookieRus Banner Template — v1.1.8
  * Рендерится на фронтенде: баннер + модал настроек (3 вкладки) + блокировка трекеров
  */
 if (!defined('ABSPATH')) exit;
@@ -23,13 +23,26 @@ foreach ($custom_categories as $custom_category) {
         $custom_category_ids[] = sanitize_key($custom_category['id']);
     }
 }
+$enabled_category_ids = ['necessary'];
+foreach (['functional' => 1, 'analytics' => 1, 'performance' => 0, 'advertising' => 1] as $category => $default) {
+    if (!array_key_exists($category, $sections) ? $default : !empty($sections[$category])) {
+        $enabled_category_ids[] = $category;
+    }
+}
+$enabled_category_ids = array_values(array_unique(array_merge($enabled_category_ids, $custom_category_ids)));
 $goals_cfg = array_replace([
     'storage' => 1,
     'analytics' => 1,
+    'personalized_content' => 1,
     'personalized' => 1,
     'retargeting' => 1,
+    'ad_measure' => 1,
+    'content_measure' => 0,
     'profiling' => 1,
+    'geolocation' => 0,
     'third_party' => 1,
+    'development' => 0,
+    'limited_ads' => 0,
 ], $goals_cfg);
 $policy_links = [
     'functional'  => $sections['functional_policy_url'] ?? '',
@@ -40,9 +53,50 @@ $policy_links = [
 $functional_retention_days = max(1, absint($sections['functional_retention_days'] ?? 365));
 $analytics_services = $sections['analytics_services'] ?? ['yandex_metrika' => 1];
 $advertising_services = $sections['advertising_services'] ?? ['yandex_ads' => 1];
-$foreign_auth_block_enabled = class_exists('CookieRus_Compliance')
-    && CookieRus_Compliance::is_foreign_auth_block_enabled();
-$russian_email_auth_block_enabled = !empty($settings['security']['russian_email_auth_block']);
+$allow_analytics_before_consent = !empty($settings['security']['allow_analytics_before_consent']);
+$overlay_enabled = !array_key_exists('overlay_enabled', $banner) || !empty($banner['overlay_enabled']);
+$mentions_cfg = is_array($settings['mentions'] ?? null) ? $settings['mentions'] : [];
+$built_in_mentions = array_replace([
+    'russian_email_auth' => 0,
+    'foreign_auth' => 0,
+    'google_recaptcha' => 0,
+    'google_analytics' => 0,
+    'google_maps' => 0,
+    'google_tag_manager' => 0,
+], is_array($mentions_cfg['built_in'] ?? null) ? $mentions_cfg['built_in'] : []);
+$custom_mentions = is_array($mentions_cfg['custom'] ?? null) ? $mentions_cfg['custom'] : [];
+$standard_mentions = [
+    'russian_email_auth' => [
+        'title' => 'Правила регистрации и входа',
+        'meta' => '',
+        'description' => 'Регистрация и вход должны соответствовать правилам сайта и требованиям законодательства.',
+    ],
+    'foreign_auth' => [
+        'title' => 'Безопасность и целостность сайта',
+        'meta' => '',
+        'description' => 'Запрещено нарушать целостность сайта, изменять системные файлы и обходить установленные ограничения.',
+    ],
+    'google_recaptcha' => [
+        'title' => 'Google reCAPTCHA не используется',
+        'meta' => 'Сервис не подключён',
+        'description' => 'На сайте не используется Google reCAPTCHA. Данные пользователей этому сервису не передаются.',
+    ],
+    'google_analytics' => [
+        'title' => 'Google Analytics не используется',
+        'meta' => 'Сервис не подключён',
+        'description' => 'На сайте не используется Google Analytics. Данные о посещаемости в Google Analytics не передаются.',
+    ],
+    'google_maps' => [
+        'title' => 'Google Maps не используется',
+        'meta' => 'Сервис не подключён',
+        'description' => 'На сайте не используются карты Google. Запросы к Google Maps не выполняются.',
+    ],
+    'google_tag_manager' => [
+        'title' => 'Google Tag Manager не используется',
+        'meta' => 'Сервис не подключён',
+        'description' => 'На сайте не используется Google Tag Manager. Коды сайта через этот сервис не загружаются.',
+    ],
+];
 
 // Animation class
 $anim_class = 'cookierus-animate-' . ($banner['animation'] ?? 'slide');
@@ -84,6 +138,7 @@ $show_goals = [
     'geolocation'          => !empty($goals_cfg['geolocation']),
     'third_party'          => !empty($goals_cfg['third_party']),
     'development'          => !empty($goals_cfg['development']),
+    'limited_ads'          => !empty($goals_cfg['limited_ads']),
 ];
 ?>
 <style>
@@ -184,6 +239,10 @@ $show_goals = [
         <?php endif; ?>
     </div>
 </div>
+
+<?php if ($overlay_enabled): ?>
+<div id="cookierus-banner-overlay" class="cookierus-banner-overlay" aria-hidden="true"></div>
+<?php endif; ?>
 
 <!-- Свёрнутая кнопка (плавающая) -->
 <?php if ($allow_minimize): ?>
@@ -426,11 +485,14 @@ $show_goals = [
                     'title' => 'Разработка и совершенствование',
                     'desc'  => 'Использование данных для улучшения существующих и создания новых функций и сервисов.',
                 ],
+                 'limited_ads' => [
+                     'title' => 'Ограниченная реклама',
+                     'desc'  => 'Показ контекстной рекламы без создания профиля интересов пользователя.',
+                 ],
             ];
-            $goals_off_by_default = ['personalized', 'retargeting', 'ad_measure', 'profiling', 'geolocation', 'third_party'];
             foreach ($goals_list as $key => $g):
                 if (empty($show_goals[$key])) continue;
-                $checked = !in_array($key, $goals_off_by_default) ? 'checked' : '';
+                $checked = !empty($goals_cfg[$key]) ? 'checked' : '';
             ?>
             <div class="cookierus-category">
                 <div class="cookierus-category-header">
@@ -472,26 +534,52 @@ $show_goals = [
         <!-- ── ПАНЕЛЬ: УПОМНАНИЯ ───────────────────────── -->
         <div class="cr-modal-panel cr-modal-panel--hidden" id="cr-panel-mentions" role="tabpanel">
             <p class="cr-modal-desc">
-                Важные сведения о регистрации и входе на сайте.
+                Короткие правила использования сайта.
             </p>
-            <div class="cookierus-category cr-cat-required">
-                <div class="cookierus-category-header">
-                    <div class="cr-cat-info">
-                        <span class="cr-cat-name">Ограничение почтовых доменов</span>
-                        <span class="cr-cat-meta">Сайт, WooCommerce и /wp-admin/</span>
-                    </div>
+
+            <?php
+            $has_enabled_standard_mention = false;
+            foreach ($standard_mentions as $standard_key => $standard_mention) {
+                if (!empty($built_in_mentions[$standard_key])) {
+                    $has_enabled_standard_mention = true;
+                    break;
+                }
+            }
+            ?>
+            <?php if (!$has_enabled_standard_mention && empty($custom_mentions)): ?>
+                <div class="cr-modal-empty">
+                    Дополнительные упоминания не добавлены.
                 </div>
-                <p class="cr-cat-desc">
-                    <?php echo $russian_email_auth_block_enabled
-                        ? 'Ограничение российских почтовых доменов включено администратором: регистрация и вход по email разрешены только для mail.ru, yandex.ru, rambler.ru, bk.ru и других доменов в зонах .ru, .su и .рф. Вход по имени пользователя не ограничивается.'
-                        : 'Ограничение российских почтовых доменов отключено. Регистрация и вход по email разрешены без проверки зоны домена. Вход по имени пользователя всегда работает независимо от email пользователя.'; ?>
-                </p>
-                <p class="cr-cat-desc">
-                    <?php echo $foreign_auth_block_enabled
-                        ? 'Дополнительно включён полный запрет кнопок и OAuth-маршрутов Google, Apple ID и других иностранных систем авторизации.'
-                        : 'Полный запрет входа через Google, Apple ID и другие иностранные системы можно включить администратору в настройках CookieRus.'; ?>
-                </p>
-            </div>
+            <?php else: ?>
+                <?php foreach ($standard_mentions as $standard_key => $standard_mention): ?>
+                    <?php if (empty($built_in_mentions[$standard_key])) continue; ?>
+                    <div class="cookierus-category cr-cat-required">
+                        <div class="cookierus-category-header">
+                            <div class="cr-cat-info">
+                                <span class="cr-cat-name"><?php echo esc_html($standard_mention['title']); ?></span>
+                                <?php if (!empty($standard_mention['meta'])): ?>
+                                    <span class="cr-cat-meta"><?php echo esc_html($standard_mention['meta']); ?></span>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        <p class="cr-cat-desc"><?php echo esc_html($standard_mention['description']); ?></p>
+                    </div>
+                <?php endforeach; ?>
+
+                <?php foreach ($custom_mentions as $custom_mention): ?>
+                    <?php if (empty($custom_mention['enabled']) || empty($custom_mention['title'])) continue; ?>
+                    <div class="cookierus-category cr-cat-required">
+                        <div class="cookierus-category-header">
+                            <div class="cr-cat-info">
+                                <span class="cr-cat-name"><?php echo esc_html($custom_mention['title']); ?></span>
+                            </div>
+                        </div>
+                        <?php if (!empty($custom_mention['description'])): ?>
+                            <p class="cr-cat-desc"><?php echo nl2br(esc_html($custom_mention['description'])); ?></p>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </div>
 
         <!-- Кнопки внизу модала -->
@@ -504,7 +592,7 @@ $show_goals = [
 </div><!-- #cookierus-modal -->
 
 <script id="cookierus-banner-script">
-/* CookieRus v1.1.7 — frontend script */
+/* CookieRus v1.1.8 — frontend script */
 (function() {
     'use strict';
 
@@ -514,9 +602,12 @@ $show_goals = [
     var DECLINE_URL    = <?php echo json_encode($decline_url); ?>;
     var REVOKE_URL     = <?php echo json_encode($revoke_url); ?>;
     var LOG_NONCE      = <?php echo json_encode(wp_create_nonce('cookierus_log_consent')); ?>;
+    var ANALYTICS_CATEGORY_ENABLED = <?php echo in_array('analytics', $enabled_category_ids, true) ? 'true' : 'false'; ?>;
+    var ALLOW_ANALYTICS_BEFORE_CONSENT = <?php echo $allow_analytics_before_consent ? 'true' : 'false'; ?>;
     var TRACKERS       = <?php echo json_encode([
-        'ym_id'   => $trackers['ym_id']   ?? '',
-        'vk_id'   => $trackers['vk_id']   ?? '',
+        'ym_id'     => $trackers['ym_id']     ?? '',
+        'mailru_id' => $trackers['mailru_id'] ?? '',
+        'vk_id'     => $trackers['vk_id']     ?? '',
     ]); ?>;
     var CALLIBRI_CODE  = <?php echo wp_json_encode($trackers['callibri_code'] ?? ''); ?>;
     var SERVICES       = <?php echo json_encode([
@@ -545,11 +636,10 @@ $show_goals = [
 
     function normalizeCategories(categories) {
         var cats = Array.isArray(categories) ? categories : (categories || 'all').split(',');
-        var allCategories = ['necessary', 'functional', 'analytics', 'performance', 'advertising']
-            .concat(CUSTOM_CATEGORY_IDS);
+        var allCategories = <?php echo wp_json_encode($enabled_category_ids); ?>;
         return (cats.indexOf('all') !== -1 || cats.indexOf('accepted') !== -1)
             ? allCategories
-            : cats;
+            : cats.filter(function(category) { return allCategories.indexOf(category) !== -1; });
     }
 
     function updateFirewall(categories) {
@@ -590,22 +680,64 @@ $show_goals = [
         window.__cookierusCallibriLoaded = true;
     }
 
+    /*
+     * Яндекс.Метрика может быть добавлена темой или другим плагином как
+     * очередь window.ym. Не считаем наличие этой очереди признаком того,
+     * что именно этот счётчик уже инициализирован: после согласия нужно
+     * обязательно передать ему init и загрузить tag.js, если его ещё нет.
+     */
+    function loadYandexMetrika() {
+        if (!TRACKERS.ym_id || !SERVICES.yandex_metrika || window.__cookierusYandexMetrikaInitialized) {
+            return;
+        }
+
+        var counterId = parseInt(TRACKERS.ym_id, 10);
+        if (!counterId) return;
+
+        if (typeof window.ym !== 'function') {
+            window.ym = function() {
+                (window.ym.a = window.ym.a || []).push(arguments);
+            };
+            window.ym.l = 1 * new Date();
+        }
+
+        if (!document.querySelector('script[src*="mc.yandex.ru/metrika/tag.js"]')) {
+            var metrika = document.createElement('script');
+            metrika.async = true;
+            metrika.src = 'https://mc.yandex.ru/metrika/tag.js';
+            document.head.appendChild(metrika);
+        }
+
+        window.ym(counterId, 'init', {
+            clickmap: true,
+            trackLinks: true,
+            accurateTrackBounce: true,
+            webvisor: true
+        });
+        window.__cookierusYandexMetrikaInitialized = true;
+    }
+
     function loadTrackers(categories) {
         var cats = normalizeCategories(categories);
         var all  = cats.indexOf('all') !== -1 || cats.indexOf('accepted') !== -1;
         var analytics  = all || cats.indexOf('analytics')   !== -1;
         var marketing  = all || cats.indexOf('advertising') !== -1;
-        if (!getCookie('cookierus_consent') || getCookie('cookierus_consent') === 'declined') return;
+        var consent = getCookie('cookierus_consent');
+        if (consent === 'declined' || (!consent && !ALLOW_ANALYTICS_BEFORE_CONSENT)) return;
+        analytics = analytics || (ALLOW_ANALYTICS_BEFORE_CONSENT && ANALYTICS_CATEGORY_ENABLED);
 
         /* Яндекс Метрика */
-        if (TRACKERS.ym_id && analytics && SERVICES.yandex_metrika && !window.ym) {
-            (function(m,e,t,r,i,k,a){
-                m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-                m[i].l=1*new Date();
-                k=e.createElement(t); a=e.getElementsByTagName(t)[0];
-                k.async=1; k.src=r; a.parentNode.insertBefore(k,a);
-            })(window,document,'script','https://mc.yandex.ru/metrika/tag.js','ym');
-            ym(parseInt(TRACKERS.ym_id,10),'init',{clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:true});
+        if (analytics) loadYandexMetrika();
+
+        /* Mail.ru Top */
+        if (TRACKERS.mailru_id && analytics && SERVICES.mailru_counters && !window.__cookierusMailruLoaded) {
+            window._tmr = window._tmr || [];
+            window._tmr.push({id: TRACKERS.mailru_id, type: 'pageView', start: (new Date()).getTime()});
+            var mailru = document.createElement('script');
+            mailru.async = true;
+            mailru.src = 'https://top-fwz1.mail.ru/js/code.js';
+            document.head.appendChild(mailru);
+            window.__cookierusMailruLoaded = true;
         }
 
         /* VK Пиксель */
@@ -634,6 +766,8 @@ $show_goals = [
             var cats = getCookie('cookierus_categories') || 'all';
             updateFirewall(cats);
             loadTrackers(cats);
+        } else if (!consent && ALLOW_ANALYTICS_BEFORE_CONSENT && ANALYTICS_CATEGORY_ENABLED) {
+            loadTrackers([]);
         }
     })();
 
