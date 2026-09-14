@@ -174,6 +174,69 @@ $advertising_services = $sections['advertising_services'] ?? [
     margin: 0;
     cursor: pointer;
 }
+
+/* ── Внутренние вкладки настроек баннера ───────────────── */
+.cr-settings-subtabs {
+    display: flex;
+    align-items: stretch;
+    gap: 6px;
+    margin: 0 0 20px;
+    padding: 6px;
+    background: #f4f7fb;
+    border: 1px solid #e1e9f5;
+    border-radius: 12px;
+    overflow-x: auto;
+}
+.cr-settings-subtab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 42px;
+    padding: 9px 15px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    color: #5b6472;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+    transition: color .18s ease, background .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.cr-settings-subtab .dashicons {
+    width: 17px;
+    height: 17px;
+    font-size: 17px;
+}
+.cr-settings-subtab:hover {
+    color: #0760D2;
+    background: #fff;
+}
+.cr-settings-subtab.is-active {
+    color: #0760D2;
+    background: #fff;
+    border-color: #d7e4f6;
+    box-shadow: 0 3px 10px rgba(7, 96, 210, .10);
+}
+.cr-settings-subtab:focus-visible {
+    outline: 2px solid #0760D2;
+    outline-offset: 1px;
+}
+[data-cr-settings-tab][hidden] { display: none !important; }
+@media (max-width: 600px) {
+    .cr-settings-subtabs {
+        gap: 3px;
+        padding: 4px;
+    }
+    .cr-settings-subtab {
+        min-height: 38px;
+        padding: 8px 11px;
+        font-size: 12px;
+    }
+    .cr-settings-subtab .dashicons { display: none; }
+}
 </style>
 
 <div class="cookierus-admin-header" style="margin-bottom: 20px;">
@@ -379,6 +442,7 @@ $advertising_services = $sections['advertising_services'] ?? [
 #cr-preview-inner.cr-pos-top      { top: 0;    left: 0; right: 0; flex-direction: row; align-items: center; justify-content: space-between; box-shadow: 0 4px 24px rgba(0,0,0,0.14); }
 #cr-preview-inner.cr-pos-bottom-left  { bottom: 10px; left: 10px; width: calc(55% - 10px); max-width: 280px; flex-direction: column; align-items: flex-start; box-shadow: 0 4px 20px rgba(0,0,0,0.18); }
 #cr-preview-inner.cr-pos-bottom-right { bottom: 10px; right: 10px; width: calc(55% - 10px); max-width: 280px; flex-direction: column; align-items: flex-start; box-shadow: 0 4px 20px rgba(0,0,0,0.18); }
+#cr-preview-inner.cr-pos-center { top: 50%; left: 50%; width: 250px; transform: translate(-50%, -50%); flex-direction: column; border-radius: 10px; }
 
 /* Content */
 #cr-preview-inner .cr-pi-content { flex: 1; display: flex; gap: 10px; align-items: flex-start; min-width: 0; }
@@ -464,6 +528,24 @@ $advertising_services = $sections['advertising_services'] ?? [
     </div>
 </div>
 
+<div class="cr-settings-subtabs" role="tablist" aria-label="Разделы настроек баннера">
+    <button type="button" class="cr-settings-subtab is-active" role="tab" aria-selected="true" aria-controls="cr-settings-content" data-cr-settings-tab-target="content">
+        <span class="dashicons dashicons-edit"></span> Содержимое
+    </button>
+    <button type="button" class="cr-settings-subtab" role="tab" aria-selected="false" aria-controls="cr-settings-appearance" data-cr-settings-tab-target="appearance">
+        <span class="dashicons dashicons-art"></span> Внешний вид
+    </button>
+    <button type="button" class="cr-settings-subtab" role="tab" aria-selected="false" aria-controls="cr-settings-categories" data-cr-settings-tab-target="categories">
+        <span class="dashicons dashicons-admin-generic"></span> Категории
+    </button>
+    <button type="button" class="cr-settings-subtab" role="tab" aria-selected="false" aria-controls="cr-settings-services" data-cr-settings-tab-target="services">
+        <span class="dashicons dashicons-chart-area"></span> Сервисы и цели
+    </button>
+    <button type="button" class="cr-settings-subtab" role="tab" aria-selected="false" aria-controls="cr-settings-behavior" data-cr-settings-tab-target="behavior">
+        <span class="dashicons dashicons-controls-repeat"></span> Поведение
+    </button>
+</div>
+
 <form method="post" action="options.php">
     <?php settings_fields('cookierus_settings_group'); ?>
     
@@ -471,12 +553,12 @@ $advertising_services = $sections['advertising_services'] ?? [
         <!-- ─────────────────────────────────────────────────────
              БЛОК A — СОДЕРЖИМОЕ
         ───────────────────────────────────────────────────── -->
-        <div class="cr-settings-section-label">
+        <div class="cr-settings-section-label" data-cr-settings-tab="content" id="cr-settings-content">
             <span class="dashicons dashicons-edit"></span> Содержимое баннера
         </div>
 
         <!-- Группа 1: Контент -->
-        <div class="cookierus-settings-card">
+        <div class="cookierus-settings-card" data-cr-settings-tab="content">
             <h4><span class="dashicons dashicons-editor-textcolor"></span> Текст и ссылка</h4>
             
             <div class="cookierus-form-group">
@@ -508,12 +590,12 @@ $advertising_services = $sections['advertising_services'] ?? [
         <!-- ─────────────────────────────────────────────────────
              БЛОК B — КНОПКИ
         ───────────────────────────────────────────────────── -->
-        <div class="cr-settings-section-label">
+        <div class="cr-settings-section-label" data-cr-settings-tab="content">
             <span class="dashicons dashicons-button"></span> Кнопки баннера
         </div>
 
         <!-- Группа 2: Дизайн кнопок -->
-        <div class="cookierus-settings-card">
+        <div class="cookierus-settings-card" data-cr-settings-tab="content">
             <h4><span class="dashicons dashicons-admin-appearance"></span> Настройка кнопок</h4>
             
             <!-- Принять -->
@@ -565,12 +647,12 @@ $advertising_services = $sections['advertising_services'] ?? [
         <!-- ─────────────────────────────────────────────────────
              БЛОК C — ДОПОЛНИТЕЛЬНО
         ───────────────────────────────────────────────────── -->
-        <div class="cr-settings-section-label">
+        <div class="cr-settings-section-label" data-cr-settings-tab="content">
             <span class="dashicons dashicons-plus-alt2"></span> Дополнительные элементы
         </div>
 
         <!-- Группа 3: Дополнительная кнопка -->
-        <div class="cookierus-settings-card">
+        <div class="cookierus-settings-card" data-cr-settings-tab="content">
             <h4><span class="dashicons dashicons-plus-alt"></span> Дополнительная кнопка</h4>
             <p class="description" style="margin-bottom:15px;">Добавьте произвольную кнопку с кастомным URL (например, «Подробнее» ведущую на страницу политики).</p>
 
@@ -602,7 +684,7 @@ $advertising_services = $sections['advertising_services'] ?? [
         </div>
 
         <!-- Группа 4: Иконка cookie -->
-        <div class="cookierus-settings-card">
+        <div class="cookierus-settings-card" data-cr-settings-tab="content">
             <h4><span class="dashicons dashicons-smiley"></span> Иконка cookie в баннере</h4>
             <p class="description" style="margin-bottom:15px;">Отображать иконку cookie слева от текста баннера.</p>
 
@@ -630,15 +712,108 @@ $advertising_services = $sections['advertising_services'] ?? [
             </div>
         </div>
 
+        <!-- Группа 5: Упоминания в окне согласия -->
+        <div class="cookierus-settings-card" data-cr-settings-tab="content">
+            <h4><span class="dashicons dashicons-megaphone"></span> Упоминания в «Настройках согласия»</h4>
+            <p class="description" style="margin-bottom:15px;">Выберите готовые уведомления или добавьте свои. Они появятся у посетителя только во вкладке «Упоминания» и не влияют на согласие cookie.</p>
+
+            <?php
+            $mentions_admin = is_array($settings['mentions'] ?? null) ? $settings['mentions'] : [];
+            $built_in_mentions_admin = array_replace([
+                'russian_email_auth' => 0,
+                'foreign_auth' => 0,
+                'google_recaptcha' => 0,
+                'google_analytics' => 0,
+                'google_maps' => 0,
+                'google_tag_manager' => 0,
+            ], is_array($mentions_admin['built_in'] ?? null) ? $mentions_admin['built_in'] : []);
+            $custom_mentions_admin = is_array($mentions_admin['custom'] ?? null) ? $mentions_admin['custom'] : [];
+            ?>
+            <div style="display:grid;gap:10px;">
+                <label style="display:flex;align-items:flex-start;gap:10px;padding:11px 12px;background:#f8faff;border:1px solid #e1e9f5;border-radius:8px;">
+                    <input type="checkbox" name="cookierus_settings[mentions][built_in][russian_email_auth]" value="1" <?php checked(1, $built_in_mentions_admin['russian_email_auth'] ?? 0); ?> style="margin-top:3px;">
+                    <span>
+                        <strong>Правила регистрации и входа</strong><br>
+                        <small style="color:#6b7280;">Показывать короткое уведомление о соблюдении правил сайта и требований законодательства.</small>
+                    </span>
+                </label>
+                <label style="display:flex;align-items:flex-start;gap:10px;padding:11px 12px;background:#f8faff;border:1px solid #e1e9f5;border-radius:8px;">
+                    <input type="checkbox" name="cookierus_settings[mentions][built_in][foreign_auth]" value="1" <?php checked(1, $built_in_mentions_admin['foreign_auth'] ?? 0); ?> style="margin-top:3px;">
+                    <span>
+                        <strong>Безопасность и целостность сайта</strong><br>
+                        <small style="color:#6b7280;">Показывать короткое уведомление о запрете вмешательства в работу сайта и обхода ограничений.</small>
+                    </span>
+                </label>
+                <label style="display:flex;align-items:flex-start;gap:10px;padding:11px 12px;background:#f8faff;border:1px solid #e1e9f5;border-radius:8px;">
+                    <input type="checkbox" name="cookierus_settings[mentions][built_in][google_recaptcha]" value="1" <?php checked(1, $built_in_mentions_admin['google_recaptcha'] ?? 0); ?> style="margin-top:3px;">
+                    <span>
+                        <strong>Google reCAPTCHA не используется</strong><br>
+                        <small style="color:#6b7280;">Показывать пользователю уведомление о том, что Google reCAPTCHA на сайте не подключена.</small>
+                    </span>
+                </label>
+                <label style="display:flex;align-items:flex-start;gap:10px;padding:11px 12px;background:#f8faff;border:1px solid #e1e9f5;border-radius:8px;">
+                    <input type="checkbox" name="cookierus_settings[mentions][built_in][google_analytics]" value="1" <?php checked(1, $built_in_mentions_admin['google_analytics'] ?? 0); ?> style="margin-top:3px;">
+                    <span>
+                        <strong>Google Analytics не используется</strong><br>
+                        <small style="color:#6b7280;">Показывать пользователю уведомление о том, что данные о посещаемости в Google Analytics не передаются.</small>
+                    </span>
+                </label>
+                <label style="display:flex;align-items:flex-start;gap:10px;padding:11px 12px;background:#f8faff;border:1px solid #e1e9f5;border-radius:8px;">
+                    <input type="checkbox" name="cookierus_settings[mentions][built_in][google_maps]" value="1" <?php checked(1, $built_in_mentions_admin['google_maps'] ?? 0); ?> style="margin-top:3px;">
+                    <span>
+                        <strong>Google Maps не используется</strong><br>
+                        <small style="color:#6b7280;">Показывать пользователю уведомление о том, что карты Google на сайте не подключены.</small>
+                    </span>
+                </label>
+                <label style="display:flex;align-items:flex-start;gap:10px;padding:11px 12px;background:#f8faff;border:1px solid #e1e9f5;border-radius:8px;">
+                    <input type="checkbox" name="cookierus_settings[mentions][built_in][google_tag_manager]" value="1" <?php checked(1, $built_in_mentions_admin['google_tag_manager'] ?? 0); ?> style="margin-top:3px;">
+                    <span>
+                        <strong>Google Tag Manager не используется</strong><br>
+                        <small style="color:#6b7280;">Показывать пользователю уведомление о том, что Google Tag Manager на сайте не подключён.</small>
+                    </span>
+                </label>
+            </div>
+
+            <div style="margin-top:20px;padding-top:16px;border-top:1px solid #e5e7eb;">
+                <strong style="display:block;margin-bottom:6px;">Свои упоминания</strong>
+                <p class="description" style="margin:0 0 12px;">Например: «Целостность сайта» — «Не пытайтесь изменять системные файлы и нарушать работу сайта.»</p>
+                <div id="cr-custom-mentions-list">
+                    <?php foreach ($custom_mentions_admin as $custom_index => $custom_mention): ?>
+                    <div class="cr-custom-item" data-custom-row>
+                        <input type="hidden" name="cookierus_settings[mentions][custom][<?php echo esc_attr($custom_index); ?>][id]" value="<?php echo esc_attr($custom_mention['id'] ?? ''); ?>">
+                        <input type="text" name="cookierus_settings[mentions][custom][<?php echo esc_attr($custom_index); ?>][title]" value="<?php echo esc_attr($custom_mention['title'] ?? ''); ?>" placeholder="Заголовок упоминания" class="large-text">
+                        <textarea name="cookierus_settings[mentions][custom][<?php echo esc_attr($custom_index); ?>][description]" rows="2" placeholder="Описание упоминания" class="large-text" style="margin-top:8px;"><?php echo esc_textarea($custom_mention['description'] ?? ''); ?></textarea>
+                        <div style="display:flex;align-items:center;gap:12px;margin-top:8px;">
+                            <label><input type="checkbox" name="cookierus_settings[mentions][custom][<?php echo esc_attr($custom_index); ?>][enabled]" value="1" <?php checked(1, $custom_mention['enabled'] ?? 1); ?>> Показывать посетителям</label>
+                            <button type="button" class="button-link-delete cr-remove-custom">Удалить</button>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+                <button type="button" class="button" id="cr-add-custom-mention">+ Добавить упоминание</button>
+                <template id="cr-custom-mention-template">
+                    <div class="cr-custom-item" data-custom-row>
+                        <input type="hidden" name="cookierus_settings[mentions][custom][__INDEX__][id]" value="">
+                        <input type="text" name="cookierus_settings[mentions][custom][__INDEX__][title]" value="" placeholder="Заголовок упоминания" class="large-text">
+                        <textarea name="cookierus_settings[mentions][custom][__INDEX__][description]" rows="2" placeholder="Описание упоминания" class="large-text" style="margin-top:8px;"></textarea>
+                        <div style="display:flex;align-items:center;gap:12px;margin-top:8px;">
+                            <label><input type="checkbox" name="cookierus_settings[mentions][custom][__INDEX__][enabled]" value="1" checked> Показывать посетителям</label>
+                            <button type="button" class="button-link-delete cr-remove-custom">Удалить</button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
         <!-- ─────────────────────────────────────────────────────
              БЛОК D — ВНЕШНИЙ ВИД
         ───────────────────────────────────────────────────── -->
-        <div class="cr-settings-section-label">
+        <div class="cr-settings-section-label" data-cr-settings-tab="appearance">
             <span class="dashicons dashicons-art"></span> Внешний вид и позиция
         </div>
 
         <!-- Группа 5: Общий дизайн -->
-        <div class="cookierus-settings-card">
+        <div class="cookierus-settings-card" data-cr-settings-tab="appearance">
             <h4><span class="dashicons dashicons-art"></span> Внешний вид баннера</h4>
             
             <div class="cookierus-form-group">
@@ -658,9 +833,19 @@ $advertising_services = $sections['advertising_services'] ?? [
                         <option value="top" <?php selected('top', $banner['position'] ?? ''); ?>>Сверху</option>
                         <option value="bottom-left" <?php selected('bottom-left', $banner['position'] ?? ''); ?>>Снизу слева</option>
                         <option value="bottom-right" <?php selected('bottom-right', $banner['position'] ?? ''); ?>>Снизу справа</option>
+                        <option value="center" <?php selected('center', $banner['position'] ?? ''); ?>>По центру (popup)</option>
                     </select>
                     <span>Скругление: <input type="number" name="cookierus_settings[banner][radius]" value="<?php echo esc_attr($banner['radius'] ?? 8); ?>" style="width:60px;"> px</span>
                 </div>
+                <p class="description" style="margin-top:8px;">Режим «По центру» показывает согласие как popup поверх страницы. Затемнение можно включить для любого положения баннера.</p>
+            </div>
+
+            <div class="cookierus-form-group">
+                <label>
+                    <input type="checkbox" name="cookierus_settings[banner][overlay_enabled]" value="1" <?php checked(1, $banner['overlay_enabled'] ?? 1); ?>>
+                    Затемнять страницу вокруг баннера
+                </label>
+                <p class="description" style="margin-top:5px;">Затемняет страницу вокруг баннера при любом положении: снизу, сверху, в углу или по центру. Пользователь сразу видит, что сначала нужно выбрать настройки cookie.</p>
             </div>
 
             <div class="cookierus-form-group">
@@ -744,7 +929,7 @@ $advertising_services = $sections['advertising_services'] ?? [
         </div>
 
         <!-- Группа 6: Настройки кнопок -->
-        <div class="cookierus-settings-card">
+        <div class="cookierus-settings-card" data-cr-settings-tab="appearance">
             <h4><span class="dashicons dashicons-admin-tools"></span> Стиль кнопок</h4>
 
             <div class="cookierus-form-group">
@@ -775,25 +960,28 @@ $advertising_services = $sections['advertising_services'] ?? [
             </div>
         </div>
 
+        <div class="cookierus-settings-card" data-cr-settings-tab="appearance">
+            <h4><span class="dashicons dashicons-menu"></span> Расположение кнопок</h4>
+            <div class="cookierus-form-group">
+                <label>Как показывать кнопки в баннере</label>
+                <select name="cookierus_settings[banner][btn_layout]" class="regular-text" style="width:100%;">
+                    <option value="column" <?php selected('column', $banner['btn_layout'] ?? 'column'); ?>>В столбик (по умолчанию)</option>
+                    <option value="row"    <?php selected('row',    $banner['btn_layout'] ?? '');       ?>>В ряд (горизонтально, баннер шире)</option>
+                </select>
+                <p class="description" style="margin-top:5px;">Горизонтальный вариант делает кнопки компактнее и выравнивает их в одну строку. На очень узких экранах они автоматически переходят в столбик.</p>
+            </div>
+        </div>
+
         <!-- ─────────────────────────────────────────────────────
              БЛОК E — ПОВЕДЕНИЕ
         ───────────────────────────────────────────────────── -->
-        <div class="cr-settings-section-label">
+        <div class="cr-settings-section-label" data-cr-settings-tab="behavior">
             <span class="dashicons dashicons-controls-repeat"></span> Поведение
         </div>
 
         <!-- Группа 7: Поведение баннера -->
-        <div class="cookierus-settings-card">
+        <div class="cookierus-settings-card" data-cr-settings-tab="behavior">
             <h4><span class="dashicons dashicons-schedule"></span> Поведение баннера</h4>
-
-            <div class="cookierus-form-group">
-                <label>Расположение кнопок</label>
-                <select name="cookierus_settings[banner][btn_layout]" class="regular-text" style="width:100%;">
-                    <option value="column" <?php selected('column', $banner['btn_layout'] ?? 'column'); ?>>⬇️ В столбик (по умолчанию)</option>
-                    <option value="row"    <?php selected('row',    $banner['btn_layout'] ?? '');       ?>>➡️ В ряд (горизонтально, баннер шире)</option>
-                </select>
-                <p class="description" style="margin-top:5px;">«В ряд» — кнопки встают горизонтально, баннер автоматически расширяется (до 600 px). Работает для угловых позиций (снизу слева/справа). На очень узких экранах автоматически переходит обратно в столбик.</p>
-            </div>
 
             <div class="cookierus-form-group">
                 <label>Повторный показ баннера</label>
@@ -823,12 +1011,12 @@ $advertising_services = $sections['advertising_services'] ?? [
         <!-- ─────────────────────────────────────────────────────
              БЛОК F — МОДАЛЬНОЕ ОКНО «НАСТРОИТЬ»
         ───────────────────────────────────────────────────── -->
-        <div class="cr-settings-section-label">
+        <div class="cr-settings-section-label" data-cr-settings-tab="categories">
             <span class="dashicons dashicons-admin-settings"></span> Модальное окно «Настроить»
         </div>
 
         <!-- Группа 8: Категории -->
-        <div class="cookierus-settings-card cr-modal-settings-card">
+        <div class="cookierus-settings-card cr-modal-settings-card" data-cr-settings-tab="categories">
             <h4><span class="dashicons dashicons-admin-generic"></span> Категории согласия</h4>
             <p class="description" style="margin-bottom:15px;">Выберите категории, которые пользователь может настроить, и укажите используемые сервисы.</p>
             
@@ -851,22 +1039,10 @@ $advertising_services = $sections['advertising_services'] ?? [
                         <?php if ($key === 'functional'): ?>
                             <label style="display:block;font-size:12px;margin-bottom:5px;color:#666;">Срок хранения (дней):</label>
                             <input type="number" min="1" max="3650" name="cookierus_settings[sections][functional_retention_days]" value="<?php echo esc_attr($sections['functional_retention_days'] ?? 365); ?>" class="small-text">
-                        <?php elseif ($key === 'analytics'): ?>
-                            <div style="font-size:12px; margin-bottom:5px; color:#666;">Разрешённые аналитические сервисы:</div>
-                            <?php foreach (['yandex_metrika' => 'Яндекс.Метрика', 'mailru_counters' => 'Счётчики Mail.ru', 'callibri' => 'Колибри'] as $service_key => $service_label): ?>
-                                <label style="display:block;margin:5px 0;">
-                                    <input type="checkbox" name="cookierus_settings[sections][analytics_services][<?php echo esc_attr($service_key); ?>]" value="1" <?php checked(1, $analytics_services[$service_key] ?? 0); ?>>
-                                    <?php echo esc_html($service_label); ?>
-                                </label>
-                            <?php endforeach; ?>
-                        <?php elseif ($key === 'advertising'): ?>
-                            <div style="font-size:12px; margin-bottom:5px; color:#666;">Разрешённые маркетинговые сервисы:</div>
-                            <?php foreach (['vk_ads' => 'VK Реклама', 'yandex_ads' => 'Яндекс.Реклама'] as $service_key => $service_label): ?>
-                                <label style="display:block;margin:5px 0;">
-                                    <input type="checkbox" name="cookierus_settings[sections][advertising_services][<?php echo esc_attr($service_key); ?>]" value="1" <?php checked(1, $advertising_services[$service_key] ?? 0); ?>>
-                                    <?php echo esc_html($service_label); ?>
-                                </label>
-                            <?php endforeach; ?>
+                        <?php elseif ($key === 'analytics' || $key === 'advertising'): ?>
+                            <div style="font-size:12px; margin-bottom:5px; color:#666;">Описание категории:</div>
+                            <input type="text" name="cookierus_settings[sections][<?php echo esc_attr($key); ?>_desc]" value="<?php echo esc_attr($sections[$key.'_desc'] ?? ''); ?>" class="large-text">
+                            <p style="margin:8px 0 0;font-size:11px;color:#777;">Выбор конкретных сервисов находится во вкладке «Сервисы и цели».</p>
                         <?php else: ?>
                             <div style="font-size:12px; margin-bottom:5px; color:#666;">Описание категории:</div>
                             <input type="text" name="cookierus_settings[sections][<?php echo $key; ?>_desc]" value="<?php echo esc_attr($sections[$key.'_desc'] ?? ''); ?>" class="large-text">
@@ -926,25 +1102,45 @@ $advertising_services = $sections['advertising_services'] ?? [
         <!-- ─────────────────────────────────────────────────────
              БЛОК G — ТРЕКЕРЫ И ЦЕЛИ
         ───────────────────────────────────────────────────── -->
-        <div class="cr-settings-section-label">
+        <div class="cr-settings-section-label" data-cr-settings-tab="services">
             <span class="dashicons dashicons-shield"></span> Трекеры и цели обработки
         </div>
 
         <!-- Группа 9: Блокировка трекеров -->
-        <div class="cookierus-settings-card cr-tracker-settings-card">
+        <div class="cookierus-settings-card cr-tracker-settings-card" data-cr-settings-tab="services">
             <h4><span class="dashicons dashicons-shield"></span> Блокировка трекеров до согласия</h4>
             <div style="background:linear-gradient(135deg,#fef3c7,#fde68a);border-left:4px solid #f59e0b;padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:18px;">
                 <strong style="color:#92400e;">⚠️ Требование 152-ФЗ и РКН</strong>
                 <p style="margin:5px 0 0;font-size:12px;color:#78350f;">Счётчики аналитики и маркетинговые пиксели должны загружаться <strong>только после</strong> нажатия пользователем кнопки «Принять». До согласия сторонние скрипты не загружаются.</p>
             </div>
-            <p class="description" style="margin-bottom:15px;">Укажите ID ваших трекеров. Плагин автоматически загрузит их только после получения согласия. Оставьте поле пустым если не используете сервис.</p>
+            <p class="description" style="margin-bottom:15px;">Укажите ID трекеров и включите соответствующий сервис выше. В штатном режиме CookieRus загружает их только после согласия пользователя на «Аналитические» или «Маркетинговые» cookie.</p>
 
             <?php $trackers = $settings['trackers'] ?? []; ?>
 
+            <div class="cookierus-btn-settings-row" style="margin-bottom:20px;">
+                <h5>Что использует сайт</h5>
+                <p style="margin:0 0 12px;font-size:12px;color:#666;">Отметьте только те сервисы, которые действительно подключены на сайте. Они начнут работать после согласия пользователя на соответствующую категорию.</p>
+                <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 18px;">
+                    <?php foreach (['yandex_metrika' => 'Яндекс.Метрика', 'mailru_counters' => 'Счётчики Mail.ru', 'callibri' => 'Callibri', 'vk_ads' => 'VK Реклама', 'yandex_ads' => 'Яндекс.Реклама'] as $service_key => $service_label): ?>
+                        <?php $service_group = in_array($service_key, ['yandex_metrika', 'mailru_counters', 'callibri'], true) ? $analytics_services : $advertising_services; ?>
+                        <label style="display:flex;align-items:center;gap:8px;margin:0;padding:8px 10px;background:#fff;border:1px solid #e1e9f5;border-radius:7px;">
+                            <input type="checkbox" name="cookierus_settings[sections][<?php echo in_array($service_key, ['yandex_metrika', 'mailru_counters', 'callibri'], true) ? 'analytics_services' : 'advertising_services'; ?>][<?php echo esc_attr($service_key); ?>]" value="1" <?php checked(1, $service_group[$service_key] ?? 0); ?>>
+                            <?php echo esc_html($service_label); ?>
+                        </label>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
             <div class="cookierus-form-group">
-                <label>Яндекс Метрика (ID счётчика)</label>
+                <label>Яндекс.Метрика — ID счётчика</label>
                 <input type="text" name="cookierus_settings[trackers][ym_id]" value="<?php echo esc_attr($trackers['ym_id'] ?? ''); ?>" class="regular-text" placeholder="12345678">
-                <p style="margin:3px 0 0;font-size:11px;color:#888;">Только цифры — ID из URL счётчика в Яндекс.Метрика</p>
+                <p style="margin:3px 0 0;font-size:11px;color:#888;">Вставьте только число из кабинета Яндекс.Метрики: Метрика → нужный счётчик → его номер. Код начнёт работать после согласия на «Аналитические».</p>
+            </div>
+
+            <div class="cookierus-form-group">
+                <label>Счётчик Mail.ru — ID</label>
+                <input type="text" name="cookierus_settings[trackers][mailru_id]" value="<?php echo esc_attr($trackers['mailru_id'] ?? ''); ?>" class="regular-text" placeholder="1234567">
+                <p style="margin:3px 0 0;font-size:11px;color:#888;">Укажите ID счётчика Mail.ru (Top). Код загрузится после согласия на «Аналитические» и включения «Счётчики Mail.ru».</p>
             </div>
 
             <div class="cookierus-form-group">
@@ -954,9 +1150,9 @@ $advertising_services = $sections['advertising_services'] ?? [
             </div>
 
             <div class="cookierus-form-group">
-                <label>Колибри — код или скрипт</label>
+                <label>Callibri — готовый JavaScript-код</label>
                 <textarea name="cookierus_settings[trackers][callibri_code]" rows="6" class="large-text" placeholder="<script>...</script>"><?php echo esc_textarea($trackers['callibri_code'] ?? ''); ?></textarea>
-                <p style="margin:3px 0 0;font-size:11px;color:#888;">Вставьте код Callibri целиком. Он не выводится и не исполняется до согласия с категорией «Аналитические» и включённым сервисом «Колибри».</p>
+                <p style="margin:3px 0 0;font-size:11px;color:#888;">Скопируйте в кабинете Callibri готовый JavaScript-код целиком, обычно вместе с тегами <code>&lt;script&gt;...&lt;/script&gt;</code>. Не вставляйте только номер проекта. Код не исполняется до согласия на «Аналитические» и включения «Колибри».</p>
             </div>
 
             <div class="cookierus-form-group">
@@ -974,6 +1170,15 @@ $advertising_services = $sections['advertising_services'] ?? [
             </div>
             <p class="description">Если включено, регистрация, восстановление доступа и вход по email разрешены только для российских почтовых сервисов и доменов .ru, .su или .рф. Вход по имени пользователя не проверяется по email и остаётся доступен. Администраторы также могут войти по своему email.</p>
 
+            <?php $allow_analytics_before_consent = !empty($settings['security']['allow_analytics_before_consent']); ?>
+            <div style="margin-top:18px;padding:14px 16px;border:1px solid <?php echo $allow_analytics_before_consent ? '#ef4444' : '#f59e0b'; ?>;background:<?php echo $allow_analytics_before_consent ? '#fef2f2' : '#fffbeb'; ?>;border-radius:8px;">
+                <label style="display:flex;align-items:flex-start;gap:10px;font-weight:600;color:#92400e;">
+                    <input type="checkbox" name="cookierus_settings[security][allow_analytics_before_consent]" value="1" <?php checked(1, $allow_analytics_before_consent); ?> style="margin-top:2px;">
+                    Разрешить загрузку аналитики до согласия пользователя
+                </label>
+                <p style="margin:8px 0 0;font-size:12px;color:#7c2d12;">⚠️ Это осознанное исключение: Яндекс.Метрика, Mail.ru и Callibri могут начать загрузку до выбора пользователя и могут обрабатывать данные без согласия. Включайте только после юридической проверки. Маркетинговые сервисы эта настройка не разрешает.</p>
+            </div>
+
             <div class="cookierus-toggle-row" style="border-top:1px solid #f0f0f1;padding-top:15px;">
                 <label class="cookierus-switch" style="display:inline-block; width:46px; height:24px;">
                     <input type="checkbox" name="cookierus_settings[security][foreign_auth_block]" value="1" id="foreign-auth-toggle" <?php checked(1, $settings['security']['foreign_auth_block'] ?? 0); ?>>
@@ -989,9 +1194,9 @@ $advertising_services = $sections['advertising_services'] ?? [
         </div>
 
         <!-- Группа 10: Цели обработки -->
-        <div class="cookierus-settings-card cr-goals-settings-card">
+        <div class="cookierus-settings-card cr-goals-settings-card" data-cr-settings-tab="services">
             <h4><span class="dashicons dashicons-list-view"></span> Цели обработки данных (вкладка «Цели»)</h4>
-            <p class="description" style="margin-bottom:15px;">Выберите, какие цели обработки отображать пользователю во вкладке «Цели» в окне настроек. Эти цели соответствуют принципам IAB TCF и требованиям 152-ФЗ.</p>
+            <p class="description" style="margin-bottom:15px;">Выберите, какие цели обработки отображать пользователю во вкладке «Цели» в окне настроек. Состояние каждой цели сохраняется отдельно и используется как исходное значение для пользователя.</p>
 
             <?php $goals_cfg = $settings['goals'] ?? []; ?>
 
@@ -1008,6 +1213,7 @@ $advertising_services = $sections['advertising_services'] ?? [
                 'geolocation'          => ['Геолокация',                                   'Использование приблизительного местоположения для регионального контента или рекламы.'],
                 'third_party'          => ['Передача данных третьим лицам',                'Предоставление данных партнёрам и поставщикам услуг (ст. 6 ч. 3, ст. 18 152-ФЗ).'],
                 'development'          => ['Разработка и совершенствование сервисов',      'Использование данных для улучшения функционала и создания новых возможностей.'],
+                 'limited_ads'          => ['Ограниченная реклама',                          'Показ контекстной рекламы без создания профиля интересов пользователя.'],
             ];
             foreach ($goals_list_admin as $key => [$title, $hint]):
             ?>
@@ -1063,6 +1269,27 @@ $advertising_services = $sections['advertising_services'] ?? [
 
 <script>
 jQuery(document).ready(function($) {
+    // ── Внутренние вкладки страницы настроек ──────────────
+    var $settingsItems = $('[data-cr-settings-tab]');
+    var $settingsTabs = $('.cr-settings-subtab');
+
+    function activateSettingsTab(tab) {
+        $settingsItems.each(function() {
+            var isVisible = $(this).attr('data-cr-settings-tab') === tab;
+            this.hidden = !isVisible;
+        });
+        $settingsTabs.each(function() {
+            var isActive = $(this).attr('data-cr-settings-tab-target') === tab;
+            $(this).toggleClass('is-active', isActive)
+                .attr('aria-selected', isActive ? 'true' : 'false');
+        });
+    }
+
+    $settingsTabs.on('click', function() {
+        activateSettingsTab($(this).attr('data-cr-settings-tab-target'));
+    });
+    activateSettingsTab('content');
+
     // ── Прочие тоглы ────────────────────────────────────
     $('.section-toggle').on('change', function() {
         $(this).closest('.section-row').find('.section-desc').slideToggle(200);
@@ -1089,6 +1316,7 @@ jQuery(document).ready(function($) {
     }
     addCustomSettingRow('cr-add-custom-category', 'cr-custom-category-template', 'cr-custom-categories-list');
     addCustomSettingRow('cr-add-custom-goal', 'cr-custom-goal-template', 'cr-custom-goals-list');
+    addCustomSettingRow('cr-add-custom-mention', 'cr-custom-mention-template', 'cr-custom-mentions-list');
     $(document).on('click', '.cr-remove-custom', function() {
         $(this).closest('[data-custom-row]').remove();
     });
@@ -1117,7 +1345,8 @@ jQuery(document).ready(function($) {
         'bottom'       : 'cr-pos-bottom',
         'top'          : 'cr-pos-top',
         'bottom-left'  : 'cr-pos-bottom-left',
-        'bottom-right' : 'cr-pos-bottom-right'
+        'bottom-right' : 'cr-pos-bottom-right',
+        'center'       : 'cr-pos-center'
     };
 
     function updatePreview() {
