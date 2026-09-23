@@ -1,6 +1,6 @@
 <?php
 /**
- * CookieRus Banner Template — v1.1.8
+ * CookieRus Banner Template — v1.1.9
  * Рендерится на фронтенде: баннер + модал настроек (3 вкладки) + блокировка трекеров
  */
 if (!defined('ABSPATH')) exit;
@@ -592,7 +592,7 @@ $show_goals = [
 </div><!-- #cookierus-modal -->
 
 <script id="cookierus-banner-script">
-/* CookieRus v1.1.8 — frontend script */
+/* CookieRus v1.1.9 — frontend script */
 (function() {
     'use strict';
 
@@ -610,10 +610,12 @@ $show_goals = [
         'vk_id'     => $trackers['vk_id']     ?? '',
     ]); ?>;
     var CALLIBRI_CODE  = <?php echo wp_json_encode($trackers['callibri_code'] ?? ''); ?>;
+    var JIVOSITE_CODE  = <?php echo wp_json_encode($trackers['jivosite_code'] ?? ''); ?>;
     var SERVICES       = <?php echo json_encode([
         'yandex_metrika' => !empty($analytics_services['yandex_metrika']),
         'mailru_counters' => !empty($analytics_services['mailru_counters']),
         'callibri' => !empty($analytics_services['callibri']),
+        'jivosite' => !empty($analytics_services['jivosite']),
         'vk_ads' => !empty($advertising_services['vk_ads']),
         'yandex_ads' => !empty($advertising_services['yandex_ads']),
     ]); ?>;
@@ -678,6 +680,31 @@ $show_goals = [
         }
 
         window.__cookierusCallibriLoaded = true;
+    }
+
+    function loadJivositeCode() {
+        if (!JIVOSITE_CODE || !SERVICES.jivosite || window.__cookierusJivositeLoaded) return;
+
+        var holder = document.createElement('div');
+        holder.innerHTML = JIVOSITE_CODE;
+        var scripts = holder.querySelectorAll('script');
+
+        if (!scripts.length) {
+            var inlineScript = document.createElement('script');
+            inlineScript.text = JIVOSITE_CODE;
+            document.head.appendChild(inlineScript);
+        } else {
+            scripts.forEach(function(script) {
+                var replacement = document.createElement('script');
+                for (var i = 0; i < script.attributes.length; i++) {
+                    replacement.setAttribute(script.attributes[i].name, script.attributes[i].value);
+                }
+                replacement.text = script.textContent || '';
+                document.head.appendChild(replacement);
+            });
+        }
+
+        window.__cookierusJivositeLoaded = true;
     }
 
     /*
@@ -756,6 +783,9 @@ $show_goals = [
 
         if (analytics && SERVICES.callibri) {
             loadCallibriCode();
+        }
+        if (analytics && SERVICES.jivosite) {
+            loadJivositeCode();
         }
     }
 
