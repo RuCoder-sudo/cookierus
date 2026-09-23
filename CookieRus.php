@@ -3,7 +3,7 @@
  * Plugin Name: CookieRus
  * Plugin URI: https://github.com/RuCoder-sudo/cookierus
  * Description: Простой способ убедиться, что ваш сайт соответствует Закону России о файлах cookie.
- * Version: 1.1.8
+ * Version: 1.1.9
  * Author: Сергей Солошенко (RuCoder)
  * Author URI: https://рукодер.рф
  * License: GPL v2 or later
@@ -11,7 +11,7 @@
  * Text Domain: cookierus
  * Domain Path: /languages
  * Requires at least: 5.0
- * Tested up to: 6.7
+ * Tested up to: 7.1
  * WC requires at least: 4.0
  * WC tested up to: 8.5
  * Network: false
@@ -29,7 +29,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('COOKIERUS_VERSION', '1.1.8');
+define('COOKIERUS_VERSION', '1.1.9');
 define('COOKIERUS_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('COOKIERUS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
@@ -232,6 +232,7 @@ class CookieRus {
             'yandex_metrika' => $settings['sections']['analytics_services']['yandex_metrika'] ?? 1,
             'mailru_counters' => $settings['sections']['analytics_services']['mailru_counters'] ?? 0,
             'callibri' => $settings['sections']['analytics_services']['callibri'] ?? 0,
+            'jivosite' => $settings['sections']['analytics_services']['jivosite'] ?? 0,
             'vk_ads' => $settings['sections']['advertising_services']['vk_ads'] ?? 0,
             'yandex_ads' => $settings['sections']['advertising_services']['yandex_ads'] ?? 1,
         ];
@@ -248,6 +249,9 @@ class CookieRus {
             'yastatic.net',
             'callibri.ru',
             'callibri.com',
+            'jivosite.com',
+            'jivo.ru',
+            'jivochat.com',
             'top.mail.ru',
             'top-fwz1.mail.ru',
             'mail.ru',
@@ -286,7 +290,7 @@ class CookieRus {
         if (preg_match('/vk\.com|vk\.ru|facebook|doubleclick|googlesyndication|googleadservices|ads\.yandex|an\.yandex/', $url)) {
             return 'advertising';
         }
-        if (preg_match('/yandex|yastatic|callibri|mail\.ru|top\.mail\.ru|matomo|google-analytics|googletagmanager|hotjar|clarity\.ms/', $url)) {
+        if (preg_match('/yandex|yastatic|callibri|jivosite|jivo\.ru|jivochat|mail\.ru|top\.mail\.ru|matomo|google-analytics|googletagmanager|hotjar|clarity\.ms/', $url)) {
             return 'analytics';
         }
 
@@ -299,6 +303,7 @@ class CookieRus {
             'yandex_metrika' => 1,
             'mailru_counters' => 0,
             'callibri' => 0,
+            'jivosite' => 0,
         ];
         $advertising = $settings['sections']['advertising_services'] ?? [
             'vk_ads' => 0,
@@ -311,6 +316,9 @@ class CookieRus {
         }
         if (preg_match('/callibri/', $url)) {
             return !empty($analytics['callibri']);
+        }
+        if (preg_match('/jivosite|jivo\.ru|jivochat/', $url)) {
+            return !empty($analytics['jivosite']);
         }
         if (preg_match('/top\.mail\.ru|mail\.ru/', $url)) {
             return !empty($analytics['mailru_counters']);
@@ -338,7 +346,7 @@ class CookieRus {
 
         $normalized_url = strtolower($url);
         $local_tracker = (bool) preg_match(
-            '/wp[-_]yandex[-_]metrika|yandex[-_]metrika|callibri|top[-.]fwz1[-.]mail[-.]ru/',
+            '/wp[-_]yandex[-_]metrika|yandex[-_]metrika|callibri|jivosite|jivo\.ru|jivochat|top[-.]fwz1[-.]mail[-.]ru/',
             $normalized_url
         );
         $host = strtolower((string) wp_parse_url($url, PHP_URL_HOST));
@@ -371,7 +379,7 @@ class CookieRus {
 
     private function is_blocked_inline_script($script) {
         return (bool) preg_match(
-            '/mc\.yandex\.ru|yastatic\.net|callibri|top\.mail\.ru|vk\.com\/js|connect\.facebook\.net|google-analytics|googletagmanager|doubleclick|googlesyndication|hotjar|clarity\.ms|yaCounter\d*|_ym[a-z_]*|\bym\s*\(/i',
+            '/mc\.yandex\.ru|yastatic\.net|callibri|jivosite|jivo\.ru|jivochat|top\.mail\.ru|vk\.com\/js|connect\.facebook\.net|google-analytics|googletagmanager|doubleclick|googlesyndication|hotjar|clarity\.ms|yaCounter\d*|_ym[a-z_]*|\bym\s*\(/i',
             (string) $script
         );
     }
@@ -472,6 +480,7 @@ class CookieRus {
                 'yandex_metrika' => (bool) $this->get_setting_value('sections.analytics_services.yandex_metrika', 1),
                 'mailru_counters' => (bool) $this->get_setting_value('sections.analytics_services.mailru_counters', 0),
                 'callibri' => (bool) $this->get_setting_value('sections.analytics_services.callibri', 0),
+                'jivosite' => (bool) $this->get_setting_value('sections.analytics_services.jivosite', 0),
                 'vk_ads' => (bool) $this->get_setting_value('sections.advertising_services.vk_ads', 0),
                 'yandex_ads' => (bool) $this->get_setting_value('sections.advertising_services.yandex_ads', 1),
             ],
@@ -486,14 +495,15 @@ class CookieRus {
             'function cat(u){u=String(u||"").toLowerCase();return /vk\\.com|vk\\.ru|facebook|doubleclick|googlesyndication|googleadservices|ads\\.yandex|an\\.yandex/.test(u)?"advertising":"analytics"}' .
             'function serviceAllowed(u){u=String(u||"").toLowerCase();var s=st.services||{};' .
             'if(/mc\\.yandex|metrika|yastatic/.test(u))return !!s.yandex_metrika;' .
-            'if(/callibri/.test(u))return !!s.callibri;' .
+             'if(/callibri/.test(u))return !!s.callibri;' .
+             'if(/jivosite|jivo\\.ru|jivochat/.test(u))return !!s.jivosite;' .
             'if(/top\\.mail\\.ru|mail\\.ru/.test(u))return !!s.mailru_counters;' .
             'if(/ads\\.yandex|an\\.yandex/.test(u))return !!s.yandex_ads;' .
             'if(/vk\\.com|vk\\.ru/.test(u))return !!s.vk_ads;' .
             'if(/facebook|google-analytics|analytics\\.google|googletagmanager|doubleclick|googlesyndication|googleadservices|hotjar|clarity\\.ms|matomo|bat\\.bing|yadro\\.ru|rambler|pixel\\.wp\\.com|stats\\.wp\\.com/.test(u))return false;' .
             'return true;}' .
              'function inlineCategory(v){return /vk\\.com|vk\\.ru|facebook|doubleclick|googlesyndication|googleadservices|ads\\.yandex|an\\.yandex/.test(String(v||"").toLowerCase())?"advertising":"analytics"}' .
-             'function inlineBlocked(v){return /mc\\.yandex\\.ru|yastatic\\.net|callibri|top[-.]fwz1[-.]mail\\.ru|top\\.mail\\.ru|vk\\.com\\/js|connect\\.facebook\\.net|google-analytics|googletagmanager|doubleclick|googlesyndication|googleadservices|hotjar|clarity\\.ms|yaCounter\\d*|_ym[a-z_]*|\\bym\\s*\\(/i.test(String(v||""))}' .
+             'function inlineBlocked(v){return /mc\\.yandex\\.ru|yastatic\\.net|callibri|jivosite|jivo\\.ru|jivochat|top[-.]fwz1[-.]mail\\.ru|top\\.mail\\.ru|vk\\.com\\/js|connect\\.facebook\\.net|google-analytics|googletagmanager|doubleclick|googlesyndication|googleadservices|hotjar|clarity\\.ms|yaCounter\\d*|_ym[a-z_]*|\\bym\\s*\\(/i.test(String(v||""))}' .
              'function categoryAllowed(c){return st.categories.indexOf(c)>=0||(c==="analytics"&&!!st.allowAnalyticsBeforeConsent)}' .
              'function blocked(u){var raw=String(u||"").toLowerCase(),h=host(u),local=/wp[-_]yandex[-_]metrika|yandex[-_]metrika|callibri|top[-.]fwz1[-.]mail[-.]ru/.test(raw);if(!h&&!local)return false;var hit=local||st.blockedDomains.some(function(x){return h===x||h.slice(-(x.length+1))==="."+x});return hit&&(!categoryAllowed(cat(u))||!serviceAllowed(u))}' .
             'w.CookieRusIsBlocked=blocked;' .
@@ -722,6 +732,10 @@ class CookieRus {
             ? wp_unslash($trackers['callibri_code'])
             : '';
         $value['trackers']['callibri_code'] = substr(str_replace("\0", '', $callibri_code), 0, 30000);
+        $jivosite_code = is_string($trackers['jivosite_code'] ?? null)
+            ? wp_unslash($trackers['jivosite_code'])
+            : '';
+        $value['trackers']['jivosite_code'] = substr(str_replace("\0", '', $jivosite_code), 0, 30000);
 
         // The visible revoke control was removed in v1.1.5. Keep only the
         // policy-link endpoint and discard the obsolete saved setting.
@@ -732,7 +746,7 @@ class CookieRus {
         $value['security']['foreign_auth_block'] = !empty($value['security']['foreign_auth_block']) ? 1 : 0;
         $value['security']['blocked_domains'] = sanitize_textarea_field($value['security']['blocked_domains'] ?? '');
 
-        $allowed_analytics_services = ['yandex_metrika', 'mailru_counters', 'callibri'];
+        $allowed_analytics_services = ['yandex_metrika', 'mailru_counters', 'callibri', 'jivosite'];
         $allowed_advertising_services = ['vk_ads', 'yandex_ads'];
         $submitted_analytics_services = (array) ($value['sections']['analytics_services'] ?? []);
         $submitted_advertising_services = (array) ($value['sections']['advertising_services'] ?? []);
@@ -893,10 +907,15 @@ class CookieRus {
             $settings = $this->get_default_settings();
         }
 
-        // CookieRus v1.1.8 keeps the policy page as the recommended decline
-        // destination. Fill it only when the administrator has no URL yet.
-        if (empty($settings['banner']['btn_decline_url'])) {
-            $settings['banner']['btn_decline_url'] = 'http://ovva-ru.ovva.tech/cookie-policy/';
+        // Policy links must belong to the current site. Replace any legacy
+        // external value with the site's own privacy page.
+        $legacy_policy_url = (string) ($settings['banner']['btn_decline_url'] ?? '');
+        $legacy_host = $legacy_policy_url !== '' ? wp_parse_url($legacy_policy_url, PHP_URL_HOST) : '';
+        $site_host = wp_parse_url(home_url('/'), PHP_URL_HOST);
+        if ($legacy_host && $site_host && strtolower($legacy_host) !== strtolower($site_host)) {
+            $settings['banner']['btn_decline_url'] = function_exists('get_privacy_policy_url')
+                ? get_privacy_policy_url()
+                : '';
         }
 
         $clean_settings = $this->sanitize_settings(
@@ -924,7 +943,7 @@ class CookieRus {
                 'link_url'             => '',
                 'btn_accept'           => 'Принять все',
                 'btn_decline'          => 'Отклонить',
-                'btn_decline_url'      => 'http://ovva-ru.ovva.tech/cookie-policy/',
+                'btn_decline_url'      => '',
                 'btn_settings'         => 'Настроить',
                 'bg_color'             => '#ffffff',
                 'text_color'           => '#333333',
@@ -955,6 +974,7 @@ class CookieRus {
                 'mailru_id'     => '',
                 'vk_id'         => '',
                 'callibri_code' => '',
+                'jivosite_code' => '',
             ],
             'custom_categories' => [],
             'custom_goals' => [],
@@ -997,6 +1017,7 @@ class CookieRus {
                     'yandex_metrika' => 1,
                     'mailru_counters' => 0,
                     'callibri' => 0,
+                    'jivosite' => 0,
                 ],
                 'advertising_services' => [
                     'vk_ads' => 0,
