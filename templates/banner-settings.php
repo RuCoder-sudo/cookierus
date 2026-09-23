@@ -1121,10 +1121,10 @@ $advertising_services = $sections['advertising_services'] ?? [
                 <h5>Что использует сайт</h5>
                 <p style="margin:0 0 12px;font-size:12px;color:#666;">Отметьте только те сервисы, которые действительно подключены на сайте. Они начнут работать после согласия пользователя на соответствующую категорию.</p>
                 <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 18px;">
-                    <?php foreach (['yandex_metrika' => 'Яндекс.Метрика', 'mailru_counters' => 'Счётчики Mail.ru', 'callibri' => 'Callibri', 'vk_ads' => 'VK Реклама', 'yandex_ads' => 'Яндекс.Реклама'] as $service_key => $service_label): ?>
-                        <?php $service_group = in_array($service_key, ['yandex_metrika', 'mailru_counters', 'callibri'], true) ? $analytics_services : $advertising_services; ?>
+                    <?php foreach (['yandex_metrika' => 'Яндекс.Метрика', 'mailru_counters' => 'Счётчики Mail.ru', 'callibri' => 'Callibri', 'jivosite' => 'JivoSite (онлайн-чат)', 'vk_ads' => 'VK Реклама', 'yandex_ads' => 'Яндекс.Реклама'] as $service_key => $service_label): ?>
+                        <?php $service_group = in_array($service_key, ['yandex_metrika', 'mailru_counters', 'callibri', 'jivosite'], true) ? $analytics_services : $advertising_services; ?>
                         <label style="display:flex;align-items:center;gap:8px;margin:0;padding:8px 10px;background:#fff;border:1px solid #e1e9f5;border-radius:7px;">
-                            <input type="checkbox" name="cookierus_settings[sections][<?php echo in_array($service_key, ['yandex_metrika', 'mailru_counters', 'callibri'], true) ? 'analytics_services' : 'advertising_services'; ?>][<?php echo esc_attr($service_key); ?>]" value="1" <?php checked(1, $service_group[$service_key] ?? 0); ?>>
+                            <input type="checkbox" name="cookierus_settings[sections][<?php echo in_array($service_key, ['yandex_metrika', 'mailru_counters', 'callibri', 'jivosite'], true) ? 'analytics_services' : 'advertising_services'; ?>][<?php echo esc_attr($service_key); ?>]" value="1" <?php checked(1, $service_group[$service_key] ?? 0); ?>>
                             <?php echo esc_html($service_label); ?>
                         </label>
                     <?php endforeach; ?>
@@ -1153,6 +1153,12 @@ $advertising_services = $sections['advertising_services'] ?? [
                 <label>Callibri — готовый JavaScript-код</label>
                 <textarea name="cookierus_settings[trackers][callibri_code]" rows="6" class="large-text" placeholder="<script>...</script>"><?php echo esc_textarea($trackers['callibri_code'] ?? ''); ?></textarea>
                 <p style="margin:3px 0 0;font-size:11px;color:#888;">Скопируйте в кабинете Callibri готовый JavaScript-код целиком, обычно вместе с тегами <code>&lt;script&gt;...&lt;/script&gt;</code>. Не вставляйте только номер проекта. Код не исполняется до согласия на «Аналитические» и включения «Колибри».</p>
+            </div>
+
+            <div class="cookierus-form-group">
+                <label>JivoSite — готовый JavaScript-код</label>
+                <textarea name="cookierus_settings[trackers][jivosite_code]" rows="6" class="large-text" placeholder="<script>...</script>"><?php echo esc_textarea($trackers['jivosite_code'] ?? ''); ?></textarea>
+                <p style="margin:3px 0 0;font-size:11px;color:#888;">Вставьте код виджета JivoSite из кабинета сервиса целиком. Код загружается только после согласия на «Аналитические» и включения «JivoSite (онлайн-чат)».</p>
             </div>
 
             <div class="cookierus-form-group">
