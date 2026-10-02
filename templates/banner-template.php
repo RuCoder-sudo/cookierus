@@ -1,6 +1,6 @@
 <?php
 /**
- * CookieRus Banner Template — v1.1.9
+ * CookieRus Banner Template — v1.2.0
  * Рендерится на фронтенде: баннер + модал настроек (3 вкладки) + блокировка трекеров
  */
 if (!defined('ABSPATH')) exit;
@@ -117,11 +117,14 @@ $banner_shadow = $shadow_map[$banner['banner_shadow'] ?? 'medium'] ?? '0 10px 30
 $btn_hover     = $banner['btn_hover']     ?? 'lift';
 $btn_layout    = $banner['btn_layout']    ?? 'column';
 $repeat_show   = $banner['repeat_show']   ?? 'never';
+$has_active_consent = !empty($_COOKIE['cookierus_consent'])
+    && $_COOKIE['cookierus_consent'] !== 'declined';
+$hide_banner_ui = empty($banner['enabled'])
+    || ($has_active_consent && $repeat_show !== 'always');
 $allow_minimize = !empty($banner['allow_minimize']);
 $revoke_requested = isset($_GET['cookierus_revoke'])
     && sanitize_text_field(wp_unslash($_GET['cookierus_revoke'])) === '1';
 $decline_url   = trim((string) ($banner['btn_decline_url'] ?? ''));
-$revoke_url    = add_query_arg('cookierus_revoke', '1', home_url('/'));
 
 $plugin_url = defined('COOKIERUS_PLUGIN_URL') ? COOKIERUS_PLUGIN_URL : plugin_dir_url(dirname(__FILE__));
 
@@ -182,7 +185,7 @@ $show_goals = [
 ═══════════════════════════════════════════════════════ -->
 <div id="cookierus-banner"
      class="cookierus-banner pos-<?php echo esc_attr($banner['position'] ?? 'bottom'); ?> <?php echo $anim_class; ?><?php echo ($btn_layout === 'row') ? ' cr-btns-row' : ''; ?>"
-     style="background-color:<?php echo esc_attr($banner['bg_color'] ?? '#ffffff'); ?>;color:<?php echo esc_attr($banner['text_color'] ?? '#333333'); ?>;border-radius:<?php echo esc_attr($banner['radius'] ?? 8); ?>px;"
+     style="<?php echo $hide_banner_ui ? 'display:none;' : ''; ?>background-color:<?php echo esc_attr($banner['bg_color'] ?? '#ffffff'); ?>;color:<?php echo esc_attr($banner['text_color'] ?? '#333333'); ?>;border-radius:<?php echo esc_attr($banner['radius'] ?? 8); ?>px;"
      role="dialog" aria-modal="true" aria-label="Настройки cookie">
 
     <?php if ($allow_minimize): ?>
@@ -592,15 +595,15 @@ $show_goals = [
 </div><!-- #cookierus-modal -->
 
 <script id="cookierus-banner-script">
-/* CookieRus v1.1.9 — frontend script */
+/* CookieRus v1.2.0 — frontend script */
 (function() {
     'use strict';
 
     var REPEAT_SHOW    = <?php echo json_encode($repeat_show); ?>;
+    var BANNER_ENABLED = <?php echo !empty($banner['enabled']) ? 'true' : 'false'; ?>;
     var ALLOW_MINIMIZE = <?php echo $allow_minimize ? 'true' : 'false'; ?>;
     var REVOKE_REQUESTED = <?php echo $revoke_requested ? 'true' : 'false'; ?>;
     var DECLINE_URL    = <?php echo json_encode($decline_url); ?>;
-    var REVOKE_URL     = <?php echo json_encode($revoke_url); ?>;
     var LOG_NONCE      = <?php echo json_encode(wp_create_nonce('cookierus_log_consent')); ?>;
     var ANALYTICS_CATEGORY_ENABLED = <?php echo in_array('analytics', $enabled_category_ids, true) ? 'true' : 'false'; ?>;
     var ALLOW_ANALYTICS_BEFORE_CONSENT = <?php echo $allow_analytics_before_consent ? 'true' : 'false'; ?>;
@@ -817,11 +820,11 @@ $show_goals = [
         var tabBtns      = document.querySelectorAll('.cr-modal-tab');
 
         /* Показывать ли баннер? */
-        if (banner && REPEAT_SHOW !== 'always' && getCookie('cookierus_consent')) {
+        if (banner && (!BANNER_ENABLED || (REPEAT_SHOW !== 'always' && getCookie('cookierus_consent')))) {
             banner.remove();
         }
 
-        if (banner && !getCookie('cookierus_consent')) {
+        if (banner && BANNER_ENABLED && !getCookie('cookierus_consent')) {
             document.body.classList.add('cookierus-show-banner');
         }
 
@@ -925,7 +928,11 @@ $show_goals = [
 
         if (declineBtn) declineBtn.addEventListener('click', function() {
             logConsent('declined', 'none');
-            window.location.href = DECLINE_URL || REVOKE_URL;
+            if (DECLINE_URL) {
+                window.location.href = DECLINE_URL;
+            } else {
+                window.location.reload();
+            }
         });
 
         if (openSettings) openSettings.addEventListener('click', function() {
