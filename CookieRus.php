@@ -3,7 +3,7 @@
  * Plugin Name: CookieRus
  * Plugin URI: https://github.com/RuCoder-sudo/cookierus
  * Description: Простой способ убедиться, что ваш сайт соответствует Закону России о файлах cookie.
- * Version: 1.1.9
+ * Version: 1.2.0
  * Author: Сергей Солошенко (RuCoder)
  * Author URI: https://рукодер.рф
  * License: GPL v2 or later
@@ -29,7 +29,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('COOKIERUS_VERSION', '1.1.9');
+define('COOKIERUS_VERSION', '1.2.0');
 define('COOKIERUS_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('COOKIERUS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
@@ -95,11 +95,30 @@ class CookieRus {
 
         // When repeat_show=always, show banner on every page load (session cookie is cleared between visits)
         $repeat_show = $settings['banner']['repeat_show'] ?? 'never';
-        $needs_banner_markup = ($is_revoke_request || !empty($settings['banner']['enabled']))
-            && ($is_revoke_request
-                || $repeat_show === 'always'
-                || !isset($_COOKIE['cookierus_consent']));
-        if ($needs_banner_markup) {
+        $banner_enabled = !empty($settings['banner']['enabled']);
+        $needs_banner_markup = $is_revoke_request
+            || ($banner_enabled
+                && ($repeat_show === 'always'
+                    || !isset($_COOKIE['cookierus_consent'])));
+
+        /*
+         * The banner template also contains the configured tracker loader.
+         * Keep that runtime available on later visits after consent has been
+         * saved; otherwise plugin-managed metrics only run on the consent page.
+         */
+        $trackers = is_array($settings['trackers'] ?? null) ? $settings['trackers'] : [];
+        $has_configured_trackers = !empty($trackers['ym_id'])
+            || !empty($trackers['mailru_id'])
+            || !empty($trackers['vk_id'])
+            || !empty($trackers['callibri_code'])
+            || !empty($trackers['jivosite_code']);
+        $has_active_consent = !empty($_COOKIE['cookierus_consent'])
+            && $_COOKIE['cookierus_consent'] !== 'declined';
+        $allow_analytics_before_consent = $this->analytics_allowed_before_consent();
+        $needs_tracker_runtime = $has_configured_trackers
+            && ($has_active_consent || $allow_analytics_before_consent);
+
+        if ($needs_banner_markup || $needs_tracker_runtime) {
             ob_start();
             include plugin_dir_path(__FILE__) . 'templates/banner-template.php';
             $this->banner_html_cache = ob_get_clean();
@@ -374,6 +393,11 @@ class CookieRus {
     }
 
     private function analytics_allowed_before_consent() {
+        if (isset($_COOKIE['cookierus_consent'])
+            && sanitize_text_field(wp_unslash($_COOKIE['cookierus_consent'])) === 'declined') {
+            return false;
+        }
+
         return !empty($this->get_setting_value('security.allow_analytics_before_consent', 0));
     }
 
@@ -475,7 +499,7 @@ class CookieRus {
         $state = [
             'categories' => array_values($categories),
             'blockedDomains' => array_values($blocked_domains),
-            'allowAnalyticsBeforeConsent' => !empty($this->get_setting_value('security.allow_analytics_before_consent', 0)),
+            'allowAnalyticsBeforeConsent' => $this->analytics_allowed_before_consent(),
             'services' => [
                 'yandex_metrika' => (bool) $this->get_setting_value('sections.analytics_services.yandex_metrika', 1),
                 'mailru_counters' => (bool) $this->get_setting_value('sections.analytics_services.mailru_counters', 0),
