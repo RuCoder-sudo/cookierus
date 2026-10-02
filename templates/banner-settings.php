@@ -1115,6 +1115,15 @@ $advertising_services = $sections['advertising_services'] ?? [
             </div>
             <p class="description" style="margin-bottom:15px;">Укажите ID трекеров и включите соответствующий сервис выше. В штатном режиме CookieRus загружает их только после согласия пользователя на «Аналитические» или «Маркетинговые» cookie.</p>
 
+            <?php $allow_analytics_before_consent = !empty($settings['security']['allow_analytics_before_consent']); ?>
+            <div style="margin:0 0 18px;padding:14px 16px;border:1px solid <?php echo $allow_analytics_before_consent ? '#ef4444' : '#f59e0b'; ?>;background:<?php echo $allow_analytics_before_consent ? '#fef2f2' : '#fffbeb'; ?>;border-radius:8px;">
+                <label style="display:flex;align-items:flex-start;gap:10px;font-weight:600;color:#92400e;">
+                    <input type="checkbox" name="cookierus_settings[security][allow_analytics_before_consent]" value="1" <?php checked(1, $allow_analytics_before_consent); ?> style="margin-top:2px;">
+                    Принудительно разрешить аналитические трекеры до согласия
+                </label>
+                <p style="margin:8px 0 0;font-size:12px;color:#7c2d12;">⚠️ Включайте только если это допустимо для вашего сайта: отмеченные аналитические сервисы (например, Яндекс.Метрика и Callibri) смогут загружаться до выбора пользователя. Рекламные трекеры и явно отклонённое согласие эта настройка не обходит.</p>
+            </div>
+
             <?php $trackers = $settings['trackers'] ?? []; ?>
 
             <div class="cookierus-btn-settings-row" style="margin-bottom:20px;">
@@ -1175,15 +1184,6 @@ $advertising_services = $sections['advertising_services'] ?? [
                 <label class="toggle-label" for="russian-email-auth-toggle">Ограничить регистрацию и вход российскими email-доменами</label>
             </div>
             <p class="description">Если включено, регистрация, восстановление доступа и вход по email разрешены только для российских почтовых сервисов и доменов .ru, .su или .рф. Вход по имени пользователя не проверяется по email и остаётся доступен. Администраторы также могут войти по своему email.</p>
-
-            <?php $allow_analytics_before_consent = !empty($settings['security']['allow_analytics_before_consent']); ?>
-            <div style="margin-top:18px;padding:14px 16px;border:1px solid <?php echo $allow_analytics_before_consent ? '#ef4444' : '#f59e0b'; ?>;background:<?php echo $allow_analytics_before_consent ? '#fef2f2' : '#fffbeb'; ?>;border-radius:8px;">
-                <label style="display:flex;align-items:flex-start;gap:10px;font-weight:600;color:#92400e;">
-                    <input type="checkbox" name="cookierus_settings[security][allow_analytics_before_consent]" value="1" <?php checked(1, $allow_analytics_before_consent); ?> style="margin-top:2px;">
-                    Разрешить загрузку аналитики до согласия пользователя
-                </label>
-                <p style="margin:8px 0 0;font-size:12px;color:#7c2d12;">⚠️ Это осознанное исключение: Яндекс.Метрика, Mail.ru и Callibri могут начать загрузку до выбора пользователя и могут обрабатывать данные без согласия. Включайте только после юридической проверки. Маркетинговые сервисы эта настройка не разрешает.</p>
-            </div>
 
             <div class="cookierus-toggle-row" style="border-top:1px solid #f0f0f1;padding-top:15px;">
                 <label class="cookierus-switch" style="display:inline-block; width:46px; height:24px;">
