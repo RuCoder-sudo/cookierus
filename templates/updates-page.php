@@ -1,6 +1,6 @@
 <?php
 /**
- * CookieRus Updates Page — v1.1.9
+ * CookieRus Updates Page — v1.2.0
  */
 if (!defined('ABSPATH')) exit;
 ?>
@@ -102,7 +102,16 @@ if (!defined('ABSPATH')) exit;
         <h3><span class="dashicons dashicons-backup"></span> История версий CookieRus</h3>
 
         <div class="cr-version-block">
-            <span class="cr-version-tag cr-latest">✅ v1.1.9 <span class="cr-version-date">— текущая версия</span></span>
+            <span class="cr-version-tag cr-latest">✅ v1.2.0 <span class="cr-version-date">— текущая версия</span></span>
+            <ul class="cr-change-list">
+                <li class="cr-fix"><strong>Исправлено:</strong> встроенные счётчики Яндекс.Метрики, Mail.ru и Callibri инициализируются на последующих страницах после сохранения согласия.</li>
+                <li class="cr-new"><strong>Добавлено:</strong> настройка принудительного запуска аналитических трекеров до согласия доступна в разделе «Трекеры и цели обработки».</li>
+                <li class="cr-fix"><strong>Сохранено:</strong> рекламные трекеры остаются заблокированными этой настройкой, а явный отказ пользователя сохраняется и не обходится.</li>
+            </ul>
+        </div>
+
+        <div class="cr-version-block">
+            <span class="cr-version-tag">v1.1.9</span>
             <ul class="cr-change-list">
                 <li class="cr-fix"><strong>Безопасность:</strong> удалены все ссылки и значения стороннего сайта из исходниках, настройках миграции и документации.</li>
                 <li class="cr-new"><strong>Совместимость:</strong> метаданные плагина обновлены для WordPress 7.1.</li>
