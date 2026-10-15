@@ -1,6 +1,6 @@
 <?php
 /**
- * CookieRus Updates Page — v1.2.0
+ * CookieRus Updates Page — v1.2.1
  */
 if (!defined('ABSPATH')) exit;
 ?>
@@ -102,7 +102,15 @@ if (!defined('ABSPATH')) exit;
         <h3><span class="dashicons dashicons-backup"></span> История версий CookieRus</h3>
 
         <div class="cr-version-block">
-            <span class="cr-version-tag cr-latest">✅ v1.2.0 <span class="cr-version-date">— текущая версия</span></span>
+            <span class="cr-version-tag cr-latest">✅ v1.2.1 <span class="cr-version-date">— текущая версия</span></span>
+            <ul class="cr-change-list">
+                <li class="cr-fix"><strong>Исправлено:</strong> AJAX-ответы WooCommerce «Загрузить ещё» и обновления фрагментов больше не перехватываются HTML-буфером CookieRus.</li>
+                <li class="cr-fix"><strong>Улучшено:</strong> версия баннера cookie обновляется вместе с плагином, чтобы браузеры загружали актуальные стили после обновления.</li>
+            </ul>
+        </div>
+
+        <div class="cr-version-block">
+            <span class="cr-version-tag">v1.2.0</span>
             <ul class="cr-change-list">
                 <li class="cr-fix"><strong>Исправлено:</strong> встроенные счётчики Яндекс.Метрики, Mail.ru и Callibri инициализируются на последующих страницах после сохранения согласия.</li>
                 <li class="cr-new"><strong>Добавлено:</strong> настройка принудительного запуска аналитических трекеров до согласия доступна в разделе «Трекеры и цели обработки».</li>
