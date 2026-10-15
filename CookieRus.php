@@ -3,7 +3,7 @@
  * Plugin Name: CookieRus
  * Plugin URI: https://github.com/RuCoder-sudo/cookierus
  * Description: Простой способ убедиться, что ваш сайт соответствует Закону России о файлах cookie.
- * Version: 1.2.0
+ * Version: 1.2.1
  * Author: Сергей Солошенко (RuCoder)
  * Author URI: https://рукодер.рф
  * License: GPL v2 or later
@@ -29,7 +29,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('COOKIERUS_VERSION', '1.2.0');
+define('COOKIERUS_VERSION', '1.2.1');
 define('COOKIERUS_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('COOKIERUS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
@@ -139,9 +139,14 @@ class CookieRus {
         if (function_exists('is_feed') && is_feed()) return true;
         if (defined('REST_REQUEST') && REST_REQUEST) return true;
         if (defined('XMLRPC_REQUEST') && XMLRPC_REQUEST) return true;
+        if (defined('DOING_AJAX') && DOING_AJAX) return true;
+        if (defined('WC_DOING_AJAX') && WC_DOING_AJAX) return true;
+        if (function_exists('wp_doing_ajax') && wp_doing_ajax()) return true;
+        if (isset($_GET['wc-ajax']) || isset($_POST['wc-ajax'])) return true;
 
         $request_uri = isset($_SERVER['REQUEST_URI']) ? wp_unslash($_SERVER['REQUEST_URI']) : '';
         $request_path = (string) wp_parse_url($request_uri, PHP_URL_PATH);
+        if (preg_match('#(?:^|/)wc-ajax(?:/|$)#i', $request_path)) return true;
 
         return (bool) preg_match(
             '#/(?:robots\.txt$|wp-json(?:/|$)|xmlrpc\.php$|(?:[a-z0-9_-]+[-_])?sitemap(?:[-_][a-z0-9_-]+|[0-9]+)?\.xml$)#i',
@@ -1072,7 +1077,12 @@ class CookieRus {
     }
 
     public function enqueue_assets() {
-        wp_enqueue_style('cookierus-banner', plugin_dir_url(__FILE__) . 'assets/css/banner.css');
+        wp_enqueue_style(
+            'cookierus-banner',
+            plugin_dir_url(__FILE__) . 'assets/css/banner.css',
+            [],
+            COOKIERUS_VERSION
+        );
         
         $settings = get_option('cookierus_settings');
         wp_localize_script('jquery', 'CookieRusData', [
