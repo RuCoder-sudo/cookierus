@@ -4,7 +4,7 @@ Tags: cookie, cookie consent, gdpr, cookie banner, cookie notice, privacy, cooki
 Requires at least: 5.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 == Description ==
 
-CookieRus — плагин для получения и управления согласием пользователей на использование файлов cookie на вашем сайте WordPress. Версия 1.2.0.
+CookieRus — плагин для получения и управления согласием пользователей на использование файлов cookie на вашем сайте WordPress. Версия 1.2.1.
 
 **Возможности плагина:**
 
@@ -38,6 +38,12 @@ CookieRus — плагин для получения и управления с�
 * Настраиваемый срок хранения функциональных cookie и ссылки на политики сервисов
 * Отзыв согласия по ссылке `/?cookierus_revoke=1` и удаление логов старше одного года
 * Сторонний менеджер тегов и связанные с ним настройки не используются
+
+**Добавлено и исправлено в версии 1.2.1:**
+
+* Исправлена кнопка «Загрузить ещё» в WooCommerce: AJAX-ответы WooCommerce и WordPress больше не перехватываются HTML-буфером CookieRus.
+* Запросы обновления фрагментов WooCommerce также исключены из изменения HTML-ответов.
+* Стили баннера получают номер версии плагина для корректного обновления после очистки кеша браузера.
 
 **Добавлено и исправлено в версии 1.2.0:**
 
