@@ -88,6 +88,11 @@
 
 ---
 
+### Изменения в версии 1.2.1
+- **Исправлено:** AJAX-ответы WooCommerce больше не изменяются HTML-буфером CookieRus — кнопка «Загрузить ещё» и обновление фрагментов могут корректно получать товары.
+- **Исправлено:** AJAX-ответы WordPress и WooCommerce пропускаются без внедрения HTML баннера и защитного скрипта.
+- **Улучшено:** версия плагина передаётся для CSS баннера, чтобы браузер загружал актуальные стили после обновления.
+
 ### Изменения в версии 1.2.0
 - **Исправлено:** встроенные Метрика, Mail.ru и Callibri запускаются на всех последующих страницах после сохранённого согласия.
 - **Добавлено:** настройка принудительного запуска аналитических трекеров до согласия перенесена в раздел «Трекеры и цели обработки».
@@ -261,6 +266,11 @@ It provides a customizable cookie banner, detailed consent categories, user acti
 - User consent statistics
 
 ---
+
+### Changes in version 1.2.1
+- **Fixed:** WooCommerce AJAX responses are no longer modified by CookieRus’s HTML output buffer, allowing “Load more” and product-fragment updates to receive valid responses.
+- **Fixed:** WordPress and WooCommerce AJAX responses bypass banner and consent-guard HTML injection.
+- **Improved:** the banner stylesheet uses the plugin version for cache invalidation after updates.
 
 ### Changes in version 1.1.3
 - **Fixed:** settings cards no longer collapse into one combined visual block.
