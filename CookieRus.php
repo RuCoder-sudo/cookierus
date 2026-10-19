@@ -3,7 +3,7 @@
  * Plugin Name: CookieRus
  * Plugin URI: https://github.com/RuCoder-sudo/cookierus
  * Description: Простой способ убедиться, что ваш сайт соответствует Закону России о файлах cookie.
- * Version: 1.2.1
+ * Version: 1.2.2
  * Author: Сергей Солошенко (RuCoder)
  * Author URI: https://рукодер.рф
  * License: GPL v2 or later
@@ -29,7 +29,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('COOKIERUS_VERSION', '1.2.1');
+define('COOKIERUS_VERSION', '1.2.2');
 define('COOKIERUS_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('COOKIERUS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
@@ -142,6 +142,12 @@ class CookieRus {
         if (defined('DOING_AJAX') && DOING_AJAX) return true;
         if (defined('WC_DOING_AJAX') && WC_DOING_AJAX) return true;
         if (function_exists('wp_doing_ajax') && wp_doing_ajax()) return true;
+        if (
+            isset($_SERVER['HTTP_X_REQUESTED_WITH'])
+            && strtolower((string) wp_unslash($_SERVER['HTTP_X_REQUESTED_WITH'])) === 'xmlhttprequest'
+        ) {
+            return true;
+        }
         if (isset($_GET['wc-ajax']) || isset($_POST['wc-ajax'])) return true;
 
         $request_uri = isset($_SERVER['REQUEST_URI']) ? wp_unslash($_SERVER['REQUEST_URI']) : '';
@@ -155,6 +161,20 @@ class CookieRus {
     }
 
     public function inject_banner_before_body_close($html) {
+        /*
+         * Themes such as WoodMart can return product-grid fragments as HTML
+         * from an AJAX request without using a WooCommerce wc-ajax endpoint.
+         * Only transform complete front-end documents, never fragments,
+         * JSON, or other AJAX payloads.
+         */
+        if (
+            !is_string($html)
+            || stripos($html, '<html') === false
+            || stripos($html, '</body>') === false
+        ) {
+            return $html;
+        }
+
         $html = $this->protect_html_resources($html);
         $html = $this->inject_guard_into_html($html);
 
