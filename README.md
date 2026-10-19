@@ -88,10 +88,14 @@
 
 ---
 
+### Изменения в версии 1.2.2
+- **Исправлено:** AJAX-запросы XMLHttpRequest, которыми WoodMart и другие темы загружают товары, не изменяются HTML-буфером CookieRus.
+- **Исправлено:** HTML-обработка выполняется только для полноценных страниц; фрагменты каталога и JSON-ответы возвращаются без баннера и защитного скрипта.
+- **Исправлено:** учтены AJAX-маршруты тем, которые не используют стандартный параметр WooCommerce `wc-ajax`.
+
 ### Изменения в версии 1.2.1
-- **Исправлено:** AJAX-ответы WooCommerce больше не изменяются HTML-буфером CookieRus — кнопка «Загрузить ещё» и обновление фрагментов могут корректно получать товары.
-- **Исправлено:** AJAX-ответы WordPress и WooCommerce пропускаются без внедрения HTML баннера и защитного скрипта.
-- **Улучшено:** версия плагина передаётся для CSS баннера, чтобы браузер загружал актуальные стили после обновления.
+- **Исправлено:** AJAX-ответы WooCommerce и WordPress исключены из обработки HTML-буфером.
+- **Улучшено:** версия плагина передавалась в URL стилей баннера для сброса кеша.
 
 ### Изменения в версии 1.2.0
 - **Исправлено:** встроенные Метрика, Mail.ru и Callibri запускаются на всех последующих страницах после сохранённого согласия.
@@ -267,10 +271,14 @@ It provides a customizable cookie banner, detailed consent categories, user acti
 
 ---
 
+### Changes in version 1.2.2
+- **Fixed:** XMLHttpRequest calls used by WoodMart and other themes to load products are no longer modified by CookieRus’s HTML output buffer.
+- **Fixed:** HTML processing now applies only to complete pages; product fragments and JSON responses pass through without banner or guard-script injection.
+- **Fixed:** theme-specific AJAX routes that do not use WooCommerce’s standard `wc-ajax` parameter are covered.
+
 ### Changes in version 1.2.1
-- **Fixed:** WooCommerce AJAX responses are no longer modified by CookieRus’s HTML output buffer, allowing “Load more” and product-fragment updates to receive valid responses.
-- **Fixed:** WordPress and WooCommerce AJAX responses bypass banner and consent-guard HTML injection.
-- **Improved:** the banner stylesheet uses the plugin version for cache invalidation after updates.
+- **Fixed:** WordPress and WooCommerce AJAX responses were excluded from HTML output buffering.
+- **Improved:** the plugin version was added to the banner stylesheet URL for cache invalidation.
 
 ### Changes in version 1.1.3
 - **Fixed:** settings cards no longer collapse into one combined visual block.
