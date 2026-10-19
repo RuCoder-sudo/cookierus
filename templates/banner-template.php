@@ -1,6 +1,6 @@
 <?php
 /**
- * CookieRus Banner Template — v1.2.1
+ * CookieRus Banner Template — v1.2.2
  * Рендерится на фронтенде: баннер + модал настроек (3 вкладки) + блокировка трекеров
  */
 if (!defined('ABSPATH')) exit;
@@ -595,7 +595,7 @@ $show_goals = [
 </div><!-- #cookierus-modal -->
 
 <script id="cookierus-banner-script">
-/* CookieRus v1.2.1 — frontend script */
+/* CookieRus v1.2.2 — frontend script */
 (function() {
     'use strict';
 
